@@ -6,33 +6,47 @@ import { motion } from "framer-motion";
 interface WindowProps {
     title: string;
     onClose: () => void;
+    onFocus?: () => void;
+    zIndex?: number;
+    initialWidth?: number;
+    initialHeight?: number;
     children: React.ReactNode;
 }
 
-export default function Window({ title, onClose, children }: WindowProps) {
+const MIN_W = 360;
+const MIN_H = 240;
+const DEFAULT_W = 560;
+const DEFAULT_H = 480;
+
+export default function Window({ title, onClose, onFocus, zIndex = 50, initialWidth, initialHeight, children }: WindowProps) {
     const windowRef = useRef<HTMLDivElement>(null);
     const dragRef = useRef({ isDragging: false, startX: 0, startY: 0, offsetX: 0, offsetY: 0 });
+    const resizeRef = useRef({ isResizing: false, startX: 0, startY: 0, startW: 0, startH: 0 });
+
+    const initW = initialWidth ?? DEFAULT_W;
+    const initH = initialHeight ?? DEFAULT_H;
+
     const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [size, setSize] = useState({ w: initW, h: initH });
     const [initialized, setInitialized] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);
     const [isMaximized, setIsMaximized] = useState(false);
     const [hoveringButtons, setHoveringButtons] = useState(false);
 
-    // Center window on mount
+    // On first mount → center. On size prop change → only resize, keep position.
     useEffect(() => {
-        if (windowRef.current) {
-            const w = windowRef.current.offsetWidth;
-            const h = windowRef.current.offsetHeight;
+        setSize({ w: initW, h: initH });
+        if (!initialized) {
             setPosition({
-                x: (window.innerWidth - w) / 2,
-                y: (window.innerHeight - h) / 2,
+                x: (window.innerWidth - initW) / 2,
+                y: (window.innerHeight - initH) / 2,
             });
             setInitialized(true);
         }
-    }, []);
+    }, [initW, initH]);
 
-    // Drag logic (disabled when maximized or minimized)
-    const onMouseDown = (e: React.MouseEvent) => {
+    // Title bar drag (disabled when maximized or minimized)
+    const onTitleMouseDown = (e: React.MouseEvent) => {
         if (isMaximized || isMinimized) return;
         dragRef.current = {
             isDragging: true,
@@ -60,6 +74,35 @@ export default function Window({ title, onClose, children }: WindowProps) {
         window.addEventListener("mouseup", onMouseUp);
     };
 
+    // Resize handle (bottom-right corner)
+    const onResizeMouseDown = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (isMaximized) return;
+        resizeRef.current = {
+            isResizing: true,
+            startX: e.clientX,
+            startY: e.clientY,
+            startW: size.w,
+            startH: size.h,
+        };
+
+        const onMouseMove = (e: MouseEvent) => {
+            if (!resizeRef.current.isResizing) return;
+            const newW = Math.max(MIN_W, resizeRef.current.startW + (e.clientX - resizeRef.current.startX));
+            const newH = Math.max(MIN_H, resizeRef.current.startH + (e.clientY - resizeRef.current.startY));
+            setSize({ w: newW, h: newH });
+        };
+
+        const onMouseUp = () => {
+            resizeRef.current.isResizing = false;
+            window.removeEventListener("mousemove", onMouseMove);
+            window.removeEventListener("mouseup", onMouseUp);
+        };
+
+        window.addEventListener("mousemove", onMouseMove);
+        window.addEventListener("mouseup", onMouseUp);
+    };
+
     const handleMinimize = (e: React.MouseEvent) => {
         e.stopPropagation();
         setIsMinimized((prev) => !prev);
@@ -77,7 +120,6 @@ export default function Window({ title, onClose, children }: WindowProps) {
         onClose();
     };
 
-    // Compute dynamic style based on state
     const windowStyle: React.CSSProperties = isMaximized
         ? {
             position: "fixed",
@@ -85,9 +127,7 @@ export default function Window({ title, onClose, children }: WindowProps) {
             top: 0,
             width: "100vw",
             height: "100vh",
-            maxWidth: "100vw",
-            maxHeight: "100vh",
-            zIndex: 50,
+            zIndex,
             borderRadius: 0,
             overflow: "hidden",
             background: "rgba(245, 240, 232, 0.75)",
@@ -101,10 +141,11 @@ export default function Window({ title, onClose, children }: WindowProps) {
             position: "fixed",
             left: position.x,
             top: position.y,
-            width: "560px",
-            maxWidth: "90vw",
-            maxHeight: isMinimized ? "48px" : "70vh",
-            zIndex: 50,
+            width: isMinimized ? `${size.w}px` : `${size.w}px`,
+            height: isMinimized ? "48px" : `${size.h}px`,
+            minWidth: `${MIN_W}px`,
+            minHeight: isMinimized ? "48px" : `${MIN_H}px`,
+            zIndex,
             borderRadius: "12px",
             overflow: "hidden",
             background: "rgba(245, 240, 232, 0.55)",
@@ -142,10 +183,11 @@ export default function Window({ title, onClose, children }: WindowProps) {
             exit={{ opacity: 0, scale: 0.92, y: 20 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             style={windowStyle}
+            onMouseDown={onFocus}
         >
             {/* Title Bar */}
             <div
-                onMouseDown={onMouseDown}
+                onMouseDown={onTitleMouseDown}
                 style={{
                     display: "flex",
                     alignItems: "center",
@@ -164,7 +206,7 @@ export default function Window({ title, onClose, children }: WindowProps) {
                     onMouseEnter={() => setHoveringButtons(true)}
                     onMouseLeave={() => setHoveringButtons(false)}
                 >
-                    {/* Close — merah */}
+                    {/* Close */}
                     <button
                         onClick={handleClose}
                         onMouseDown={(e) => e.stopPropagation()}
@@ -172,20 +214,11 @@ export default function Window({ title, onClose, children }: WindowProps) {
                         style={trafficButtonStyle("#FF5F57")}
                     >
                         {hoveringButtons && (
-                            <span style={{
-                                position: "absolute",
-                                fontSize: "8px",
-                                color: "rgba(0,0,0,0.5)",
-                                fontWeight: 700,
-                                lineHeight: 1,
-                                pointerEvents: "none",
-                            }}>
-                                ✕
-                            </span>
+                            <span style={{ position: "absolute", fontSize: "8px", color: "rgba(0,0,0,0.5)", fontWeight: 700, lineHeight: 1, pointerEvents: "none" }}>✕</span>
                         )}
                     </button>
 
-                    {/* Minimize — kuning */}
+                    {/* Minimize */}
                     <button
                         onClick={handleMinimize}
                         onMouseDown={(e) => e.stopPropagation()}
@@ -193,21 +226,11 @@ export default function Window({ title, onClose, children }: WindowProps) {
                         style={trafficButtonStyle("#FEBC2E")}
                     >
                         {hoveringButtons && (
-                            <span style={{
-                                position: "absolute",
-                                fontSize: "10px",
-                                color: "rgba(0,0,0,0.5)",
-                                fontWeight: 700,
-                                lineHeight: 1,
-                                pointerEvents: "none",
-                                marginTop: "-1px",
-                            }}>
-                                −
-                            </span>
+                            <span style={{ position: "absolute", fontSize: "10px", color: "rgba(0,0,0,0.5)", fontWeight: 700, lineHeight: 1, pointerEvents: "none", marginTop: "-1px" }}>−</span>
                         )}
                     </button>
 
-                    {/* Maximize — hijau */}
+                    {/* Maximize */}
                     <button
                         onClick={handleMaximize}
                         onMouseDown={(e) => e.stopPropagation()}
@@ -215,14 +238,7 @@ export default function Window({ title, onClose, children }: WindowProps) {
                         style={trafficButtonStyle("#28C840")}
                     >
                         {hoveringButtons && (
-                            <span style={{
-                                position: "absolute",
-                                fontSize: "8px",
-                                color: "rgba(0,0,0,0.5)",
-                                fontWeight: 700,
-                                lineHeight: 1,
-                                pointerEvents: "none",
-                            }}>
+                            <span style={{ position: "absolute", fontSize: "8px", color: "rgba(0,0,0,0.5)", fontWeight: 700, lineHeight: 1, pointerEvents: "none" }}>
                                 {isMaximized ? "⊙" : "⤢"}
                             </span>
                         )}
@@ -242,27 +258,54 @@ export default function Window({ title, onClose, children }: WindowProps) {
                 >
                     {title}
                     {isMinimized && (
-                        <span style={{ fontSize: "11px", marginLeft: "6px", color: "#2C2C2C50" }}>
-                            — minimized
-                        </span>
+                        <span style={{ fontSize: "11px", marginLeft: "6px", color: "#2C2C2C50" }}>— minimized</span>
                     )}
                 </span>
 
-                {/* Spacer */}
                 <div style={{ width: "42px" }} />
             </div>
 
-            {/* Content — hidden when minimized */}
+            {/* Content */}
             {!isMinimized && (
                 <div
                     style={{
                         padding: "24px",
                         overflowY: "auto",
-                        maxHeight: isMaximized ? "calc(100vh - 48px)" : "calc(70vh - 48px)",
+                        height: isMaximized ? "calc(100vh - 48px)" : `calc(${size.h}px - 48px)`,
                         color: "#2C2C2C",
+                        boxSizing: "border-box",
                     }}
                 >
                     {children}
+                </div>
+            )}
+
+            {/* Resize handle — bottom-right corner */}
+            {!isMaximized && !isMinimized && (
+                <div
+                    onMouseDown={onResizeMouseDown}
+                    title="Resize"
+                    style={{
+                        position: "absolute",
+                        bottom: 0,
+                        right: 0,
+                        width: "20px",
+                        height: "20px",
+                        cursor: "nwse-resize",
+                        zIndex: 10,
+                        display: "flex",
+                        alignItems: "flex-end",
+                        justifyContent: "flex-end",
+                        padding: "4px",
+                        boxSizing: "border-box",
+                    }}
+                >
+                    {/* Grip dots — like macOS */}
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                        <circle cx="8" cy="8" r="1.5" fill="rgba(44,44,44,0.25)" />
+                        <circle cx="4" cy="8" r="1.5" fill="rgba(44,44,44,0.15)" />
+                        <circle cx="8" cy="4" r="1.5" fill="rgba(44,44,44,0.15)" />
+                    </svg>
                 </div>
             )}
         </motion.div>

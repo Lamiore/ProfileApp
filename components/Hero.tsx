@@ -39,7 +39,30 @@ export default function Hero() {
     const viewportRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const gridRef = useRef<HTMLDivElement>(null);
-    const [activeWindow, setActiveWindow] = useState<string | null>(null);
+    const [openWindows, setOpenWindows] = useState<string[]>([]);
+
+    // Buka/tutup window. Kalau sudah terbuka, tutup. Kalau belum, buka.
+    const toggleWindow = (name: string) => {
+        setOpenWindows((prev) =>
+            prev.includes(name)
+                ? prev.filter((w) => w !== name)
+                : [...prev, name]
+        );
+    };
+
+    // Bawa window ke paling depan (pindah ke akhir array = z-index tertinggi)
+    const bringToFront = (name: string) => {
+        setOpenWindows((prev) => [
+            ...prev.filter((w) => w !== name),
+            name,
+        ]);
+    };
+
+    const closeWindow = (name: string) => {
+        setOpenWindows((prev) => prev.filter((w) => w !== name));
+    };
+
+    const BASE_Z = 50; // z-index dasar window, di-stack per urutan
 
     useEffect(() => {
         const viewport = viewportRef.current;
@@ -327,7 +350,7 @@ export default function Hero() {
                             className="text-sm tracking-[0.3em] uppercase"
                             style={{ color: "#2C2C2C99" }}
                         >
-                            Random
+                            //Random
                         </motion.p>
 
                         <motion.h1
@@ -337,7 +360,7 @@ export default function Hero() {
                             className="text-[6rem] font-bold leading-none tracking-tight"
                             style={{ color: "#2C2C2C" }}
                         >
-                            Lam
+                            Lam.
                         </motion.h1>
 
                         <motion.p
@@ -351,18 +374,18 @@ export default function Hero() {
                         </motion.p>
                     </div>
 
-                    {/* Buttons — liquid glass iOS 26 style */}
+                    {/* Buttons — always on top, z-index above blur overlay & window */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 1 }}
                         className="flex gap-2 flex-wrap"
-                        style={{ pointerEvents: "auto" }}
+                        style={{ pointerEvents: "auto", position: "relative", zIndex: 60 }}
                     >
                         {buttons.map((btn, i) => (
                             <motion.button
                                 key={btn}
-                                onClick={() => setActiveWindow(btn)}
+                                onClick={() => toggleWindow(btn)}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 1 + i * 0.08 }}
@@ -371,32 +394,47 @@ export default function Hero() {
                                 className="relative px-5 py-2.5 text-sm tracking-widest uppercase cursor-pointer overflow-hidden"
                                 style={{
                                     borderRadius: "999px",
-                                    color: "#2C2C2C",
-                                    background: "rgba(255, 255, 255, 0.25)",
+                                    color: openWindows.includes(btn) ? "#fff" : "#2C2C2C",
+                                    background: openWindows.includes(btn)
+                                        ? "rgba(44,44,44,0.7)"
+                                        : "rgba(255, 255, 255, 0.25)",
                                     backdropFilter: "blur(20px) saturate(180%)",
                                     WebkitBackdropFilter: "blur(20px) saturate(180%)",
-                                    border: "1px solid rgba(255, 255, 255, 0.5)",
+                                    border: openWindows.includes(btn)
+                                        ? "1px solid rgba(255,255,255,0.2)"
+                                        : "1px solid rgba(255, 255, 255, 0.5)",
                                     boxShadow: "0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)",
                                     textShadow: "none",
+                                    transition: "background 0.2s, color 0.2s, border 0.2s",
                                 }}
                             >
                                 {btn}
                             </motion.button>
                         ))}
                     </motion.div>
+                    {/* BlurOverlay hanya muncul kalau ada window terbuka */}
                     <AnimatePresence>
-                        {activeWindow && (
-                            <>
-                                <BlurOverlay onClose={() => setActiveWindow(null)} />
-                                <Window title={activeWindow} onClose={() => setActiveWindow(null)}>
-                                    {activeWindow === "About" && <AboutWindow />}
-                                    {activeWindow === "Project" && <ProjectWindow />}
-                                    {activeWindow === "Blog" && <BlogWindow />}
-                                    {activeWindow === "Gallery" && <GalleryWindow />}
-                                    {activeWindow === "Connection" && <ConnectionWindow />}
-                                </Window>
-                            </>
+                        {openWindows.length > 0 && (
+                            <BlurOverlay onClose={() => setOpenWindows([])} />
                         )}
+                    </AnimatePresence>
+                    {/* Render semua window yang terbuka, stacked by z-index */}
+                    <AnimatePresence>
+                        {openWindows.map((name, index) => (
+                            <Window
+                                key={name}
+                                title={name}
+                                zIndex={BASE_Z + index}
+                                onFocus={() => bringToFront(name)}
+                                onClose={() => closeWindow(name)}
+                            >
+                                {name === "About" && <AboutWindow />}
+                                {name === "Project" && <ProjectWindow />}
+                                {name === "Blog" && <BlogWindow />}
+                                {name === "Gallery" && <GalleryWindow />}
+                                {name === "Connection" && <ConnectionWindow />}
+                            </Window>
+                        ))}
                     </AnimatePresence>
                 </div>
             </div>
