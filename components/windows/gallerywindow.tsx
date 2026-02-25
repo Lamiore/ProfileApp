@@ -30,10 +30,10 @@ const IMAGES = [
     "https://images.unsplash.com/photo-1770387200335-31ae84af6b40?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzA3NDY5MzV8&ixlib=rb-4.1.0&q=80&w=600",
 ];
 
+const MIN_COL_WIDTH = 160; // px per column minimum
+
 const getCols = (width: number) => {
-    if (width < 300) return 2;
-    if (width < 500) return 3;
-    return 4;
+    return Math.max(2, Math.floor(width / MIN_COL_WIDTH));
 };
 
 export default function GalleryWindow() {
