@@ -1,7 +1,33 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
+
+// --- Sound effects via Web Audio API ---
+const playSound = (freq: number, endFreq: number, duration: number, volume: number, type: OscillatorType = "sine") => {
+    try {
+        const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(endFreq, ctx.currentTime + duration);
+        gain.gain.setValueAtTime(volume, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+    } catch { /* silent fail */ }
+};
+
+const playOpenSound = () => {
+    playSound(600, 1200, 0.15, 0.08, "sine");
+    setTimeout(() => playSound(900, 1400, 0.1, 0.05, "sine"), 60);
+};
+
+const playCloseSound = () => {
+    playSound(800, 400, 0.15, 0.06, "sine");
+};
 
 interface WindowProps {
     title: string;
@@ -32,9 +58,23 @@ export default function Window({ title, onClose, onFocus, zIndex = 50, initialWi
     const [isMinimized, setIsMinimized] = useState(false);
     const [isMaximized, setIsMaximized] = useState(false);
     const [hoveringButtons, setHoveringButtons] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Detect mobile
+    useEffect(() => {
+        const check = () => {
+            const mobile = window.innerWidth <= 768;
+            setIsMobile(mobile);
+            if (mobile) setIsMaximized(true);
+        };
+        check();
+        window.addEventListener("resize", check);
+        return () => window.removeEventListener("resize", check);
+    }, []);
 
     // On first mount → center. On size prop change → only resize, keep position.
     useEffect(() => {
+        if (isMobile) return; // skip on mobile — always fullscreen
         setSize({ w: initW, h: initH });
         if (!initialized) {
             setPosition({
@@ -43,7 +83,12 @@ export default function Window({ title, onClose, onFocus, zIndex = 50, initialWi
             });
             setInitialized(true);
         }
-    }, [initW, initH]);
+    }, [initW, initH, isMobile]);
+
+    // Play open sound on mount
+    useEffect(() => {
+        playOpenSound();
+    }, []);
 
     // Title bar drag (disabled when maximized or minimized)
     const onTitleMouseDown = (e: React.MouseEvent) => {
@@ -117,6 +162,7 @@ export default function Window({ title, onClose, onFocus, zIndex = 50, initialWi
 
     const handleClose = (e: React.MouseEvent) => {
         e.stopPropagation();
+        playCloseSound();
         onClose();
     };
 

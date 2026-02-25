@@ -41,16 +41,37 @@ export default function Hero() {
     const gridRef = useRef<HTMLDivElement>(null);
     const [openWindows, setOpenWindows] = useState<string[]>([]);
 
-    // Buka/tutup window. Kalau sudah terbuka, tutup. Kalau belum, buka.
+    // --- Sound effects ---
+    const playSound = (freq: number, endFreq: number, duration: number, volume: number, type: OscillatorType = "sine") => {
+        try {
+            const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(endFreq, ctx.currentTime + duration);
+            gain.gain.setValueAtTime(volume, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+            osc.connect(gain).connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + duration);
+        } catch { /* silent fail */ }
+    };
+    const playCloseSound = () => playSound(800, 400, 0.15, 0.06, "sine");
+
+    // Buka/tutup window + sound
     const toggleWindow = (name: string) => {
-        setOpenWindows((prev) =>
-            prev.includes(name)
-                ? prev.filter((w) => w !== name)
-                : [...prev, name]
-        );
+        setOpenWindows((prev) => {
+            if (prev.includes(name)) {
+                playCloseSound();
+                return prev.filter((w) => w !== name);
+            }
+            // open sound is played by Window component on mount
+            return [...prev, name];
+        });
     };
 
-    // Bawa window ke paling depan (pindah ke akhir array = z-index tertinggi)
+    // Bawa window ke paling depan
     const bringToFront = (name: string) => {
         setOpenWindows((prev) => [
             ...prev.filter((w) => w !== name),
@@ -59,6 +80,7 @@ export default function Hero() {
     };
 
     const closeWindow = (name: string) => {
+        playCloseSound();
         setOpenWindows((prev) => prev.filter((w) => w !== name));
     };
 
@@ -415,7 +437,7 @@ export default function Hero() {
                     {/* BlurOverlay hanya muncul kalau ada window terbuka */}
                     <AnimatePresence>
                         {openWindows.length > 0 && (
-                            <BlurOverlay onClose={() => setOpenWindows([])} />
+                            <BlurOverlay onClose={() => { playCloseSound(); setOpenWindows([]); }} />
                         )}
                     </AnimatePresence>
                     {/* Render semua window yang terbuka, stacked by z-index */}
