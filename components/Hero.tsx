@@ -86,6 +86,27 @@ export default function Hero() {
 
     const BASE_Z = 50; // z-index dasar window, di-stack per urutan
 
+    // Hero hover image interaction
+    useEffect(() => {
+        const hoverElements = document.querySelectorAll('.hero-hover');
+        const handlers: { el: Element; over: () => void; leave: () => void }[] = [];
+
+        hoverElements.forEach((el) => {
+            const over = () => el.classList.remove('unhover');
+            const leave = () => el.classList.add('unhover');
+            el.addEventListener('mouseover', over);
+            el.addEventListener('mouseleave', leave);
+            handlers.push({ el, over, leave });
+        });
+
+        return () => {
+            handlers.forEach(({ el, over, leave }) => {
+                el.removeEventListener('mouseover', over);
+                el.removeEventListener('mouseleave', leave);
+            });
+        };
+    }, []);
+
     useEffect(() => {
         const viewport = viewportRef.current;
         const container = containerRef.current;
@@ -357,6 +378,24 @@ export default function Hero() {
                 </div>
             </div>
 
+            {/* Logo — kiri atas */}
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 2.8 }}
+                className="absolute top-0 left-0 z-10 p-12"
+                style={{ pointerEvents: "auto" }}
+            >
+                <a href="" className="logo" aria-label="Home">
+                    <span className="flip-text">
+                        <span data-char="L" style={{ "--i": 1 } as React.CSSProperties}>L</span>
+                        <span data-char="a" style={{ "--i": 2 } as React.CSSProperties}>a</span>
+                        <span data-char="m" style={{ "--i": 3 } as React.CSSProperties}>m</span>
+                        <span data-char="." style={{ "--i": 4 } as React.CSSProperties}>.</span>
+                    </span>
+                </a>
+            </motion.div>
+
             {/* Content — kiri bawah */}
             <div
                 className="absolute inset-0 z-10 flex flex-col justify-end p-12"
@@ -365,54 +404,50 @@ export default function Hero() {
                 {/* Typography — kiri */}
                 <div className="flex flex-col items-start gap-8">
                     <div className="flex flex-col gap-2">
-                        <motion.p
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
-                            className="text-xs tracking-[0.3em] uppercase font-bold"
-                            style={{
-                                color: "#2C2C2C",
-                                fontFamily: "Helvetica, Arial, sans-serif",
-                                textShadow: "-1px -1px 0 rgba(255,255,255,1), 1px -1px 0 rgba(255,255,255,1), -1px 1px 0 rgba(255,255,255,1), 1px 1px 0 rgba(255,255,255,1)"
-                            }}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.8, delay: 2.9 }}
+                            className="hero-text"
+                            style={{ pointerEvents: "none" }}
                         >
-                            //Random
-                        </motion.p>
-
-                        <motion.h1
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                            className="text-[6rem] font-bold leading-none tracking-tight"
-                            style={{
-                                color: "#2C2C2C",
-                                fontFamily: "Helvetica, Arial, sans-serif",
-                                textShadow: "-2px -2px 0 rgba(255,255,255,1), 2px -2px 0 rgba(255,255,255,1), -2px 2px 0 rgba(255,255,255,1), 2px 2px 0 rgba(255,255,255,1), 0px 2px 0 rgba(255,255,255,1), 2px 0px 0 rgba(255,255,255,1), 0px -2px 0 rgba(255,255,255,1), -2px 0px 0 rgba(255,255,255,1)"
-                            }}
-                        >
-                            Lam.
-                        </motion.h1>
-
-                        <motion.p
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.8 }}
-                            className="text-base max-w-sm leading-relaxed font-bold"
-                            style={{
-                                color: "#2C2C2C",
-                                fontFamily: "Helvetica, Arial, sans-serif",
-                                textShadow: "-1px -1px 0 rgba(255,255,255,1), 1px -1px 0 rgba(255,255,255,1), -1px 1px 0 rgba(255,255,255,1), 1px 1px 0 rgba(255,255,255,1)"
-                            }}
-                        >
-                            Crafting experiences, one pixel at a time.
-                        </motion.p>
+                            <div className="hero-line">
+                                <motion.span
+                                    initial={{ y: "100%", opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ duration: 1.2, delay: 3.0, ease: [0.16, 1, 0.3, 1] }}
+                                    style={{ display: "inline-block" }}
+                                >
+                                    Simplicity is the
+                                </motion.span>
+                            </div>
+                            <div className="hero-line">
+                                <motion.span
+                                    initial={{ y: "100%", opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ duration: 1.2, delay: 3.1, ease: [0.16, 1, 0.3, 1] }}
+                                    style={{ display: "inline-block" }}
+                                >
+                                    <span className="hero-hover unhover">
+                                        ultimate
+                                        <span className="hero-img">
+                                            <img
+                                                src="https://i.pinimg.com/736x/7d/38/b7/7d38b799f9b3991ea320be58b9500180.jpg"
+                                                alt="aesthetic"
+                                            />
+                                        </span>
+                                    </span>
+                                    {" "}sophistication.
+                                </motion.span>
+                            </div>
+                        </motion.div>
                     </div>
 
                     {/* Buttons — always on top, z-index above blur overlay & window */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 1 }}
+                        transition={{ duration: 0.6, delay: 3.6 }}
                         className="flex gap-2 flex-wrap"
                         style={{ pointerEvents: "auto", position: "relative", zIndex: 60 }}
                     >
@@ -422,7 +457,7 @@ export default function Hero() {
                                 onClick={() => toggleWindow(btn)}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 1 + i * 0.08 }}
+                                transition={{ delay: 3.6 + i * 0.08 }}
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.96 }}
                                 className="relative px-5 py-2.5 text-sm tracking-widest uppercase cursor-pointer overflow-hidden"

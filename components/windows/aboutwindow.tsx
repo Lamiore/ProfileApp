@@ -10,21 +10,22 @@ export default function AboutWindow() {
 
             {/* Top — foto + bio */}
             <div style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
-                {/* Foto placeholder */}
+                {/* Foto profil */}
                 <div style={{
                     width: "80px",
                     height: "80px",
                     borderRadius: "50%",
-                    background: "rgba(44,44,44,0.1)",
                     flexShrink: 0,
                     overflow: "hidden",
                     border: "2px solid rgba(44,44,44,0.1)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "28px",
+                    position: "relative",
                 }}>
-                    🧑‍🎨
+                    <Image
+                        src="/profile.jpg"
+                        alt="Profile photo"
+                        fill
+                        style={{ objectFit: "cover" }}
+                    />
                 </div>
 
                 {/* Bio */}

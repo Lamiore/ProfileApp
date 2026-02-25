@@ -125,3 +125,194 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ── Logo Flip Text ── */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  overflow: hidden;
+  line-height: 1;
+  padding: 5px 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2C2C2C;
+  letter-spacing: -0.02em;
+  user-select: none;
+  transition: opacity 0.3s ease;
+  text-shadow:
+    -1px -1px 0 rgba(255, 255, 255, 1),
+    1px -1px 0 rgba(255, 255, 255, 1),
+    -1px 1px 0 rgba(255, 255, 255, 1),
+    1px 1px 0 rgba(255, 255, 255, 1);
+}
+
+.logo:hover {
+  opacity: 0.6;
+}
+
+.flip-text {
+  --clr-1: #2C2C2C;
+  --clr-2: #7a8450;
+  --clr-3: #7b3b4b;
+  --translate-distance: 1lh;
+  --duration: 3s;
+  --timing-function: cubic-bezier(0.66, 0, 0.34, 1);
+
+  overflow-y: hidden;
+  display: inline-flex;
+  gap: 0;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 700;
+}
+
+.flip-text>span {
+  position: relative;
+  display: inline-grid;
+  place-content: center;
+  color: var(--clr-1);
+  --delay: calc(var(--i) * 100ms);
+  --translate: calc(var(--translate-distance) * 2);
+}
+
+@media not (prefers-reduced-motion) {
+  .flip-text>span {
+    animation: flip-transform var(--duration) var(--timing-function) var(--delay) infinite,
+      flip-translate var(--duration) var(--timing-function) var(--delay) infinite;
+  }
+}
+
+.flip-text>span::after,
+.flip-text>span::before {
+  content: attr(data-char);
+  position: absolute;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  color: var(--clr-2);
+}
+
+.flip-text>span::after {
+  top: 100%;
+}
+
+.flip-text>span::before {
+  top: 200%;
+  color: var(--clr-3);
+}
+
+@keyframes flip-transform {
+  0% {
+    transform: translateY(0);
+  }
+
+  50%,
+  100% {
+    transform: translateY(calc(var(--translate) * -1));
+  }
+}
+
+@keyframes flip-translate {
+
+  0%,
+  24.99% {
+    translate: 0 0;
+    opacity: 1;
+  }
+
+  25% {
+    opacity: 0;
+  }
+
+  25.01% {
+    translate: 0 0;
+    opacity: 1;
+  }
+}
+
+/* ── Hero Typography ── */
+.hero-text {
+  font-size: clamp(3rem, 6vw, 6.5rem);
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: #2C2C2C;
+  font-family: Helvetica, Arial, sans-serif;
+  user-select: none;
+  text-shadow:
+    -2px -2px 0 rgba(255, 255, 255, 1),
+    2px -2px 0 rgba(255, 255, 255, 1),
+    -2px 2px 0 rgba(255, 255, 255, 1),
+    2px 2px 0 rgba(255, 255, 255, 1),
+    0px 2px 0 rgba(255, 255, 255, 1),
+    2px 0px 0 rgba(255, 255, 255, 1),
+    0px -2px 0 rgba(255, 255, 255, 1),
+    -2px 0px 0 rgba(255, 255, 255, 1);
+}
+
+.hero-line {
+  overflow: hidden;
+}
+
+/* Hover word container */
+.hero-hover {
+  position: relative;
+  display: inline-block;
+  color: #b0b0b0;
+  transition: color 0.5s ease, padding-right 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: pointer;
+  pointer-events: auto;
+  padding-right: clamp(8rem, 14vw, 16rem);
+  text-shadow:
+    -2px -2px 0 rgba(255, 255, 255, 1),
+    2px -2px 0 rgba(255, 255, 255, 1),
+    -2px 2px 0 rgba(255, 255, 255, 1),
+    2px 2px 0 rgba(255, 255, 255, 1),
+    0px 2px 0 rgba(255, 255, 255, 1),
+    2px 0px 0 rgba(255, 255, 255, 1),
+    0px -2px 0 rgba(255, 255, 255, 1),
+    -2px 0px 0 rgba(255, 255, 255, 1);
+}
+
+.hero-hover:hover {
+  color: #2C2C2C;
+}
+
+.hero-hover.unhover {
+  padding-right: 0;
+}
+
+.hero-hover.unhover .hero-img {
+  width: 0;
+  right: -0.1rem;
+}
+
+.hero-hover.unhover .hero-img img {
+  transform: scale(1.3);
+  transition-delay: 0s;
+}
+
+/* Inline image */
+.hero-img {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  display: block;
+  width: clamp(7rem, 13vw, 15rem);
+  height: clamp(3.5rem, 5vw, 5.5rem);
+  overflow: hidden;
+  transform: translateY(-50%);
+  transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    right 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border-radius: 6px;
+}
+
+.hero-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition-delay: 0.15s;
+  display: block;
+}
