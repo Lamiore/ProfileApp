@@ -72,14 +72,20 @@ export default function Window({ title, onClose, onFocus, zIndex = 50, initialWi
         return () => window.removeEventListener("resize", check);
     }, []);
 
-    // On first mount → center. On size prop change → only resize, keep position.
+    // Random spawn offset – generated once on mount, stays fixed
+    const randomOffset = useRef({
+        x: (Math.random() - 0.5) * 360, // -180 to +180 px
+        y: (Math.random() - 0.5) * 240, // -120 to +120 px
+    });
+
+    // On first mount → center + random scatter. On size prop change → only resize, keep position.
     useEffect(() => {
         if (isMobile) return; // skip on mobile — always fullscreen
         setSize({ w: initW, h: initH });
         if (!initialized) {
             setPosition({
-                x: (window.innerWidth - initW) / 2,
-                y: (window.innerHeight - initH) / 2,
+                x: (window.innerWidth - initW) / 2 + randomOffset.current.x,
+                y: (window.innerHeight - initH) / 2 + randomOffset.current.y,
             });
             setInitialized(true);
         }
