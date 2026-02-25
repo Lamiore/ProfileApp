@@ -11,15 +11,15 @@ import GalleryWindow from "@/components/windows/gallerywindow";
 import ConnectionWindow from "@/components/windows/connectionwindow";
 
 const IMAGES = [
-    "https://images.okaydev.co/production/uploads/articles/building-an-infinite-animated-grid-no-webgl-needed/okay-creature-01.jpg?w=1024&h=1024&auto=compress%2Cformat&fit=min&dm=1770879560&s=086ab8a578db90a897ccb42465a7075b",
-    "https://images.okaydev.co/production/uploads/articles/building-an-infinite-animated-grid-no-webgl-needed/okay-creature-02.jpg?w=1024&h=1024&auto=compress%2Cformat&fit=min&dm=1770879561&s=dc1e49888250a4939aac294b63fcceea",
-    "https://images.okaydev.co/production/uploads/articles/building-an-infinite-animated-grid-no-webgl-needed/okay-creature-03.jpg?w=1024&h=1024&auto=compress%2Cformat&fit=min&dm=1770879561&s=47245c8a50622ce01819ed9d1481153f",
-    "https://images.okaydev.co/production/uploads/articles/building-an-infinite-animated-grid-no-webgl-needed/okay-creature-04.jpg?w=1024&h=1024&auto=compress%2Cformat&fit=min&dm=1770879562&s=fbfefc6eee114f91ad6ccd58477b8feb",
-    "https://images.okaydev.co/production/uploads/articles/building-an-infinite-animated-grid-no-webgl-needed/okay-creature-05.jpg?w=1024&h=1024&auto=compress%2Cformat&fit=min&dm=1770879563&s=2a6b546b9601c21efb677c51bf39e4d2",
-    "https://images.okaydev.co/production/uploads/articles/building-an-infinite-animated-grid-no-webgl-needed/okay-creature-06.jpg?w=1024&h=1024&auto=compress%2Cformat&fit=min&dm=1770879564&s=0ac91ce79fa486fe66c5e79d30670d88",
-    "https://images.okaydev.co/production/uploads/articles/building-an-infinite-animated-grid-no-webgl-needed/okay-creature-07.jpg?w=1024&h=1024&auto=compress%2Cformat&fit=min&dm=1770879565&s=9a28f44510dc21fadd9449f4b328500c",
-    "https://images.okaydev.co/production/uploads/articles/building-an-infinite-animated-grid-no-webgl-needed/okay-creature-08.jpg?w=1024&h=1024&auto=compress%2Cformat&fit=min&dm=1770879566&s=eedecd5320ec481c45f2185416773346",
-    "https://images.okaydev.co/production/uploads/articles/building-an-infinite-animated-grid-no-webgl-needed/okay-creature-09.jpg?w=1024&h=1024&auto=compress%2Cformat&fit=min&dm=1770879566&s=f60b32386d814a8df539b22f930f23c4",
+    "https://i.pinimg.com/736x/86/d0/34/86d034b31ec9a9e75f63cf7d83dd6a85.jpg",
+    "https://i.pinimg.com/1200x/4d/59/94/4d59942ae53d576463e85565788b7b65.jpg",
+    "https://i.pinimg.com/1200x/b9/96/1b/b9961bdd641884faa1a503be3170ba9a.jpg",
+    "https://i.pinimg.com/736x/ba/51/b6/ba51b6bca8d101c59fa0a0a34e29eb37.jpg",
+    "https://i.pinimg.com/736x/ef/87/7a/ef877a32692bea385b544e1e686123ff.jpg",
+    "https://i.pinimg.com/736x/1f/8e/f8/1f8ef82b2d77c86278ffe3c67e84442e.jpg",
+    "https://i.pinimg.com/736x/f8/42/f2/f842f2c37eb8aaa2455e9d1c4228da7d.jpg",
+    "https://i.pinimg.com/736x/67/9f/c2/679fc2d4cc43eb5a1483403cee117ccc.jpg",
+    "https://i.pinimg.com/736x/9e/a5/22/9ea522e8a0f562fabac47442d2406db7.jpg",
 ];
 
 const CONFIG = {
@@ -369,8 +369,12 @@ export default function Hero() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, delay: 0.2 }}
-                            className="text-sm tracking-[0.3em] uppercase"
-                            style={{ color: "#2C2C2C99" }}
+                            className="text-xs tracking-[0.3em] uppercase font-bold"
+                            style={{
+                                color: "#2C2C2C",
+                                fontFamily: "Helvetica, Arial, sans-serif",
+                                textShadow: "-1px -1px 0 rgba(255,255,255,1), 1px -1px 0 rgba(255,255,255,1), -1px 1px 0 rgba(255,255,255,1), 1px 1px 0 rgba(255,255,255,1)"
+                            }}
                         >
                             //Random
                         </motion.p>
@@ -378,9 +382,13 @@ export default function Hero() {
                         <motion.h1
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
                             className="text-[6rem] font-bold leading-none tracking-tight"
-                            style={{ color: "#2C2C2C" }}
+                            style={{
+                                color: "#2C2C2C",
+                                fontFamily: "Helvetica, Arial, sans-serif",
+                                textShadow: "-2px -2px 0 rgba(255,255,255,1), 2px -2px 0 rgba(255,255,255,1), -2px 2px 0 rgba(255,255,255,1), 2px 2px 0 rgba(255,255,255,1), 0px 2px 0 rgba(255,255,255,1), 2px 0px 0 rgba(255,255,255,1), 0px -2px 0 rgba(255,255,255,1), -2px 0px 0 rgba(255,255,255,1)"
+                            }}
                         >
                             Lam.
                         </motion.h1>
@@ -388,11 +396,15 @@ export default function Hero() {
                         <motion.p
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.7 }}
-                            className="text-sm italic"
-                            style={{ color: "#2C2C2CAA" }}
+                            transition={{ duration: 0.6, delay: 0.8 }}
+                            className="text-base max-w-sm leading-relaxed font-bold"
+                            style={{
+                                color: "#2C2C2C",
+                                fontFamily: "Helvetica, Arial, sans-serif",
+                                textShadow: "-1px -1px 0 rgba(255,255,255,1), 1px -1px 0 rgba(255,255,255,1), -1px 1px 0 rgba(255,255,255,1), 1px 1px 0 rgba(255,255,255,1)"
+                            }}
                         >
-                            "Crafting experiences, one pixel at a time."
+                            Crafting experiences, one pixel at a time.
                         </motion.p>
                     </div>
 
