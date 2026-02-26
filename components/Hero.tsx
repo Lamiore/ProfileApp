@@ -17,7 +17,7 @@ const IMAGES = [
     "https://i.pinimg.com/736x/ba/51/b6/ba51b6bca8d101c59fa0a0a34e29eb37.jpg",
     "https://i.pinimg.com/736x/ef/87/7a/ef877a32692bea385b544e1e686123ff.jpg",
     "https://i.pinimg.com/736x/1f/8e/f8/1f8ef82b2d77c86278ffe3c67e84442e.jpg",
-    "https://i.pinimg.com/736x/f8/42/f2/f842f2c37eb8aaa2455e9d1c4228da7d.jpg",
+    "https://i.pinimg.com/1200x/a9/0f/77/a90f77bbacef39f3e620ba103ec11c33.jpg",
     "https://i.pinimg.com/736x/67/9f/c2/679fc2d4cc43eb5a1483403cee117ccc.jpg",
     "https://i.pinimg.com/736x/9e/a5/22/9ea522e8a0f562fabac47442d2406db7.jpg",
 ];
@@ -40,6 +40,23 @@ export default function Hero() {
     const containerRef = useRef<HTMLDivElement>(null);
     const gridRef = useRef<HTMLDivElement>(null);
     const [openWindows, setOpenWindows] = useState<string[]>([]);
+    const [isMobile, setIsMobile] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const focusCounter = useRef(0);
+    const [windowZMap, setWindowZMap] = useState<Record<string, number>>({});
+
+    // Detect mobile viewport
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth <= 768);
+        check();
+        window.addEventListener("resize", check);
+        return () => window.removeEventListener("resize", check);
+    }, []);
+
+    // Close menu when viewport switches to desktop
+    useEffect(() => {
+        if (!isMobile) setMenuOpen(false);
+    }, [isMobile]);
 
     // --- Sound effects ---
     const playSound = (freq: number, endFreq: number, duration: number, volume: number, type: OscillatorType = "sine") => {
@@ -64,27 +81,48 @@ export default function Hero() {
         setOpenWindows((prev) => {
             if (prev.includes(name)) {
                 playCloseSound();
+                // Clean up z-map entry
+                setWindowZMap((z) => {
+                    const next = { ...z };
+                    delete next[name];
+                    return next;
+                });
                 return prev.filter((w) => w !== name);
             }
-            // open sound is played by Window component on mount
+            // On mobile: only 1 window at a time — close existing before opening new
+            if (isMobile && prev.length > 0) {
+                playCloseSound();
+                setWindowZMap({});
+                focusCounter.current = 1;
+                setWindowZMap({ [name]: 1 });
+                return [name];
+            }
+            // Assign z-index for new window
+            focusCounter.current += 1;
+            setWindowZMap((z) => ({ ...z, [name]: focusCounter.current }));
             return [...prev, name];
         });
+        // Auto-close mobile menu when opening a window
+        if (isMobile) setMenuOpen(false);
     };
 
-    // Bawa window ke paling depan
+    // Bawa window ke paling depan — only update z-index, never reorder array
     const bringToFront = (name: string) => {
-        setOpenWindows((prev) => [
-            ...prev.filter((w) => w !== name),
-            name,
-        ]);
+        focusCounter.current += 1;
+        setWindowZMap((z) => ({ ...z, [name]: focusCounter.current }));
     };
 
     const closeWindow = (name: string) => {
         playCloseSound();
         setOpenWindows((prev) => prev.filter((w) => w !== name));
+        setWindowZMap((z) => {
+            const next = { ...z };
+            delete next[name];
+            return next;
+        });
     };
 
-    const BASE_Z = 50; // z-index dasar window, di-stack per urutan
+    const BASE_Z = 50; // z-index dasar window
 
     // Hero hover image interaction
     useEffect(() => {
@@ -396,6 +434,105 @@ export default function Hero() {
                 </a>
             </motion.div>
 
+            {/* Mobile Hamburger Button — only visible when no window is open */}
+            {isMobile && openWindows.length === 0 && (
+                <motion.button
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 2.8 }}
+                    onClick={() => setMenuOpen((prev) => !prev)}
+                    className="absolute top-0 right-0 z-[70] p-12"
+                    style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer" }}
+                    aria-label={menuOpen ? "Close menu" : "Open menu"}
+                >
+                    <div style={{ width: "24px", height: "18px", position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                        <span
+                            style={{
+                                display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#2C2C2C",
+                                transformOrigin: "center", transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)",
+                                transform: menuOpen ? "rotate(45deg) translateY(8px)" : "none",
+                            }}
+                        />
+                        <span
+                            style={{
+                                display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#2C2C2C",
+                                transition: "opacity 0.2s, transform 0.2s",
+                                opacity: menuOpen ? 0 : 1, transform: menuOpen ? "scaleX(0)" : "scaleX(1)",
+                            }}
+                        />
+                        <span
+                            style={{
+                                display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#2C2C2C",
+                                transformOrigin: "center", transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)",
+                                transform: menuOpen ? "rotate(-45deg) translateY(-8px)" : "none",
+                            }}
+                        />
+                    </div>
+                </motion.button>
+            )}
+
+            {/* Mobile Slide-Down Menu */}
+            <AnimatePresence>
+                {isMobile && menuOpen && (
+                    <motion.div
+                        initial={{ y: "-100%" }}
+                        animate={{ y: 0 }}
+                        exit={{ y: "-100%" }}
+                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        style={{
+                            position: "fixed",
+                            inset: 0,
+                            zIndex: 65,
+                            background: "rgba(245, 240, 232, 0.85)",
+                            backdropFilter: "blur(40px) saturate(180%)",
+                            WebkitBackdropFilter: "blur(40px) saturate(180%)",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "12px",
+                            padding: "80px 32px 32px",
+                        }}
+                    >
+                        {buttons.map((btn, i) => (
+                            <motion.button
+                                key={btn}
+                                onClick={() => toggleWindow(btn)}
+                                initial={{ opacity: 0, y: -20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                transition={{ delay: i * 0.06, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                                whileTap={{ scale: 0.96 }}
+                                style={{
+                                    width: "100%",
+                                    maxWidth: "320px",
+                                    padding: "16px 24px",
+                                    fontSize: "14px",
+                                    fontWeight: 500,
+                                    letterSpacing: "0.15em",
+                                    textTransform: "uppercase" as const,
+                                    cursor: "pointer",
+                                    borderRadius: "14px",
+                                    color: openWindows.includes(btn) ? "#fff" : "#2C2C2C",
+                                    background: openWindows.includes(btn)
+                                        ? "rgba(44,44,44,0.7)"
+                                        : "rgba(255, 255, 255, 0.35)",
+                                    backdropFilter: "blur(20px)",
+                                    WebkitBackdropFilter: "blur(20px)",
+                                    border: openWindows.includes(btn)
+                                        ? "1px solid rgba(255,255,255,0.2)"
+                                        : "1px solid rgba(255, 255, 255, 0.5)",
+                                    boxShadow: "0 2px 12px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6)",
+                                    transition: "background 0.2s, color 0.2s, border 0.2s",
+                                }}
+                            >
+                                {btn}
+                            </motion.button>
+                        ))}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* Content — kiri bawah */}
             <div
                 className="absolute inset-0 z-10 flex flex-col justify-end p-12"
@@ -443,48 +580,50 @@ export default function Hero() {
                         </motion.div>
                     </div>
 
-                    {/* Buttons — always on top, z-index above blur overlay & window */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 3.6 }}
-                        className="flex gap-2 flex-wrap"
-                        style={{ pointerEvents: "auto", position: "relative", zIndex: 60 }}
-                    >
-                        {buttons.map((btn, i) => (
-                            <motion.button
-                                key={btn}
-                                onClick={() => toggleWindow(btn)}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 3.6 + i * 0.08 }}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.96 }}
-                                className="relative px-5 py-2.5 text-sm tracking-widest uppercase cursor-pointer overflow-hidden"
-                                style={{
-                                    borderRadius: "999px",
-                                    color: openWindows.includes(btn) ? "#fff" : "#2C2C2C",
-                                    background: openWindows.includes(btn)
-                                        ? "rgba(44,44,44,0.7)"
-                                        : "rgba(255, 255, 255, 0.25)",
-                                    backdropFilter: "blur(20px) saturate(180%)",
-                                    WebkitBackdropFilter: "blur(20px) saturate(180%)",
-                                    border: openWindows.includes(btn)
-                                        ? "1px solid rgba(255,255,255,0.2)"
-                                        : "1px solid rgba(255, 255, 255, 0.5)",
-                                    boxShadow: "0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)",
-                                    textShadow: "none",
-                                    transition: "background 0.2s, color 0.2s, border 0.2s",
-                                }}
-                            >
-                                {btn}
-                            </motion.button>
-                        ))}
-                    </motion.div>
+                    {/* Buttons — desktop only, hidden on mobile (moved to hamburger menu) */}
+                    {!isMobile && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 3.6 }}
+                            className="flex gap-2 flex-wrap"
+                            style={{ pointerEvents: "auto", position: "relative", zIndex: 60 }}
+                        >
+                            {buttons.map((btn, i) => (
+                                <motion.button
+                                    key={btn}
+                                    onClick={() => toggleWindow(btn)}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 3.6 + i * 0.08 }}
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.96 }}
+                                    className="relative px-5 py-2.5 text-sm tracking-widest uppercase cursor-pointer overflow-hidden"
+                                    style={{
+                                        borderRadius: "999px",
+                                        color: openWindows.includes(btn) ? "#fff" : "#2C2C2C",
+                                        background: openWindows.includes(btn)
+                                            ? "rgba(44,44,44,0.7)"
+                                            : "rgba(255, 255, 255, 0.25)",
+                                        backdropFilter: "blur(20px) saturate(180%)",
+                                        WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                                        border: openWindows.includes(btn)
+                                            ? "1px solid rgba(255,255,255,0.2)"
+                                            : "1px solid rgba(255, 255, 255, 0.5)",
+                                        boxShadow: "0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)",
+                                        textShadow: "none",
+                                        transition: "background 0.2s, color 0.2s, border 0.2s",
+                                    }}
+                                >
+                                    {btn}
+                                </motion.button>
+                            ))}
+                        </motion.div>
+                    )}
                     {/* BlurOverlay hanya muncul kalau ada window terbuka */}
                     <AnimatePresence>
                         {openWindows.length > 0 && (
-                            <BlurOverlay onClose={() => { playCloseSound(); setOpenWindows([]); }} />
+                            <BlurOverlay onClose={() => { playCloseSound(); setOpenWindows([]); setWindowZMap({}); focusCounter.current = 0; }} />
                         )}
                     </AnimatePresence>
                     {/* Render semua window yang terbuka, stacked by z-index */}
@@ -493,9 +632,11 @@ export default function Hero() {
                             <Window
                                 key={name}
                                 title={name}
-                                zIndex={BASE_Z + index}
+                                zIndex={BASE_Z + (windowZMap[name] ?? index)}
                                 onFocus={() => bringToFront(name)}
                                 onClose={() => closeWindow(name)}
+                                onMenuToggle={() => setMenuOpen((prev) => !prev)}
+                                menuOpen={menuOpen}
                             >
                                 {name === "About" && <AboutWindow />}
                                 {name === "Project" && <ProjectWindow />}

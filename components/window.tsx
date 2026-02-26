@@ -33,6 +33,8 @@ interface WindowProps {
     title: string;
     onClose: () => void;
     onFocus?: () => void;
+    onMenuToggle?: () => void;
+    menuOpen?: boolean;
     zIndex?: number;
     initialWidth?: number;
     initialHeight?: number;
@@ -44,7 +46,7 @@ const MIN_H = 240;
 const DEFAULT_W = 560;
 const DEFAULT_H = 480;
 
-export default function Window({ title, onClose, onFocus, zIndex = 50, initialWidth, initialHeight, children }: WindowProps) {
+export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen = false, zIndex = 50, initialWidth, initialHeight, children }: WindowProps) {
     const windowRef = useRef<HTMLDivElement>(null);
     const dragRef = useRef({ isDragging: false, startX: 0, startY: 0, offsetX: 0, offsetY: 0 });
     const resizeRef = useRef({ isResizing: false, startX: 0, startY: 0, startW: 0, startH: 0 });
@@ -65,7 +67,11 @@ export default function Window({ title, onClose, onFocus, zIndex = 50, initialWi
         const check = () => {
             const mobile = window.innerWidth <= 768;
             setIsMobile(mobile);
-            if (mobile) setIsMaximized(true);
+            if (mobile) {
+                setIsMaximized(true);
+            } else {
+                setIsMaximized(false);
+            }
         };
         check();
         window.addEventListener("resize", check);
@@ -252,50 +258,52 @@ export default function Window({ title, onClose, onFocus, zIndex = 50, initialWi
                     flexShrink: 0,
                 }}
             >
-                {/* Traffic light buttons */}
-                <div
-                    style={{ display: "flex", gap: "6px", alignItems: "center" }}
-                    onMouseEnter={() => setHoveringButtons(true)}
-                    onMouseLeave={() => setHoveringButtons(false)}
-                >
-                    {/* Close */}
-                    <button
-                        onClick={handleClose}
-                        onMouseDown={(e) => e.stopPropagation()}
-                        title="Close"
-                        style={trafficButtonStyle("#FF5F57")}
+                {/* Traffic light buttons — hidden on mobile */}
+                {!isMobile && (
+                    <div
+                        style={{ display: "flex", gap: "6px", alignItems: "center" }}
+                        onMouseEnter={() => setHoveringButtons(true)}
+                        onMouseLeave={() => setHoveringButtons(false)}
                     >
-                        {hoveringButtons && (
-                            <span style={{ position: "absolute", fontSize: "8px", color: "rgba(0,0,0,0.5)", fontWeight: 700, lineHeight: 1, pointerEvents: "none" }}>✕</span>
-                        )}
-                    </button>
+                        {/* Close */}
+                        <button
+                            onClick={handleClose}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            title="Close"
+                            style={trafficButtonStyle("#FF5F57")}
+                        >
+                            {hoveringButtons && (
+                                <span style={{ position: "absolute", fontSize: "8px", color: "rgba(0,0,0,0.5)", fontWeight: 700, lineHeight: 1, pointerEvents: "none" }}>✕</span>
+                            )}
+                        </button>
 
-                    {/* Minimize */}
-                    <button
-                        onClick={handleMinimize}
-                        onMouseDown={(e) => e.stopPropagation()}
-                        title={isMinimized ? "Restore" : "Minimize"}
-                        style={trafficButtonStyle("#FEBC2E")}
-                    >
-                        {hoveringButtons && (
-                            <span style={{ position: "absolute", fontSize: "10px", color: "rgba(0,0,0,0.5)", fontWeight: 700, lineHeight: 1, pointerEvents: "none", marginTop: "-1px" }}>−</span>
-                        )}
-                    </button>
+                        {/* Minimize */}
+                        <button
+                            onClick={handleMinimize}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            title={isMinimized ? "Restore" : "Minimize"}
+                            style={trafficButtonStyle("#FEBC2E")}
+                        >
+                            {hoveringButtons && (
+                                <span style={{ position: "absolute", fontSize: "10px", color: "rgba(0,0,0,0.5)", fontWeight: 700, lineHeight: 1, pointerEvents: "none", marginTop: "-1px" }}>−</span>
+                            )}
+                        </button>
 
-                    {/* Maximize */}
-                    <button
-                        onClick={handleMaximize}
-                        onMouseDown={(e) => e.stopPropagation()}
-                        title={isMaximized ? "Restore" : "Maximize"}
-                        style={trafficButtonStyle("#28C840")}
-                    >
-                        {hoveringButtons && (
-                            <span style={{ position: "absolute", fontSize: "8px", color: "rgba(0,0,0,0.5)", fontWeight: 700, lineHeight: 1, pointerEvents: "none" }}>
-                                {isMaximized ? "⊙" : "⤢"}
-                            </span>
-                        )}
-                    </button>
-                </div>
+                        {/* Maximize */}
+                        <button
+                            onClick={handleMaximize}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            title={isMaximized ? "Restore" : "Maximize"}
+                            style={trafficButtonStyle("#28C840")}
+                        >
+                            {hoveringButtons && (
+                                <span style={{ position: "absolute", fontSize: "8px", color: "rgba(0,0,0,0.5)", fontWeight: 700, lineHeight: 1, pointerEvents: "none" }}>
+                                    {isMaximized ? "⊙" : "⤢"}
+                                </span>
+                            )}
+                        </button>
+                    </div>
+                )}
 
                 {/* Title */}
                 <span
@@ -314,7 +322,66 @@ export default function Window({ title, onClose, onFocus, zIndex = 50, initialWi
                     )}
                 </span>
 
-                <div style={{ width: "42px" }} />
+                {/* Mobile hamburger menu button — right side of title bar */}
+                {isMobile && onMenuToggle ? (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        aria-label={menuOpen ? "Close menu" : "Open menu"}
+                        style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            padding: "4px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            width: "42px",
+                            flexShrink: 0,
+                        }}
+                    >
+                        <div style={{ width: "20px", height: "14px", position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                            <span
+                                style={{
+                                    display: "block",
+                                    width: "100%",
+                                    height: "2px",
+                                    borderRadius: "2px",
+                                    background: "#2C2C2C",
+                                    transformOrigin: "center",
+                                    transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)",
+                                    transform: menuOpen ? "rotate(45deg) translateY(6px)" : "none",
+                                }}
+                            />
+                            <span
+                                style={{
+                                    display: "block",
+                                    width: "100%",
+                                    height: "2px",
+                                    borderRadius: "2px",
+                                    background: "#2C2C2C",
+                                    transition: "opacity 0.2s, transform 0.2s",
+                                    opacity: menuOpen ? 0 : 1,
+                                    transform: menuOpen ? "scaleX(0)" : "scaleX(1)",
+                                }}
+                            />
+                            <span
+                                style={{
+                                    display: "block",
+                                    width: "100%",
+                                    height: "2px",
+                                    borderRadius: "2px",
+                                    background: "#2C2C2C",
+                                    transformOrigin: "center",
+                                    transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)",
+                                    transform: menuOpen ? "rotate(-45deg) translateY(-6px)" : "none",
+                                }}
+                            />
+                        </div>
+                    </button>
+                ) : (
+                    !isMobile && <div style={{ width: "42px" }} />
+                )}
             </div>
 
             {/* Content */}
