@@ -74,8 +74,8 @@ export default function Window({ title, onClose, onFocus, zIndex = 50, initialWi
 
     // Random spawn offset – generated once on mount, stays fixed
     const randomOffset = useRef({
-        x: (Math.random() - 0.5) * 360, // -180 to +180 px
-        y: (Math.random() - 0.5) * 240, // -120 to +120 px
+        x: (Math.random() - 0.5) * 180, // -180 to +180 px
+        y: (Math.random() - 0.5) * 120, // -120 to +120 px
     });
 
     // On first mount → center + random scatter. On size prop change → only resize, keep position.
