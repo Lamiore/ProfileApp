@@ -49,7 +49,7 @@
 
 :root {
   --radius: 0.625rem;
-  --background: #ffffff;
+  --background: #F5F5F0;
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -134,7 +134,7 @@
   overflow: hidden;
   line-height: 1;
   padding: 5px 0;
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 700;
   color: #2C2C2C;
   letter-spacing: -0.02em;
@@ -153,8 +153,8 @@
 
 .flip-text {
   --clr-1: #2C2C2C;
-  --clr-2: #7a8450;
-  --clr-3: #7b3b4b;
+  --clr-2: #888888;
+  --clr-3: #000000;
   --translate-distance: 1lh;
   --duration: 3s;
   --timing-function: cubic-bezier(0.66, 0, 0.34, 1);

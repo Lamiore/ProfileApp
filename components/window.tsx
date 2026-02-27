@@ -115,10 +115,14 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
 
         const onMouseMove = (e: MouseEvent) => {
             if (!dragRef.current.isDragging) return;
-            setPosition({
-                x: dragRef.current.offsetX + (e.clientX - dragRef.current.startX),
-                y: dragRef.current.offsetY + (e.clientY - dragRef.current.startY),
-            });
+            const newX = dragRef.current.offsetX + (e.clientX - dragRef.current.startX);
+            const newY = dragRef.current.offsetY + (e.clientY - dragRef.current.startY);
+            // Clamp so window stays within viewport
+            // Allow dragging title bar up to screen edges; keep at least 48px of title bar visible
+            const TITLE_H = 48;
+            const clampedX = Math.min(Math.max(newX, 0), window.innerWidth - size.w);
+            const clampedY = Math.min(Math.max(newY, 0), window.innerHeight - TITLE_H);
+            setPosition({ x: clampedX, y: clampedY });
         };
 
         const onMouseUp = () => {

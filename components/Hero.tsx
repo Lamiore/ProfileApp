@@ -40,6 +40,44 @@ const CONFIG = {
 
 const buttons = ["About", "Project", "Blog", "Gallery", "Connection"];
 
+const buttonIcons: Record<string, React.ReactNode> = {
+    About: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+        </svg>
+    ),
+    Project: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg>
+    ),
+    Blog: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+        </svg>
+    ),
+    Gallery: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+        </svg>
+    ),
+    Connection: (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="6" cy="12" r="2.5" />
+            <circle cx="18" cy="6" r="2.5" />
+            <circle cx="18" cy="18" r="2.5" />
+            <line x1="8.5" y1="11" x2="15.5" y2="7" />
+            <line x1="8.5" y1="13" x2="15.5" y2="17" />
+        </svg>
+    ),
+};
+
 export default function Hero() {
     const viewportRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -166,10 +204,10 @@ export default function Hero() {
             driftBlendFactor: 0,  // 0 = no drift, 1 = full drift
         };
 
-        const IDLE_DELAY_MS = 2000;  // 2 detik sebelum drift aktif
-        const DRIFT_SPEED = 0.3;     // kecepatan drift (px per frame equiv)
-        const DRIFT_RADIUS_X = 180;  // seberapa jauh drift horizontal
-        const DRIFT_RADIUS_Y = 120;  // seberapa jauh drift vertikal
+        const IDLE_DELAY_MS = 500;   // mulai drift lebih cepat
+        const DRIFT_SPEED = 1.0;     // kecepatan drift lebih tinggi
+        const DRIFT_RADIUS_X = 280;  // jangkauan horizontal lebih jauh
+        const DRIFT_RADIUS_Y = 180;  // jangkauan vertikal lebih jauh
 
         let cellWidth = 0;
         let cellHeight = 0;
@@ -321,7 +359,7 @@ export default function Hero() {
 
             if (state.driftActive) {
                 // Blend factor naik perlahan (fade-in drift)
-                state.driftBlendFactor = Math.min(1, state.driftBlendFactor + 0.004);
+                state.driftBlendFactor = Math.min(1, state.driftBlendFactor + 0.012);
                 state.driftTime += DRIFT_SPEED * 0.016; // ~60fps equiv
 
                 // Organic figure-8 / Lissajous path
@@ -331,8 +369,8 @@ export default function Hero() {
                     + Math.cos(state.driftTime * 0.17) * DRIFT_RADIUS_Y * 0.4;
 
                 // Blend dari posisi user ke posisi drift
-                state.targetOffset.x += (driftX - state.targetOffset.x) * 0.004 * state.driftBlendFactor;
-                state.targetOffset.y += (driftY - state.targetOffset.y) * 0.004 * state.driftBlendFactor;
+                state.targetOffset.x += (driftX - state.targetOffset.x) * 0.012 * state.driftBlendFactor;
+                state.targetOffset.y += (driftY - state.targetOffset.y) * 0.012 * state.driftBlendFactor;
             } else {
                 // Fade-out drift blend
                 state.driftBlendFactor = Math.max(0, state.driftBlendFactor - 0.05);
@@ -405,57 +443,134 @@ export default function Hero() {
                 </div>
             </div>
 
-            {/* Logo — kiri atas */}
-            <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 2.8 }}
-                className="absolute top-0 left-0 z-10 p-12"
-                style={{ pointerEvents: "auto" }}
-            >
-                <a href="" className="logo" aria-label="Home">
-                    <span className="flip-text">
-                        <span data-char="L" style={{ "--i": 1 } as React.CSSProperties}>L</span>
-                        <span data-char="a" style={{ "--i": 2 } as React.CSSProperties}>a</span>
-                        <span data-char="m" style={{ "--i": 3 } as React.CSSProperties}>m</span>
-                        <span data-char="." style={{ "--i": 4 } as React.CSSProperties}>.</span>
-                    </span>
-                </a>
-            </motion.div>
-
-            {/* Mobile Hamburger Button — only visible when no window is open */}
-            {isMobile && openWindows.length === 0 && (
-                <motion.button
+            {/* Navbar — logo kiri, buttons kanan atas */}
+            <div className="absolute top-0 left-0 right-0 z-[55] flex items-center justify-between p-12" style={{ pointerEvents: "none" }}>
+                {/* Logo */}
+                <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 2.8 }}
+                    style={{ pointerEvents: "auto" }}
+                >
+                    <a
+                        href="#"
+                        className="logo"
+                        aria-label="Home"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            if (openWindows.length > 0) {
+                                playCloseSound();
+                                setOpenWindows([]);
+                                setWindowZMap({});
+                                focusCounter.current = 0;
+                            }
+                        }}
+                    >
+                        <span className="flip-text">
+                            <span data-char="L" style={{ "--i": 1 } as React.CSSProperties}>L</span>
+                            <span data-char="a" style={{ "--i": 2 } as React.CSSProperties}>a</span>
+                            <span data-char="m" style={{ "--i": 3 } as React.CSSProperties}>m</span>
+                            <span data-char="." style={{ "--i": 4 } as React.CSSProperties}>.</span>
+                        </span>
+                    </a>
+                </motion.div>
+
+                {/* Nav Buttons — desktop only */}
+                {!isMobile && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 3.0 }}
+                        className="flex gap-2 flex-wrap justify-end"
+                        style={{ pointerEvents: "auto", position: "relative", zIndex: 60 }}
+                    >
+                        {buttons.map((btn, i) => (
+                            <motion.button
+                                key={btn}
+                                onClick={() => toggleWindow(btn)}
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 3.0 + i * 0.08 }}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.96 }}
+                                className="relative flex items-center gap-2 px-5 py-2.5 text-sm tracking-widest uppercase cursor-pointer overflow-hidden"
+                                style={{
+                                    borderRadius: "999px",
+                                    color: openWindows.includes(btn) ? "#fff" : "#2C2C2C",
+                                    background: openWindows.includes(btn)
+                                        ? "rgba(44,44,44,0.7)"
+                                        : "rgba(255, 255, 255, 0.25)",
+                                    backdropFilter: "blur(20px) saturate(180%)",
+                                    WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                                    border: openWindows.includes(btn)
+                                        ? "1px solid rgba(255,255,255,0.2)"
+                                        : "1px solid rgba(255, 255, 255, 0.5)",
+                                    boxShadow: "0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)",
+                                    textShadow: "none",
+                                    fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                                    fontWeight: 700,
+                                    transition: "background 0.2s, color 0.2s, border 0.2s",
+                                }}
+                            >
+                                <span style={{ opacity: 0.75, display: "flex", alignItems: "center" }}>{buttonIcons[btn]}</span>
+                                {btn}
+                            </motion.button>
+                        ))}
+                    </motion.div>
+                )}
+            </div>
+
+            {/* Mobile Hamburger Button — only visible when no window is open */}
+            {isMobile && openWindows.length === 0 && !menuOpen && (
+                <motion.button
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.4 }}
                     onClick={() => setMenuOpen((prev) => !prev)}
                     className="absolute top-0 right-0 z-[70] p-12"
                     style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer" }}
                     aria-label={menuOpen ? "Close menu" : "Open menu"}
                 >
-                    <div style={{ width: "24px", height: "18px", position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                        <span
-                            style={{
-                                display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#2C2C2C",
-                                transformOrigin: "center", transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)",
-                                transform: menuOpen ? "rotate(45deg) translateY(8px)" : "none",
-                            }}
-                        />
-                        <span
-                            style={{
-                                display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#2C2C2C",
-                                transition: "opacity 0.2s, transform 0.2s",
-                                opacity: menuOpen ? 0 : 1, transform: menuOpen ? "scaleX(0)" : "scaleX(1)",
-                            }}
-                        />
-                        <span
-                            style={{
-                                display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#2C2C2C",
-                                transformOrigin: "center", transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)",
-                                transform: menuOpen ? "rotate(-45deg) translateY(-8px)" : "none",
-                            }}
-                        />
+                    {/* iOS 26 Liquid Glass pill */}
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            width: "48px",
+                            height: "48px",
+                            borderRadius: "18px",
+                            /* Liquid glass layers */
+                            background: "linear-gradient(145deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.20) 50%, rgba(255,255,255,0.38) 100%)",
+                            backdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
+                            WebkitBackdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
+                            border: "1px solid rgba(255,255,255,0.70)",
+                            boxShadow: [
+                                "0 2px 12px rgba(0,0,0,0.10)",
+                                "0 1px 0 rgba(255,255,255,0.90) inset",
+                                "0 -1px 0 rgba(0,0,0,0.06) inset",
+                                "inset 1px 0 0 rgba(255,255,255,0.60)",
+                            ].join(", "),
+                            transition: "box-shadow 0.25s, background 0.25s",
+                        }}
+                    >
+                        <div style={{ width: "22px", height: "16px", position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                            <span
+                                style={{
+                                    display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#2C2C2C",
+                                }}
+                            />
+                            <span
+                                style={{
+                                    display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#2C2C2C",
+                                }}
+                            />
+                            <span
+                                style={{
+                                    display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#2C2C2C",
+                                }}
+                            />
+                        </div>
                     </div>
                 </motion.button>
             )}
@@ -483,6 +598,47 @@ export default function Hero() {
                             padding: "80px 32px 32px",
                         }}
                     >
+                        {/* Close (X) button — top right */}
+                        <motion.button
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            transition={{ duration: 0.25, delay: 0.1 }}
+                            onClick={() => {
+                                setMenuOpen(false);
+                                if (openWindows.length > 0) {
+                                    playCloseSound();
+                                    setOpenWindows([]);
+                                    setWindowZMap({});
+                                    focusCounter.current = 0;
+                                }
+                            }}
+                            aria-label="Close menu"
+                            style={{
+                                position: "absolute",
+                                top: "40px",
+                                right: "40px",
+                                width: "48px",
+                                height: "48px",
+                                borderRadius: "18px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                background: "linear-gradient(145deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.20) 50%, rgba(255,255,255,0.38) 100%)",
+                                backdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
+                                WebkitBackdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
+                                border: "1px solid rgba(255,255,255,0.70)",
+                                boxShadow: "0 2px 12px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.90) inset, 0 -1px 0 rgba(0,0,0,0.06) inset",
+                                cursor: "pointer",
+                                zIndex: 70,
+                            }}
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2C2C2C" strokeWidth="2.2" strokeLinecap="round">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </motion.button>
+
                         {buttons.map((btn, i) => (
                             <motion.button
                                 key={btn}
@@ -493,15 +649,17 @@ export default function Hero() {
                                 transition={{ delay: i * 0.06, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                                 whileTap={{ scale: 0.96 }}
                                 style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    gap: "10px",
                                     width: "100%",
-                                    maxWidth: "320px",
-                                    padding: "16px 24px",
-                                    fontSize: "14px",
-                                    fontWeight: 500,
+                                    maxWidth: "360px",
+                                    fontSize: "16px",
                                     letterSpacing: "0.15em",
                                     textTransform: "uppercase" as const,
                                     cursor: "pointer",
-                                    borderRadius: "14px",
+                                    borderRadius: "16px",
                                     color: openWindows.includes(btn) ? "#fff" : "#2C2C2C",
                                     background: openWindows.includes(btn)
                                         ? "rgba(44,44,44,0.7)"
@@ -512,9 +670,12 @@ export default function Hero() {
                                         ? "1px solid rgba(255,255,255,0.2)"
                                         : "1px solid rgba(255, 255, 255, 0.5)",
                                     boxShadow: "0 2px 12px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6)",
+                                    fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                                    fontWeight: 700,
                                     transition: "background 0.2s, color 0.2s, border 0.2s",
                                 }}
                             >
+                                <span style={{ opacity: 0.7, display: "flex", alignItems: "center" }}>{buttonIcons[btn]}</span>
                                 {btn}
                             </motion.button>
                         ))}
@@ -569,46 +730,7 @@ export default function Hero() {
                         </motion.div>
                     </div>
 
-                    {/* Buttons — desktop only, hidden on mobile (moved to hamburger menu) */}
-                    {!isMobile && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 3.6 }}
-                            className="flex gap-2 flex-wrap"
-                            style={{ pointerEvents: "auto", position: "relative", zIndex: 60 }}
-                        >
-                            {buttons.map((btn, i) => (
-                                <motion.button
-                                    key={btn}
-                                    onClick={() => toggleWindow(btn)}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 3.6 + i * 0.08 }}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.96 }}
-                                    className="relative px-5 py-2.5 text-sm tracking-widest uppercase cursor-pointer overflow-hidden"
-                                    style={{
-                                        borderRadius: "999px",
-                                        color: openWindows.includes(btn) ? "#fff" : "#2C2C2C",
-                                        background: openWindows.includes(btn)
-                                            ? "rgba(44,44,44,0.7)"
-                                            : "rgba(255, 255, 255, 0.25)",
-                                        backdropFilter: "blur(20px) saturate(180%)",
-                                        WebkitBackdropFilter: "blur(20px) saturate(180%)",
-                                        border: openWindows.includes(btn)
-                                            ? "1px solid rgba(255,255,255,0.2)"
-                                            : "1px solid rgba(255, 255, 255, 0.5)",
-                                        boxShadow: "0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)",
-                                        textShadow: "none",
-                                        transition: "background 0.2s, color 0.2s, border 0.2s",
-                                    }}
-                                >
-                                    {btn}
-                                </motion.button>
-                            ))}
-                        </motion.div>
-                    )}
+
                     {/* BlurOverlay hanya muncul kalau ada window terbuka */}
                     <AnimatePresence>
                         {openWindows.length > 0 && (
@@ -626,6 +748,8 @@ export default function Hero() {
                                 onClose={() => closeWindow(name)}
                                 onMenuToggle={() => setMenuOpen((prev) => !prev)}
                                 menuOpen={menuOpen}
+                                initialWidth={["Gallery", "Blog", "Project"].includes(name) ? 820 : 560}
+                                initialHeight={["Gallery", "Blog", "Project"].includes(name) ? 620 : 480}
                             >
                                 {name === "About" && <AboutWindow />}
                                 {name === "Project" && <ProjectWindow />}
