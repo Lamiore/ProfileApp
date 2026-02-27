@@ -1,14 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import dynamic from "next/dynamic";
 import Window from "@/components/window";
 import BlurOverlay from "@/components/BlurOverlay";
-import AboutWindow from "@/components/windows/aboutwindow";
-import ProjectWindow from "@/components/windows/projectwindow";
-import BlogWindow from "@/components/windows/blogwindow";
-import GalleryWindow from "@/components/windows/gallerywindow";
-import ConnectionWindow from "@/components/windows/connectionwindow";
+import { playCloseSound } from "@/lib/audio";
+
+// Dynamic imports — window components only load when actually opened
+const AboutWindow = dynamic(() => import("@/components/windows/aboutwindow"), { ssr: false });
+const ProjectWindow = dynamic(() => import("@/components/windows/projectwindow"), { ssr: false });
+const BlogWindow = dynamic(() => import("@/components/windows/blogwindow"), { ssr: false });
+const GalleryWindow = dynamic(() => import("@/components/windows/gallerywindow"), { ssr: false });
+const ConnectionWindow = dynamic(() => import("@/components/windows/connectionwindow"), { ssr: false });
 
 const IMAGES = [
     "https://i.pinimg.com/736x/86/d0/34/86d034b31ec9a9e75f63cf7d83dd6a85.jpg",
@@ -31,6 +35,7 @@ const CONFIG = {
     scaleEasing: 0.08,
     maxScaleEffect: 0.2,
     tileOverscan: 1,
+    mobileTileOverscan: 0,
 };
 
 const buttons = ["About", "Project", "Blog", "Gallery", "Connection"];
@@ -58,26 +63,10 @@ export default function Hero() {
         if (!isMobile) setMenuOpen(false);
     }, [isMobile]);
 
-    // --- Sound effects ---
-    const playSound = (freq: number, endFreq: number, duration: number, volume: number, type: OscillatorType = "sine") => {
-        try {
-            const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(endFreq, ctx.currentTime + duration);
-            gain.gain.setValueAtTime(volume, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-            osc.connect(gain).connect(ctx.destination);
-            osc.start();
-            osc.stop(ctx.currentTime + duration);
-        } catch { /* silent fail */ }
-    };
-    const playCloseSound = () => playSound(800, 400, 0.15, 0.06, "sine");
+    // Sound effects are now in lib/audio.ts (shared AudioContext)
 
-    // Buka/tutup window + sound
-    const toggleWindow = (name: string) => {
+    // Buka/tutup window + sound — memoized to prevent child re-renders
+    const toggleWindow = useCallback((name: string) => {
         setOpenWindows((prev) => {
             if (prev.includes(name)) {
                 playCloseSound();
@@ -104,15 +93,15 @@ export default function Hero() {
         });
         // Auto-close mobile menu when opening a window
         if (isMobile) setMenuOpen(false);
-    };
+    }, [isMobile]);
 
     // Bawa window ke paling depan — only update z-index, never reorder array
-    const bringToFront = (name: string) => {
+    const bringToFront = useCallback((name: string) => {
         focusCounter.current += 1;
         setWindowZMap((z) => ({ ...z, [name]: focusCounter.current }));
-    };
+    }, []);
 
-    const closeWindow = (name: string) => {
+    const closeWindow = useCallback((name: string) => {
         playCloseSound();
         setOpenWindows((prev) => prev.filter((w) => w !== name));
         setWindowZMap((z) => {
@@ -120,7 +109,7 @@ export default function Hero() {
             delete next[name];
             return next;
         });
-    };
+    }, []);
 
     const BASE_Z = 50; // z-index dasar window
 
