@@ -3,31 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 
-// --- Sound effects via Web Audio API ---
-const playSound = (freq: number, endFreq: number, duration: number, volume: number, type: OscillatorType = "sine") => {
-    try {
-        const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(endFreq, ctx.currentTime + duration);
-        gain.gain.setValueAtTime(volume, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-        osc.connect(gain).connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + duration);
-    } catch { /* silent fail */ }
-};
-
-const playOpenSound = () => {
-    playSound(600, 1200, 0.15, 0.08, "sine");
-    setTimeout(() => playSound(900, 1400, 0.1, 0.05, "sine"), 60);
-};
-
-const playCloseSound = () => {
-    playSound(800, 400, 0.15, 0.06, "sine");
-};
+import { playOpenSound, playCloseSound } from "@/lib/audio";
 
 interface WindowProps {
     title: string;
@@ -64,6 +40,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
 
     // Detect mobile
     useEffect(() => {
+        let timeoutId: ReturnType<typeof setTimeout>;
         const check = () => {
             const mobile = window.innerWidth <= 768;
             setIsMobile(mobile);
@@ -74,8 +51,15 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
             }
         };
         check();
-        window.addEventListener("resize", check);
-        return () => window.removeEventListener("resize", check);
+        const handleResize = () => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(check, 150);
+        };
+        window.addEventListener("resize", handleResize);
+        return () => {
+            clearTimeout(timeoutId);
+            window.removeEventListener("resize", handleResize);
+        };
     }, []);
 
     // Random spawn offset – generated once on mount, stays fixed

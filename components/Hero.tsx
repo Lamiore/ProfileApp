@@ -87,13 +87,22 @@ export default function Hero() {
     const [menuOpen, setMenuOpen] = useState(false);
     const focusCounter = useRef(0);
     const [windowZMap, setWindowZMap] = useState<Record<string, number>>({});
+    const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    // Detect mobile viewport
+    // Detect mobile viewport (debounced)
     useEffect(() => {
+        let timeoutId: ReturnType<typeof setTimeout>;
         const check = () => setIsMobile(window.innerWidth <= 768);
-        check();
-        window.addEventListener("resize", check);
-        return () => window.removeEventListener("resize", check);
+        check(); // run once on mount
+        const handleResize = () => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(check, 150);
+        };
+        window.addEventListener("resize", handleResize);
+        return () => {
+            clearTimeout(timeoutId);
+            window.removeEventListener("resize", handleResize);
+        };
     }, []);
 
     // Close menu when viewport switches to desktop
@@ -164,6 +173,27 @@ export default function Hero() {
             return next;
         });
     }, []);
+
+    // Smart click handler: single = open/reopen, double = close
+    const handleNavClick = useCallback((btn: string) => {
+        if (clickTimerRef.current) {
+            // Second click arrived quickly → double-click → close
+            clearTimeout(clickTimerRef.current);
+            clickTimerRef.current = null;
+            if (openWindows.includes(btn)) closeWindow(btn);
+            return;
+        }
+        // First click — wait to see if a second comes
+        clickTimerRef.current = setTimeout(() => {
+            clickTimerRef.current = null;
+            // Single click confirmed
+            if (openWindows.includes(btn)) {
+                reopenWindow(btn);
+            } else {
+                toggleWindow(btn);
+            }
+        }, 220);
+    }, [openWindows, closeWindow, reopenWindow, toggleWindow]);
 
     const BASE_Z = 50; // z-index dasar window
 
@@ -356,13 +386,22 @@ export default function Hero() {
             state.targetRotationY = 0;
         };
 
+        let resizeTimeout: ReturnType<typeof setTimeout>;
         const onResize = () => {
-            calculateCellSizeAndTiling();
-            createGridItems();
-            updateItemPositions();
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                calculateCellSizeAndTiling();
+                createGridItems();
+                updateItemPositions();
+            }, 100);
         };
 
         const animate = () => {
+            // Pause animation loop completely if tab is hidden
+            if (document.hidden) {
+                rafId = requestAnimationFrame(animate);
+                return;
+            }
             rafId = requestAnimationFrame(animate);
 
             const now = performance.now();
@@ -423,6 +462,9 @@ export default function Hero() {
         viewport.addEventListener("touchend", onTouchEnd);
         window.addEventListener("resize", onResize);
 
+        // Listen to visibilitychange inside the effect explicitly if needed,
+        // though document.hidden check inside animate loop already handles the RAF pause.
+
         animate();
 
         return () => {
@@ -436,6 +478,7 @@ export default function Hero() {
             viewport.removeEventListener("touchmove", onTouchMove);
             viewport.removeEventListener("touchend", onTouchEnd);
             window.removeEventListener("resize", onResize);
+            clearTimeout(resizeTimeout);
         };
     }, []);
 
@@ -468,18 +511,14 @@ export default function Hero() {
                     transition={{ duration: 0.6, delay: 2.8 }}
                     style={{ pointerEvents: "auto" }}
                 >
-                    <a
-                        href="#"
+                    <div
                         className="logo"
-                        aria-label="Home"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            if (openWindows.length > 0) {
-                                playCloseSound();
-                                setOpenWindows([]);
-                                setWindowZMap({});
-                                focusCounter.current = 0;
-                            }
+                        style={{
+                            filter: openWindows.length > 0 ? "blur(8px)" : "none",
+                            opacity: openWindows.length > 0 ? 0.5 : 1,
+                            transition: "filter 0.4s ease, opacity 0.4s ease",
+                            pointerEvents: "none",
+                            userSelect: "none"
                         }}
                     >
                         <span className="flip-text">
@@ -488,7 +527,7 @@ export default function Hero() {
                             <span data-char="m" style={{ "--i": 3 } as React.CSSProperties}>m</span>
                             <span data-char="." style={{ "--i": 4 } as React.CSSProperties}>.</span>
                         </span>
-                    </a>
+                    </div>
                 </motion.div>
 
                 {/* Nav Buttons — desktop only */}
@@ -503,7 +542,7 @@ export default function Hero() {
                         {buttons.map((btn, i) => (
                             <motion.button
                                 key={btn}
-                                onClick={() => openWindows.includes(btn) ? reopenWindow(btn) : toggleWindow(btn)}
+                                onClick={() => handleNavClick(btn)}
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 3.0 + i * 0.08 }}
@@ -658,7 +697,7 @@ export default function Hero() {
                         {buttons.map((btn, i) => (
                             <motion.button
                                 key={btn}
-                                onClick={() => openWindows.includes(btn) ? reopenWindow(btn) : toggleWindow(btn)}
+                                onClick={() => handleNavClick(btn)}
                                 initial={{ opacity: 0, y: -20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -20 }}
