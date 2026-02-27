@@ -38,7 +38,7 @@ const CONFIG = {
     mobileTileOverscan: 0,
 };
 
-const buttons = ["About", "Project", "Blog", "Gallery", "Connection"];
+const buttons = ["About", "Project", "Blog", "Gallery", "Connect"];
 
 const buttonIcons: Record<string, React.ReactNode> = {
     About: (
@@ -67,7 +67,7 @@ const buttonIcons: Record<string, React.ReactNode> = {
             <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
         </svg>
     ),
-    Connection: (
+    Connect: (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="6" cy="12" r="2.5" />
             <circle cx="18" cy="6" r="2.5" />
@@ -137,6 +137,22 @@ export default function Hero() {
     const bringToFront = useCallback((name: string) => {
         focusCounter.current += 1;
         setWindowZMap((z) => ({ ...z, [name]: focusCounter.current }));
+    }, []);
+
+    // Tutup lalu buka ulang window (reset posisi & ukuran)
+    const reopenWindow = useCallback((name: string) => {
+        playCloseSound();
+        setOpenWindows((prev) => prev.filter((w) => w !== name));
+        setWindowZMap((z) => {
+            const next = { ...z };
+            delete next[name];
+            return next;
+        });
+        setTimeout(() => {
+            focusCounter.current += 1;
+            setWindowZMap((z) => ({ ...z, [name]: focusCounter.current }));
+            setOpenWindows((prev) => [...prev, name]);
+        }, 60);
     }, []);
 
     const closeWindow = useCallback((name: string) => {
@@ -487,7 +503,7 @@ export default function Hero() {
                         {buttons.map((btn, i) => (
                             <motion.button
                                 key={btn}
-                                onClick={() => toggleWindow(btn)}
+                                onClick={() => openWindows.includes(btn) ? reopenWindow(btn) : toggleWindow(btn)}
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 3.0 + i * 0.08 }}
@@ -642,7 +658,7 @@ export default function Hero() {
                         {buttons.map((btn, i) => (
                             <motion.button
                                 key={btn}
-                                onClick={() => toggleWindow(btn)}
+                                onClick={() => openWindows.includes(btn) ? reopenWindow(btn) : toggleWindow(btn)}
                                 initial={{ opacity: 0, y: -20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -20 }}
@@ -755,7 +771,7 @@ export default function Hero() {
                                 {name === "Project" && <ProjectWindow />}
                                 {name === "Blog" && <BlogWindow />}
                                 {name === "Gallery" && <GalleryWindow />}
-                                {name === "Connection" && <ConnectionWindow />}
+                                {name === "Connect" && <ConnectionWindow />}
                             </Window>
                         ))}
                     </AnimatePresence>

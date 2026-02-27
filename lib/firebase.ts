@@ -3,12 +3,12 @@ import { getStorage } from "firebase/storage";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAnm3N3A3D9OOLWS_RGq1kZR1cL0R4w4Kc",
-    authDomain: "personalapps-48ea5.firebaseapp.com",
-    projectId: "personalapps-48ea5",
-    storageBucket: "personalapps-48ea5.firebasestorage.app",
-    messagingSenderId: "347556985406",
-    appId: "1:347556985406:web:b080b9c84754f5d7b36f6f"
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
 // Prevent re-initialization in Next.js hot reload
