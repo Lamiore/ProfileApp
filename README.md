@@ -1,1 +1,1 @@
-anjay
+React + Next.js + Firebase + Tailwind CSS + Framer Motion + TypeScript + Vercel
