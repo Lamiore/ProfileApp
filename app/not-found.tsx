@@ -8,8 +8,8 @@ export default function NotFound() {
         <>
             <style>{`
                 .nf-body {
-                    background: #F5F5F0;
-                    color: #1a1a1a;
+                    background: #0a0a0a;
+                    color: #ededed;
                     font-family: "Courier New", Courier, monospace;
                     font-size: 17px;
                     line-height: 1.7em;
@@ -33,7 +33,7 @@ export default function NotFound() {
                 }
 
                 .code-area a {
-                    color: #2C2C2C;
+                    color: #ededed;
                     text-decoration: underline;
                     text-underline-offset: 3px;
                     transition: opacity 0.2s;
@@ -63,42 +63,42 @@ export default function NotFound() {
                     <span>&nbsp;</span>
 
                     <span>
-                        <span style={{ color: "#444444" }}>const</span>
+                        <span style={{ color: "#a1a1aa" }}>const</span>
                         {" "}
-                        <span style={{ color: "#1a1a1a", fontStyle: "italic" }}>page</span>
+                        <span style={{ color: "#ededed", fontStyle: "italic" }}>page</span>
                         {" = "}
-                        <span style={{ color: "#444444" }}>await</span>
+                        <span style={{ color: "#a1a1aa" }}>await</span>
                         {" "}
-                        <span style={{ color: "#1a1a1a" }}>find</span>
+                        <span style={{ color: "#ededed" }}>find</span>
                         {"("}
-                        <span style={{ color: "#555555", fontStyle: "italic" }}>url</span>
+                        <span style={{ color: "#d4d4d8", fontStyle: "italic" }}>url</span>
                         {");"}
                     </span>
 
                     <span>&nbsp;</span>
 
                     <span>
-                        <span style={{ color: "#444444" }}>if</span>
+                        <span style={{ color: "#a1a1aa" }}>if</span>
                         {" (page === "}
-                        <span style={{ color: "#555555", fontStyle: "italic" }}>null</span>
+                        <span style={{ color: "#d4d4d8", fontStyle: "italic" }}>null</span>
                         {") {"}
                     </span>
 
                     <span style={{ paddingLeft: "20px" }}>
-                        <span style={{ color: "#444444" }}>console</span>
+                        <span style={{ color: "#a1a1aa" }}>console</span>
                         {"."}
-                        <span style={{ color: "#1a1a1a" }}>warn</span>
+                        <span style={{ color: "#ededed" }}>warn</span>
                         {"("}
-                        <span style={{ color: "#555555" }}>
+                        <span style={{ color: "#d4d4d8" }}>
                             &quot;halaman ini belum kubangun 🛠️&quot;
                         </span>
                         {");"}
                     </span>
 
                     <span style={{ paddingLeft: "20px" }}>
-                        <span style={{ color: "#444444" }}>return</span>
+                        <span style={{ color: "#a1a1aa" }}>return</span>
                         {" ("}
-                        <span style={{ color: "#555555", fontStyle: "italic" }}>
+                        <span style={{ color: "#d4d4d8", fontStyle: "italic" }}>
                             &quot;404 — lost in the void&quot;
                         </span>
                         {");"}
@@ -108,7 +108,7 @@ export default function NotFound() {
 
                     <span>&nbsp;</span>
 
-                    <span style={{ color: "#666666", fontStyle: "italic" }}>
+                    <span style={{ color: "#71717a", fontStyle: "italic" }}>
                         {"// ✦ "}
                         <Link href="/">kembali ke realita →</Link>
                     </span>
