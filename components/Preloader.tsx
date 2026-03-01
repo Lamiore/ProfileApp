@@ -29,7 +29,7 @@ export default function Preloader() {
                         position: "fixed",
                         inset: 0,
                         zIndex: 9999999,
-                        backgroundColor: "#F5F5F0", // matches portfolio background
+                        backgroundColor: "#1A1A1A", // matches dark theme background
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",

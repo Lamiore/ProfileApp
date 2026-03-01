@@ -743,7 +743,7 @@ export default function Hero() {
                                         ultimate
                                         <span className="hero-img">
                                             <img
-                                                src="https://i.pinimg.com/736x/7d/38/b7/7d38b799f9b3991ea320be58b9500180.jpg"
+                                                src="https://i.pinimg.com/avif/736x/e6/f8/62/e6f8626de840aff61f7d0a6d11c14940.avf"
                                                 alt="aesthetic"
                                             />
                                         </span>
