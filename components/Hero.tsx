@@ -15,15 +15,15 @@ const GalleryWindow = dynamic(() => import("@/components/windows/gallerywindow")
 const ConnectionWindow = dynamic(() => import("@/components/windows/connectionwindow"), { ssr: false });
 
 const IMAGES = [
-    "https://i.pinimg.com/736x/86/d0/34/86d034b31ec9a9e75f63cf7d83dd6a85.jpg",
-    "https://i.pinimg.com/1200x/4d/59/94/4d59942ae53d576463e85565788b7b65.jpg",
-    "https://i.pinimg.com/1200x/b9/96/1b/b9961bdd641884faa1a503be3170ba9a.jpg",
-    "https://i.pinimg.com/736x/ba/51/b6/ba51b6bca8d101c59fa0a0a34e29eb37.jpg",
-    "https://i.pinimg.com/736x/ef/87/7a/ef877a32692bea385b544e1e686123ff.jpg",
-    "https://i.pinimg.com/736x/1f/8e/f8/1f8ef82b2d77c86278ffe3c67e84442e.jpg",
-    "https://i.pinimg.com/1200x/a9/0f/77/a90f77bbacef39f3e620ba103ec11c33.jpg",
-    "https://i.pinimg.com/736x/67/9f/c2/679fc2d4cc43eb5a1483403cee117ccc.jpg",
-    "https://i.pinimg.com/736x/9e/a5/22/9ea522e8a0f562fabac47442d2406db7.jpg",
+    "https://i.pinimg.com/avif/736x/b9/88/1d/b9881d73712f3e4aa410348dcabcb8b3.avf",
+    "https://i.pinimg.com/736x/58/45/d8/5845d8e1ab60bffa4c25e7166f7eaed3.jpg",
+    "https://i.pinimg.com/avif/1200x/f9/6f/7b/f96f7be472570bc706ccc673aee1e4b8.avf",
+    "https://i.pinimg.com/736x/ca/e2/94/cae294f8e1aab257939af9ab1f465b64.jpg",
+    "https://i.pinimg.com/736x/01/e4/25/01e425074ed2e47516895ff239d6be30.jpg",
+    "https://i.pinimg.com/avif/1200x/48/24/3c/48243cf660a62c6907a27d24a25cc98d.avf",
+    "https://i.pinimg.com/avif/736x/7c/5e/b1/7c5eb18cfdb1aec55b79f18979955ae7.avf",
+    "https://i.pinimg.com/736x/5c/d6/cc/5cd6cc4e4d00ecb875734ac625de675e.jpg",
+    "https://i.pinimg.com/avif/736x/2a/2a/89/2a2a89bc2919adcf986231811e6d7204.avf",
 ];
 
 const CONFIG = {
@@ -520,16 +520,16 @@ export default function Hero() {
                                 className="relative flex items-center gap-2 px-5 py-2.5 text-sm tracking-widest uppercase cursor-pointer overflow-hidden"
                                 style={{
                                     borderRadius: "999px",
-                                    color: openWindows.includes(btn) ? "#fff" : "#2C2C2C",
+                                    color: openWindows.includes(btn) ? "#fff" : "#E0E0E0",
                                     background: openWindows.includes(btn)
-                                        ? "rgba(44,44,44,0.7)"
-                                        : "rgba(255, 255, 255, 0.25)",
+                                        ? "rgba(255,255,255,0.2)"
+                                        : "rgba(26, 26, 26, 0.35)",
                                     backdropFilter: "blur(20px) saturate(180%)",
                                     WebkitBackdropFilter: "blur(20px) saturate(180%)",
                                     border: openWindows.includes(btn)
                                         ? "1px solid rgba(255,255,255,0.2)"
-                                        : "1px solid rgba(255, 255, 255, 0.5)",
-                                    boxShadow: "0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)",
+                                        : "1px solid rgba(255, 255, 255, 0.2)",
+                                    boxShadow: "0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.2)",
                                     textShadow: "none",
                                     fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                                     fontWeight: 700,
@@ -581,17 +581,17 @@ export default function Hero() {
                         <div style={{ width: "22px", height: "16px", position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                             <span
                                 style={{
-                                    display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#2C2C2C",
+                                    display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#E0E0E0",
                                 }}
                             />
                             <span
                                 style={{
-                                    display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#2C2C2C",
+                                    display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#E0E0E0",
                                 }}
                             />
                             <span
                                 style={{
-                                    display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#2C2C2C",
+                                    display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#E0E0E0",
                                 }}
                             />
                         </div>
@@ -611,7 +611,7 @@ export default function Hero() {
                             position: "fixed",
                             inset: 0,
                             zIndex: 65,
-                            background: "rgba(245, 240, 232, 0.85)",
+                            background: "rgba(26, 26, 26, 0.85)",
                             backdropFilter: "blur(40px) saturate(180%)",
                             WebkitBackdropFilter: "blur(40px) saturate(180%)",
                             display: "flex",
@@ -657,7 +657,7 @@ export default function Hero() {
                                 zIndex: 70,
                             }}
                         >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2C2C2C" strokeWidth="2.2" strokeLinecap="round">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" strokeWidth="2.2" strokeLinecap="round">
                                 <line x1="18" y1="6" x2="6" y2="18" />
                                 <line x1="6" y1="6" x2="18" y2="18" />
                             </svg>
@@ -684,16 +684,16 @@ export default function Hero() {
                                     textTransform: "uppercase" as const,
                                     cursor: "pointer",
                                     borderRadius: "16px",
-                                    color: openWindows.includes(btn) ? "#fff" : "#2C2C2C",
+                                    color: openWindows.includes(btn) ? "#fff" : "#E0E0E0",
                                     background: openWindows.includes(btn)
-                                        ? "rgba(44,44,44,0.7)"
-                                        : "rgba(255, 255, 255, 0.35)",
+                                        ? "rgba(255,255,255,0.2)"
+                                        : "rgba(26, 26, 26, 0.35)",
                                     backdropFilter: "blur(20px)",
                                     WebkitBackdropFilter: "blur(20px)",
                                     border: openWindows.includes(btn)
                                         ? "1px solid rgba(255,255,255,0.2)"
-                                        : "1px solid rgba(255, 255, 255, 0.5)",
-                                    boxShadow: "0 2px 12px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6)",
+                                        : "1px solid rgba(255, 255, 255, 0.2)",
+                                    boxShadow: "0 2px 12px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.2)",
                                     fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                                     fontWeight: 700,
                                     transition: "background 0.2s, color 0.2s, border 0.2s",

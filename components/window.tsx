@@ -176,7 +176,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
             zIndex,
             borderRadius: 0,
             overflow: "hidden",
-            background: "rgba(245, 240, 232, 0.75)",
+            background: "rgba(26, 26, 26, 0.75)",
             backdropFilter: "blur(40px) saturate(180%)",
             WebkitBackdropFilter: "blur(40px) saturate(180%)",
             border: "none",
@@ -194,10 +194,10 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
             zIndex,
             borderRadius: "12px",
             overflow: "hidden",
-            background: "rgba(245, 240, 232, 0.55)",
+            background: "rgba(26, 26, 26, 0.55)",
             backdropFilter: "blur(40px) saturate(180%)",
             WebkitBackdropFilter: "blur(40px) saturate(180%)",
-            border: "1px solid rgba(255,255,255,0.6)",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
             boxShadow: "0 8px 32px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.8) inset",
             pointerEvents: "auto",
         };
@@ -241,7 +241,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
                     padding: "14px 16px",
                     cursor: isMaximized || isMinimized ? "default" : "grab",
                     borderBottom: isMinimized ? "none" : "1px solid rgba(44,44,44,0.1)",
-                    background: "rgba(245,240,232,0.4)",
+                    background: "rgba(26, 26, 26, 0.4)",
                     userSelect: "none",
                     flexShrink: 0,
                 }}
@@ -300,13 +300,13 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
                         textAlign: "center",
                         fontSize: "13px",
                         fontWeight: 500,
-                        color: "#2C2C2C99",
+                        color: "rgba(255, 255, 255, 0.6)",
                         letterSpacing: "0.05em",
                     }}
                 >
                     {title}
                     {isMinimized && (
-                        <span style={{ fontSize: "11px", marginLeft: "6px", color: "#2C2C2C50" }}>— minimized</span>
+                        <span style={{ fontSize: "11px", marginLeft: "6px", color: "rgba(255, 255, 255, 0.3)" }}>— minimized</span>
                     )}
                 </span>
 
@@ -335,7 +335,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
                                     width: "100%",
                                     height: "2px",
                                     borderRadius: "2px",
-                                    background: "#2C2C2C",
+                                    background: "#E0E0E0",
                                     transformOrigin: "center",
                                     transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)",
                                     transform: menuOpen ? "rotate(45deg) translateY(6px)" : "none",
@@ -347,7 +347,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
                                     width: "100%",
                                     height: "2px",
                                     borderRadius: "2px",
-                                    background: "#2C2C2C",
+                                    background: "#E0E0E0",
                                     transition: "opacity 0.2s, transform 0.2s",
                                     opacity: menuOpen ? 0 : 1,
                                     transform: menuOpen ? "scaleX(0)" : "scaleX(1)",
@@ -359,7 +359,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
                                     width: "100%",
                                     height: "2px",
                                     borderRadius: "2px",
-                                    background: "#2C2C2C",
+                                    background: "#E0E0E0",
                                     transformOrigin: "center",
                                     transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)",
                                     transform: menuOpen ? "rotate(-45deg) translateY(-6px)" : "none",
@@ -379,7 +379,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
                         padding: "24px",
                         overflowY: "auto",
                         height: isMaximized ? "calc(100vh - 48px)" : `calc(${size.h}px - 48px)`,
-                        color: "#2C2C2C",
+                        color: "#E0E0E0",
                         boxSizing: "border-box",
                     }}
                 >
@@ -409,9 +409,9 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
                 >
                     {/* Grip dots — like macOS */}
                     <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                        <circle cx="8" cy="8" r="1.5" fill="rgba(44,44,44,0.25)" />
-                        <circle cx="4" cy="8" r="1.5" fill="rgba(44,44,44,0.15)" />
-                        <circle cx="8" cy="4" r="1.5" fill="rgba(44,44,44,0.15)" />
+                        <circle cx="8" cy="8" r="1.5" fill="rgba(255,255,255,0.25)" />
+                        <circle cx="4" cy="8" r="1.5" fill="rgba(255,255,255,0.15)" />
+                        <circle cx="8" cy="4" r="1.5" fill="rgba(255,255,255,0.15)" />
                     </svg>
                 </div>
             )}
