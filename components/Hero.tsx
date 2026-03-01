@@ -21,7 +21,7 @@ const IMAGES = [
     "https://i.pinimg.com/736x/ca/e2/94/cae294f8e1aab257939af9ab1f465b64.jpg",
     "https://i.pinimg.com/736x/01/e4/25/01e425074ed2e47516895ff239d6be30.jpg",
     "https://i.pinimg.com/avif/1200x/48/24/3c/48243cf660a62c6907a27d24a25cc98d.avf",
-    "https://i.pinimg.com/avif/736x/7c/5e/b1/7c5eb18cfdb1aec55b79f18979955ae7.avf",
+    "https://i.pinimg.com/736x/2a/ea/c9/2aeac961f4fb84819c1bc8ef5b83f5b3.jpg",
     "https://i.pinimg.com/736x/5c/d6/cc/5cd6cc4e4d00ecb875734ac625de675e.jpg",
     "https://i.pinimg.com/avif/736x/2a/2a/89/2a2a89bc2919adcf986231811e6d7204.avf",
 ];
@@ -743,7 +743,7 @@ export default function Hero() {
                                         ultimate
                                         <span className="hero-img">
                                             <img
-                                                src="https://i.pinimg.com/avif/736x/e6/f8/62/e6f8626de840aff61f7d0a6d11c14940.avf"
+                                                src="https://i.pinimg.com/avif/736x/fe/00/a6/fe00a6d3a8978b2c055e6d86674be866.avf"
                                                 alt="aesthetic"
                                             />
                                         </span>
