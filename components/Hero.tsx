@@ -87,7 +87,7 @@ export default function Hero() {
     const [menuOpen, setMenuOpen] = useState(false);
     const focusCounter = useRef(0);
     const [windowZMap, setWindowZMap] = useState<Record<string, number>>({});
-    const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
 
     // Detect mobile viewport (debounced)
     useEffect(() => {
@@ -148,21 +148,7 @@ export default function Hero() {
         setWindowZMap((z) => ({ ...z, [name]: focusCounter.current }));
     }, []);
 
-    // Tutup lalu buka ulang window (reset posisi & ukuran)
-    const reopenWindow = useCallback((name: string) => {
-        playCloseSound();
-        setOpenWindows((prev) => prev.filter((w) => w !== name));
-        setWindowZMap((z) => {
-            const next = { ...z };
-            delete next[name];
-            return next;
-        });
-        setTimeout(() => {
-            focusCounter.current += 1;
-            setWindowZMap((z) => ({ ...z, [name]: focusCounter.current }));
-            setOpenWindows((prev) => [...prev, name]);
-        }, 60);
-    }, []);
+
 
     const closeWindow = useCallback((name: string) => {
         playCloseSound();
@@ -174,26 +160,9 @@ export default function Hero() {
         });
     }, []);
 
-    // Smart click handler: single = open/reopen, double = close
     const handleNavClick = useCallback((btn: string) => {
-        if (clickTimerRef.current) {
-            // Second click arrived quickly → double-click → close
-            clearTimeout(clickTimerRef.current);
-            clickTimerRef.current = null;
-            if (openWindows.includes(btn)) closeWindow(btn);
-            return;
-        }
-        // First click — wait to see if a second comes
-        clickTimerRef.current = setTimeout(() => {
-            clickTimerRef.current = null;
-            // Single click confirmed
-            if (openWindows.includes(btn)) {
-                reopenWindow(btn);
-            } else {
-                toggleWindow(btn);
-            }
-        }, 220);
-    }, [openWindows, closeWindow, reopenWindow, toggleWindow]);
+        toggleWindow(btn);
+    }, [toggleWindow]);
 
     const BASE_Z = 50; // z-index dasar window
 
