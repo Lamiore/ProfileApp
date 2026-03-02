@@ -54,65 +54,64 @@ export default function NotFound() {
             `}</style>
 
             <div className="nf-body">
-                <motion.div
-                    className="code-area"
-                    initial={{ opacity: 0, y: 14 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                >
-                    <span>&nbsp;</span>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2rem" }}>
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                        <motion.svg
+                            width="140"
+                            height="140"
+                            viewBox="0 0 100 100"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            animate={{ y: [0, -12, 0] }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                        >
+                            <path
+                                d="M20 90C20 90 25 80 35 90C45 100 55 80 65 90C75 100 80 90 80 90V45C80 28.4315 66.5685 15 50 15C33.4315 15 20 28.4315 20 45V90Z"
+                                fill="rgba(237, 237, 237, 0.03)"
+                                stroke="#52525b"
+                                strokeWidth="2"
+                                strokeLinejoin="round"
+                            />
+                            {/* Eyes blinking */}
+                            <motion.circle
+                                cx="35" cy="45" r="4" fill="#a1a1aa"
+                                animate={{ scaleY: [1, 0, 1] }}
+                                transition={{ duration: 4, repeat: Infinity, times: [0, 0.05, 0.1], repeatDelay: 1 }}
+                                style={{ transformOrigin: "35px 45px" }}
+                            />
+                            <motion.circle
+                                cx="65" cy="45" r="4" fill="#a1a1aa"
+                                animate={{ scaleY: [1, 0, 1] }}
+                                transition={{ duration: 4, repeat: Infinity, times: [0, 0.05, 0.1], repeatDelay: 1 }}
+                                style={{ transformOrigin: "65px 45px" }}
+                            />
+                            <ellipse cx="50" cy="65" rx="6" ry="8" fill="#52525b" opacity="0.8" />
+                        </motion.svg>
+                    </motion.div>
 
-                    <span>
-                        <span style={{ color: "#a1a1aa" }}>const</span>
-                        {" "}
-                        <span style={{ color: "#ededed", fontStyle: "italic" }}>page</span>
-                        {" = "}
-                        <span style={{ color: "#a1a1aa" }}>await</span>
-                        {" "}
-                        <span style={{ color: "#ededed" }}>find</span>
-                        {"("}
-                        <span style={{ color: "#d4d4d8", fontStyle: "italic" }}>url</span>
-                        {");"}
-                    </span>
-
-                    <span>&nbsp;</span>
-
-                    <span>
-                        <span style={{ color: "#a1a1aa" }}>if</span>
-                        {" (page === "}
-                        <span style={{ color: "#d4d4d8", fontStyle: "italic" }}>null</span>
-                        {") {"}
-                    </span>
-
-                    <span style={{ paddingLeft: "20px" }}>
-                        <span style={{ color: "#a1a1aa" }}>console</span>
-                        {"."}
-                        <span style={{ color: "#ededed" }}>warn</span>
-                        {"("}
-                        <span style={{ color: "#d4d4d8" }}>
-                            &quot;halaman ini belum kubangun 🛠️&quot;
-                        </span>
-                        {");"}
-                    </span>
-
-                    <span style={{ paddingLeft: "20px" }}>
-                        <span style={{ color: "#a1a1aa" }}>return</span>
-                        {" ("}
-                        <span style={{ color: "#d4d4d8", fontStyle: "italic" }}>
-                            &quot;404 — lost in the void&quot;
-                        </span>
-                        {");"}
-                    </span>
-
-                    <span>{"}"}</span>
-
-                    <span>&nbsp;</span>
-
-                    <span style={{ color: "#71717a", fontStyle: "italic" }}>
-                        {"// ✦ "}
-                        <Link href="/">kembali ke realita →</Link>
-                    </span>
-                </motion.div>
+                    <motion.div
+                        initial={{ opacity: 0, y: 14 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+                        style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "1rem" }}
+                    >
+                        <h1 style={{ fontSize: "2rem", fontWeight: "normal", color: "#ededed", margin: 0, letterSpacing: "0.05em" }}>
+                            404 Not Found
+                        </h1>
+                        <p style={{ color: "#a1a1aa", margin: 0, fontSize: "1rem" }}>
+                            <Link href="/" style={{ color: "#a1a1aa", textDecoration: "none", borderBottom: "1px dashed #52525b", paddingBottom: "2px", transition: "color 0.2s, borderColor 0.2s" }}
+                                onMouseEnter={(e) => { e.currentTarget.style.color = "#ededed"; e.currentTarget.style.borderColor = "#a1a1aa"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.color = "#a1a1aa"; e.currentTarget.style.borderColor = "#52525b"; }}
+                            >
+                                kembali ke realita →
+                            </Link>
+                        </p>
+                    </motion.div>
+                </div>
             </div>
         </>
     );

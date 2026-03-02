@@ -603,9 +603,9 @@ export default function Hero() {
             <AnimatePresence>
                 {isMobile && menuOpen && (
                     <motion.div
-                        initial={{ y: "-100%" }}
-                        animate={{ y: 0 }}
-                        exit={{ y: "-100%" }}
+                        initial={{ x: "100%" }}
+                        animate={{ x: 0 }}
+                        exit={{ x: "100%" }}
                         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                         style={{
                             position: "fixed",
@@ -663,46 +663,40 @@ export default function Hero() {
                             </svg>
                         </motion.button>
 
-                        {buttons.map((btn, i) => (
-                            <motion.button
-                                key={btn}
-                                onClick={() => handleNavClick(btn)}
-                                initial={{ opacity: 0, y: -20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -20 }}
-                                transition={{ delay: i * 0.06, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                                whileTap={{ scale: 0.96 }}
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    gap: "10px",
-                                    width: "100%",
-                                    maxWidth: "360px",
-                                    fontSize: "16px",
-                                    letterSpacing: "0.15em",
-                                    textTransform: "uppercase" as const,
-                                    cursor: "pointer",
-                                    borderRadius: "16px",
-                                    color: openWindows.includes(btn) ? "#fff" : "#E0E0E0",
-                                    background: openWindows.includes(btn)
-                                        ? "rgba(255,255,255,0.2)"
-                                        : "rgba(26, 26, 26, 0.35)",
-                                    backdropFilter: "blur(20px)",
-                                    WebkitBackdropFilter: "blur(20px)",
-                                    border: openWindows.includes(btn)
-                                        ? "1px solid rgba(255,255,255,0.2)"
-                                        : "1px solid rgba(255, 255, 255, 0.2)",
-                                    boxShadow: "0 2px 12px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.2)",
-                                    fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                                    fontWeight: 700,
-                                    transition: "background 0.2s, color 0.2s, border 0.2s",
-                                }}
-                            >
-                                <span style={{ opacity: 0.7, display: "flex", alignItems: "center" }}>{buttonIcons[btn]}</span>
-                                {btn}
-                            </motion.button>
-                        ))}
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "160px", gap: "12px" }}>
+                            {buttons.map((btn, i) => (
+                                <motion.button
+                                    key={btn}
+                                    onClick={() => handleNavClick(btn)}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    transition={{ delay: i * 0.06, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                                    whileTap={{ scale: 0.96 }}
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "flex-start",
+                                        gap: "16px",
+                                        width: "100%",
+                                        padding: "16px 0",
+                                        fontSize: "18px",
+                                        letterSpacing: "0.15em",
+                                        textTransform: "uppercase" as const,
+                                        cursor: "pointer",
+                                        color: openWindows.includes(btn) ? "#fff" : "#A0A0A0",
+                                        background: "transparent",
+                                        border: "none",
+                                        fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                                        fontWeight: 700,
+                                        transition: "color 0.2s",
+                                    }}
+                                >
+                                    <span style={{ opacity: 0.7, display: "flex", alignItems: "center" }}>{buttonIcons[btn]}</span>
+                                    {btn}
+                                </motion.button>
+                            ))}
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>

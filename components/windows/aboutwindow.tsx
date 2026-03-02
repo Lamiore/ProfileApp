@@ -3,7 +3,7 @@
 import Image from "next/image";
 
 export default function AboutWindow() {
-    const skills = ["Photoshop", "After Effects", "Visual Design", "Creative Direction"];
+    const skills = ["Photoshop", "After Effects", "Visual Design"];
 
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -77,9 +77,12 @@ export default function AboutWindow() {
                 </p>
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                     {[
-                        { year: "Now", desc: "Exploring the world of creative economy & visual design" },
-                        { year: "2024", desc: "Mulai serius mendalami Photoshop & After Effects" },
-                        { year: "—", desc: "The story is still being written..." },
+                        { year: "2025", desc: "Mulai menemukan ritme. Lumayan paham cara mainnya dan siap eksplor lebih jauh." },
+                        { year: "2024", desc: "Ekspansi skill ke dunia logika dengan mempelajari bahasa pemrograman." },
+                        { year: "2023", desc: "Menyusun fondasi digital lewat eksplorasi pembuatan website." },
+                        { year: "2022", desc: "Mengasah insting visual dan terjun langsung lewat PKL di studio foto." },
+                        { year: "2021", desc: "Menghidupkan imajinasi visual melalui Photoshop dan After Effects." },
+                        { year: "2020", desc: "Langkah pertama merangkai jejak digital. Awal mula eksplorasi di ekosistem Windows." },
                     ].map((item, i) => (
                         <div key={i} style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
                             <span style={{ fontSize: "11px", color: "rgba(224, 224, 224, 0.4)", fontVariantNumeric: "tabular-nums", width: "32px", flexShrink: 0, paddingTop: "2px" }}>

@@ -233,21 +233,13 @@
 /* ── Hero Typography ── */
 .hero-text {
   font-size: clamp(3rem, 6vw, 6.5rem);
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.1;
   letter-spacing: -0.03em;
   color: #E0E0E0;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: 'Helvetica 1957', Helvetica, Arial, sans-serif;
   user-select: none;
-  text-shadow:
-    -2px -2px 0 rgba(0, 0, 0, 1),
-    2px -2px 0 rgba(0, 0, 0, 1),
-    -2px 2px 0 rgba(0, 0, 0, 1),
-    2px 2px 0 rgba(0, 0, 0, 1),
-    0px 2px 0 rgba(0, 0, 0, 1),
-    2px 0px 0 rgba(0, 0, 0, 1),
-    0px -2px 0 rgba(0, 0, 0, 1),
-    -2px 0px 0 rgba(0, 0, 0, 1);
+  text-shadow: 4px 4px 10px rgba(0, 0, 0, 1);
 }
 
 .hero-line {
@@ -263,15 +255,7 @@
   cursor: pointer;
   pointer-events: auto;
   padding-right: clamp(8rem, 14vw, 16rem);
-  text-shadow:
-    -2px -2px 0 rgba(0, 0, 0, 1),
-    2px -2px 0 rgba(0, 0, 0, 1),
-    -2px 2px 0 rgba(0, 0, 0, 1),
-    2px 2px 0 rgba(0, 0, 0, 1),
-    0px 2px 0 rgba(0, 0, 0, 1),
-    2px 0px 0 rgba(0, 0, 0, 1),
-    0px -2px 0 rgba(0, 0, 0, 1),
-    -2px 0px 0 rgba(0, 0, 0, 1);
+  text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.45);
 }
 
 .hero-hover:hover {
