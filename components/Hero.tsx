@@ -253,6 +253,10 @@ export default function Hero() {
         let tilesX = 1;
         let tilesY = 1;
         let rafId: number;
+        let rafRunning = false;
+        let driftTimer: ReturnType<typeof setTimeout>;
+        // assigned after animate is defined below
+        let startRaf: () => void = () => { };
 
         const calculateCellSizeAndTiling = () => {
             const vw = window.innerWidth;
@@ -315,6 +319,9 @@ export default function Hero() {
         const resetIdle = () => {
             state.lastInteractionTime = performance.now();
             state.driftActive = false;
+            clearTimeout(driftTimer);
+            driftTimer = setTimeout(startRaf, IDLE_DELAY_MS + 16);
+            startRaf();
         };
 
         const onMouseDown = (e: MouseEvent) => {
