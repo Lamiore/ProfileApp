@@ -203,8 +203,8 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
         };
 
     const trafficButtonStyle = (color: string): React.CSSProperties => ({
-        width: "12px",
-        height: "12px",
+        width: "14px",
+        height: "14px",
         borderRadius: "50%",
         background: color,
         border: "none",
@@ -249,7 +249,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
                 {/* Traffic light buttons — hidden on mobile */}
                 {!isMobile && (
                     <div
-                        style={{ display: "flex", gap: "6px", alignItems: "center" }}
+                        style={{ display: "flex", gap: "8px", alignItems: "center" }}
                         onMouseEnter={() => setHoveringButtons(true)}
                         onMouseLeave={() => setHoveringButtons(false)}
                     >
@@ -261,7 +261,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
                             style={trafficButtonStyle("#FF5F57")}
                         >
                             {hoveringButtons && (
-                                <span style={{ position: "absolute", fontSize: "8px", color: "rgba(0,0,0,0.5)", fontWeight: 700, lineHeight: 1, pointerEvents: "none" }}>✕</span>
+                                <span style={{ position: "absolute", fontSize: "10px", color: "rgba(0,0,0,0.5)", fontWeight: 700, lineHeight: 1, pointerEvents: "none" }}>✕</span>
                             )}
                         </button>
 
@@ -273,7 +273,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
                             style={trafficButtonStyle("#FEBC2E")}
                         >
                             {hoveringButtons && (
-                                <span style={{ position: "absolute", fontSize: "10px", color: "rgba(0,0,0,0.5)", fontWeight: 700, lineHeight: 1, pointerEvents: "none", marginTop: "-1px" }}>−</span>
+                                <span style={{ position: "absolute", fontSize: "12px", color: "rgba(0,0,0,0.5)", fontWeight: 700, lineHeight: 1, pointerEvents: "none", marginTop: "-1px" }}>−</span>
                             )}
                         </button>
 
@@ -285,7 +285,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
                             style={trafficButtonStyle("#28C840")}
                         >
                             {hoveringButtons && (
-                                <span style={{ position: "absolute", fontSize: "8px", color: "rgba(0,0,0,0.5)", fontWeight: 700, lineHeight: 1, pointerEvents: "none" }}>
+                                <span style={{ position: "absolute", fontSize: "10px", color: "rgba(0,0,0,0.5)", fontWeight: 700, lineHeight: 1, pointerEvents: "none" }}>
                                     {isMaximized ? "⊙" : "⤢"}
                                 </span>
                             )}
