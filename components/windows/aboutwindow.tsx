@@ -2,24 +2,29 @@
 
 import Image from "next/image";
 
-export default function AboutWindow() {
+export default function AboutWindow({ onOpenWindow }: { onOpenWindow?: (name: string) => void }) {
     const skills = ["Photoshop", "After Effects", "Visual Design"];
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+        <div style={{ position: "relative", display: "flex", flexDirection: "column", gap: "24px" }}>
 
             {/* Top — foto + bio */}
             <div style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
                 {/* Foto profil */}
-                <div style={{
-                    width: "80px",
-                    height: "80px",
-                    borderRadius: "50%",
-                    flexShrink: 0,
-                    overflow: "hidden",
-                    border: "2px solid rgba(255,255,255,0.1)",
-                    position: "relative",
-                }}>
+                <div
+                    onDoubleClick={() => onOpenWindow?.("Login")}
+                    title="Double click for secret area"
+                    style={{
+                        width: "80px",
+                        height: "80px",
+                        borderRadius: "50%",
+                        flexShrink: 0,
+                        overflow: "hidden",
+                        border: "2px solid rgba(255,255,255,0.1)",
+                        position: "relative",
+                        cursor: "pointer"
+                    }}
+                >
                     <Image
                         src="/profile.jpg"
                         alt="Profile photo"

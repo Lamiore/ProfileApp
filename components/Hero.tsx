@@ -6,6 +6,8 @@ import dynamic from "next/dynamic";
 import Window from "@/components/window";
 import BlurOverlay from "@/components/BlurOverlay";
 import { playCloseSound } from "@/lib/audio";
+import { auth } from "@/lib/firebase";
+import { onAuthStateChanged, User } from "firebase/auth";
 
 // Dynamic imports — window components only load when actually opened
 const AboutWindow = dynamic(() => import("@/components/windows/aboutwindow"), { ssr: false });
@@ -13,6 +15,8 @@ const ProjectWindow = dynamic(() => import("@/components/windows/projectwindow")
 const BlogWindow = dynamic(() => import("@/components/windows/blogwindow"), { ssr: false });
 const GalleryWindow = dynamic(() => import("@/components/windows/gallerywindow"), { ssr: false });
 const ConnectionWindow = dynamic(() => import("@/components/windows/connectionwindow"), { ssr: false });
+const LoginWindow = dynamic(() => import("@/components/windows/loginwindow"), { ssr: false });
+const DashboardWindow = dynamic(() => import("@/components/windows/dashboardwindow"), { ssr: false });
 
 const IMAGES = [
     "https://i.pinimg.com/avif/736x/b9/88/1d/b9881d73712f3e4aa410348dcabcb8b3.avf",
@@ -87,6 +91,15 @@ export default function Hero() {
     const [menuOpen, setMenuOpen] = useState(false);
     const focusCounter = useRef(0);
     const [windowZMap, setWindowZMap] = useState<Record<string, number>>({});
+    const [user, setUser] = useState<User | null>(null);
+
+    // Listen to Firebase auth state
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+        });
+        return () => unsubscribe();
+    }, []);
 
 
     // Detect mobile viewport (debounced)
@@ -104,13 +117,6 @@ export default function Hero() {
             window.removeEventListener("resize", handleResize);
         };
     }, []);
-
-    // Close menu when viewport switches to desktop
-    useEffect(() => {
-        if (!isMobile) setMenuOpen(false);
-    }, [isMobile]);
-
-    // Sound effects are now in lib/audio.ts (shared AudioContext)
 
     // Buka/tutup window + sound — memoized to prevent child re-renders
     const toggleWindow = useCallback((name: string) => {
@@ -160,9 +166,27 @@ export default function Hero() {
         });
     }, []);
 
-    const handleNavClick = useCallback((btn: string) => {
-        toggleWindow(btn);
-    }, [toggleWindow]);
+    const handleLoginSuccess = useCallback(() => {
+        closeWindow("Login");
+        // Open Dashboard if not open, otherwise bring to front
+        setOpenWindows((prev) => {
+            if (prev.includes("Dashboard")) {
+                bringToFront("Dashboard");
+                return prev;
+            } else {
+                if (isMobile && prev.length > 0) {
+                    setWindowZMap({});
+                    focusCounter.current = 1;
+                    setWindowZMap({ "Dashboard": 1 });
+                    return ["Dashboard"];
+                }
+                focusCounter.current += 1;
+                setWindowZMap((z) => ({ ...z, ["Dashboard"]: focusCounter.current }));
+                return [...prev, "Dashboard"];
+            }
+        });
+        if (isMobile) setMenuOpen(false);
+    }, [closeWindow, bringToFront, isMobile, setWindowZMap]);
 
     const BASE_Z = 50; // z-index dasar window
 
@@ -365,11 +389,12 @@ export default function Hero() {
             }, 100);
         };
 
+        let isPaused = false;
+
         const animate = () => {
-            // Pause animation loop completely if tab is hidden
             if (document.hidden) {
-                rafId = requestAnimationFrame(animate);
-                return;
+                isPaused = true;
+                return; // stop loop — resumed via visibilitychange
             }
             rafId = requestAnimationFrame(animate);
 
@@ -407,13 +432,27 @@ export default function Hero() {
                 state.cameraOffset.y += dy * CONFIG.easingFactor;
                 updateItemPositions();
             }
-            const speedFactor = Math.min(state.scrollSpeed * 0.01, 1);
-            state.targetScale = 1 - speedFactor * CONFIG.maxScaleEffect;
-            state.scrollSpeed *= 0.85;
+            if (state.scrollSpeed > 0.1) {
+                const speedFactor = Math.min(state.scrollSpeed * 0.01, 1);
+                state.targetScale = 1 - speedFactor * CONFIG.maxScaleEffect;
+                state.scrollSpeed *= 0.85;
+            } else {
+                state.scrollSpeed = 0;
+                state.targetScale = 1;
+            }
+            const prevScale = state.containerScale;
+            const prevRotX = state.containerRotationX;
+            const prevRotY = state.containerRotationY;
             state.containerScale += (state.targetScale - state.containerScale) * CONFIG.scaleEasing;
             state.containerRotationX += (state.targetRotationX - state.containerRotationX) * CONFIG.rotationEasing;
             state.containerRotationY += (state.targetRotationY - state.containerRotationY) * CONFIG.rotationEasing;
-            container.style.transform = `scale(${state.containerScale}) skewY(${state.containerRotationX}deg) skewX(${state.containerRotationY}deg)`;
+            if (
+                Math.abs(state.containerScale - prevScale) > 0.0001 ||
+                Math.abs(state.containerRotationX - prevRotX) > 0.0001 ||
+                Math.abs(state.containerRotationY - prevRotY) > 0.0001
+            ) {
+                container.style.transform = `scale(${state.containerScale}) skewY(${state.containerRotationX}deg) skewX(${state.containerRotationY}deg)`;
+            }
         };
 
         calculateCellSizeAndTiling();
@@ -434,10 +473,18 @@ export default function Hero() {
         // Listen to visibilitychange inside the effect explicitly if needed,
         // though document.hidden check inside animate loop already handles the RAF pause.
 
+        const onVisibilityChange = () => {
+            if (!document.hidden && isPaused) {
+                isPaused = false;
+                rafId = requestAnimationFrame(animate);
+            }
+        };
+        document.addEventListener('visibilitychange', onVisibilityChange);
         animate();
 
         return () => {
             cancelAnimationFrame(rafId);
+            document.removeEventListener('visibilitychange', onVisibilityChange);
             viewport.removeEventListener("mousedown", onMouseDown);
             viewport.removeEventListener("mousemove", onMouseMove);
             viewport.removeEventListener("mouseup", onMouseUp);
@@ -511,7 +558,7 @@ export default function Hero() {
                         {buttons.map((btn, i) => (
                             <motion.button
                                 key={btn}
-                                onClick={() => handleNavClick(btn)}
+                                onClick={() => toggleWindow(btn)}
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 3.0 + i * 0.08 }}
@@ -667,7 +714,7 @@ export default function Hero() {
                             {buttons.map((btn, i) => (
                                 <motion.button
                                     key={btn}
-                                    onClick={() => handleNavClick(btn)}
+                                    onClick={() => toggleWindow(btn)}
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -20 }}
@@ -766,14 +813,23 @@ export default function Hero() {
                                 onClose={() => closeWindow(name)}
                                 onMenuToggle={() => setMenuOpen((prev) => !prev)}
                                 menuOpen={menuOpen}
-                                initialWidth={["Gallery", "Blog", "Project"].includes(name) ? 820 : 560}
-                                initialHeight={["Gallery", "Blog", "Project"].includes(name) ? 620 : 480}
+                                initialWidth={["Gallery", "Blog", "Project"].includes(name) ? 820 : ["Dashboard"].includes(name) ? 960 : 560}
+                                initialHeight={["Gallery", "Blog", "Project"].includes(name) ? 620 : ["Dashboard"].includes(name) ? 600 : 480}
                             >
-                                {name === "About" && <AboutWindow />}
+                                {name === "About" && <AboutWindow onOpenWindow={(wName) => {
+                                    if (wName === "Login" && user) {
+                                        // If already logged in, skip Login and directly open Dashboard
+                                        handleLoginSuccess();
+                                    } else {
+                                        toggleWindow(wName);
+                                    }
+                                }} />}
                                 {name === "Project" && <ProjectWindow />}
                                 {name === "Blog" && <BlogWindow />}
                                 {name === "Gallery" && <GalleryWindow />}
                                 {name === "Connect" && <ConnectionWindow />}
+                                {name === "Login" && <LoginWindow onLoginSuccess={handleLoginSuccess} />}
+                                {name === "Dashboard" && <DashboardWindow />}
                             </Window>
                         ))}
                     </AnimatePresence>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
 import { playOpenSound, playCloseSound } from "@/lib/audio";
@@ -21,6 +21,21 @@ const MIN_W = 360;
 const MIN_H = 240;
 const DEFAULT_W = 560;
 const DEFAULT_H = 480;
+
+const trafficButtonStyle = (color: string): React.CSSProperties => ({
+    width: "14px",
+    height: "14px",
+    borderRadius: "50%",
+    background: color,
+    border: "none",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+    position: "relative",
+    transition: "filter 0.15s ease",
+});
 
 export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen = false, zIndex = 50, initialWidth, initialHeight, children }: WindowProps) {
     const windowRef = useRef<HTMLDivElement>(null);
@@ -63,10 +78,10 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
     }, []);
 
     // Random spawn offset – generated once on mount, stays fixed
-    const randomOffset = useRef({
+    const [randomOffset] = useState(() => ({
         x: (Math.random() - 0.5) * 180, // -180 to +180 px
         y: (Math.random() - 0.5) * 120, // -120 to +120 px
-    });
+    }));
 
     // On first mount → center + random scatter. On size prop change → only resize, keep position.
     useEffect(() => {
@@ -74,12 +89,12 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
         setSize({ w: initW, h: initH });
         if (!initialized) {
             setPosition({
-                x: (window.innerWidth - initW) / 2 + randomOffset.current.x,
-                y: (window.innerHeight - initH) / 2 + randomOffset.current.y,
+                x: (window.innerWidth - initW) / 2 + randomOffset.x,
+                y: (window.innerHeight - initH) / 2 + randomOffset.y,
             });
             setInitialized(true);
         }
-    }, [initW, initH, isMobile]);
+    }, [initW, initH, isMobile, initialized, randomOffset]);
 
     // Play open sound on mount
     useEffect(() => {
@@ -187,7 +202,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
             position: "fixed",
             left: position.x,
             top: position.y,
-            width: isMinimized ? `${size.w}px` : `${size.w}px`,
+            width: `${size.w}px`,
             height: isMinimized ? "48px" : `${size.h}px`,
             minWidth: `${MIN_W}px`,
             minHeight: isMinimized ? "48px" : `${MIN_H}px`,
@@ -201,21 +216,6 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
             boxShadow: "0 8px 32px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.8) inset",
             pointerEvents: "auto",
         };
-
-    const trafficButtonStyle = (color: string): React.CSSProperties => ({
-        width: "14px",
-        height: "14px",
-        borderRadius: "50%",
-        background: color,
-        border: "none",
-        cursor: "pointer",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexShrink: 0,
-        position: "relative",
-        transition: "filter 0.15s ease",
-    });
 
     return (
         <motion.div

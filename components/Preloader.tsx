@@ -5,11 +5,17 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Preloader() {
-    const [isLoading, setIsLoading] = useState(true);
     const pathname = usePathname();
+    const [isLoading, setIsLoading] = useState(true);
+    const [prevPathname, setPrevPathname] = useState(pathname);
+
+    // Initial load block triggering a synchronous re-sync so React handles state updates in correct sequence.
+    if (pathname !== prevPathname) {
+        setPrevPathname(pathname);
+        setIsLoading(true);
+    }
 
     useEffect(() => {
-        setIsLoading(true);
         // Simulate minimum loading time for the animation to look good
         const timer = setTimeout(() => {
             setIsLoading(false);
