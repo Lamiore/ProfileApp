@@ -310,65 +310,92 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
                     )}
                 </span>
 
-                {/* Mobile hamburger menu button — right side of title bar */}
-                {isMobile && onMenuToggle ? (
-                    <button
-                        onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
-                        onMouseDown={(e) => e.stopPropagation()}
-                        aria-label={menuOpen ? "Close menu" : "Open menu"}
-                        style={{
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            padding: "4px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            width: "42px",
-                            flexShrink: 0,
-                        }}
-                    >
-                        <div style={{ width: "20px", height: "14px", position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                            <span
-                                style={{
-                                    display: "block",
-                                    width: "100%",
-                                    height: "2px",
-                                    borderRadius: "2px",
-                                    background: "#E0E0E0",
-                                    transformOrigin: "center",
-                                    transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)",
-                                    transform: menuOpen ? "rotate(45deg) translateY(6px)" : "none",
-                                }}
-                            />
-                            <span
-                                style={{
-                                    display: "block",
-                                    width: "100%",
-                                    height: "2px",
-                                    borderRadius: "2px",
-                                    background: "#E0E0E0",
-                                    transition: "opacity 0.2s, transform 0.2s",
-                                    opacity: menuOpen ? 0 : 1,
-                                    transform: menuOpen ? "scaleX(0)" : "scaleX(1)",
-                                }}
-                            />
-                            <span
-                                style={{
-                                    display: "block",
-                                    width: "100%",
-                                    height: "2px",
-                                    borderRadius: "2px",
-                                    background: "#E0E0E0",
-                                    transformOrigin: "center",
-                                    transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)",
-                                    transform: menuOpen ? "rotate(-45deg) translateY(-6px)" : "none",
-                                }}
-                            />
-                        </div>
-                    </button>
+                {/* Mobile buttons — right side of title bar */}
+                {isMobile ? (
+                    onMenuToggle ? (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onMenuToggle(); }}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            aria-label={menuOpen ? "Close menu" : "Open menu"}
+                            style={{
+                                background: "none",
+                                border: "none",
+                                cursor: "pointer",
+                                padding: "4px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                width: "42px",
+                                flexShrink: 0,
+                            }}
+                        >
+                            <div style={{ width: "20px", height: "14px", position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                                <span
+                                    style={{
+                                        display: "block",
+                                        width: "100%",
+                                        height: "2px",
+                                        borderRadius: "2px",
+                                        background: "#E0E0E0",
+                                        transformOrigin: "center",
+                                        transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)",
+                                        transform: menuOpen ? "rotate(45deg) translateY(6px)" : "none",
+                                    }}
+                                />
+                                <span
+                                    style={{
+                                        display: "block",
+                                        width: "100%",
+                                        height: "2px",
+                                        borderRadius: "2px",
+                                        background: "#E0E0E0",
+                                        transition: "opacity 0.2s, transform 0.2s",
+                                        opacity: menuOpen ? 0 : 1,
+                                        transform: menuOpen ? "scaleX(0)" : "scaleX(1)",
+                                    }}
+                                />
+                                <span
+                                    style={{
+                                        display: "block",
+                                        width: "100%",
+                                        height: "2px",
+                                        borderRadius: "2px",
+                                        background: "#E0E0E0",
+                                        transformOrigin: "center",
+                                        transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)",
+                                        transform: menuOpen ? "rotate(-45deg) translateY(-6px)" : "none",
+                                    }}
+                                />
+                            </div>
+                        </button>
+                    ) : (
+                        <button
+                            onClick={handleClose}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            aria-label="Close window"
+                            style={{
+                                background: "rgba(255, 95, 87, 0.15)",
+                                border: "1px solid rgba(255, 95, 87, 0.3)",
+                                cursor: "pointer",
+                                padding: "0",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                width: "28px",
+                                height: "28px",
+                                borderRadius: "8px",
+                                flexShrink: 0,
+                                color: "#FF5F57",
+                            }}
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </button>
+                    )
                 ) : (
-                    !isMobile && <div style={{ width: "42px" }} />
+                    <div style={{ width: "42px" }} />
                 )}
             </div>
 
