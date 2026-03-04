@@ -6,8 +6,6 @@ import dynamic from "next/dynamic";
 import Window from "@/components/window";
 import BlurOverlay from "@/components/BlurOverlay";
 import { playCloseSound } from "@/lib/audio";
-import { auth } from "@/lib/firebase";
-import { onAuthStateChanged, User } from "firebase/auth";
 
 const AboutWindow = dynamic(() => import("@/components/windows/aboutwindow"), { ssr: false });
 const ProjectWindow = dynamic(() => import("@/components/windows/projectwindow"), { ssr: false });
@@ -236,8 +234,9 @@ export default function Hero() {
             const totalHeight = cellHeight * CONFIG.ROWS;
             const neededTilesX = Math.ceil((vw * requiredCoverFactor) / totalWidth);
             const neededTilesY = Math.ceil((vh * requiredCoverFactor) / totalHeight);
-            tilesX = Math.max(1, neededTilesX + CONFIG.tileOverscan);
-            tilesY = Math.max(1, neededTilesY + CONFIG.tileOverscan);
+            const overscan = window.innerWidth <= 768 ? CONFIG.mobileTileOverscan : CONFIG.tileOverscan;
+            tilesX = Math.max(1, neededTilesX + overscan);
+            tilesY = Math.max(1, neededTilesY + overscan);
         };
 
         const createGridItems = () => {
@@ -424,7 +423,11 @@ export default function Hero() {
                 Math.abs(state.containerRotationX - prevRotX) > 0.0001 ||
                 Math.abs(state.containerRotationY - prevRotY) > 0.0001
             ) {
-                container.style.transform = `scale(${state.containerScale}) skewY(${state.containerRotationX}deg) skewX(${state.containerRotationY}deg)`;
+                if (window.innerWidth <= 768) {
+                    container.style.transform = `scale(${state.containerScale})`;
+                } else {
+                    container.style.transform = `scale(${state.containerScale}) skewY(${state.containerRotationX}deg) skewX(${state.containerRotationY}deg)`;
+                }
             }
         };
 

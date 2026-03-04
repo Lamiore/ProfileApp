@@ -119,12 +119,16 @@ export default function GalleryWindow() {
     useEffect(() => {
         const el = containerRef.current;
         if (!el) return;
+        let rafId: number;
         const ro = new ResizeObserver(([entry]) => {
-            setCols(getCols(entry.contentRect.width));
+            cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(() => {
+                setCols(getCols(entry.contentRect.width));
+            });
         });
         ro.observe(el);
         setCols(getCols(el.offsetWidth));
-        return () => ro.disconnect();
+        return () => { ro.disconnect(); cancelAnimationFrame(rafId); };
     }, []);
 
     const gap = cols <= 2 ? 16 : 24;

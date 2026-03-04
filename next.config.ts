@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   experimental: {
-    optimizePackageImports: ['framer-motion'],
+    optimizePackageImports: ['framer-motion', 'lucide-react', 'radix-ui'],
   },
   images: {
     remotePatterns: [
@@ -20,6 +20,14 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "firebasestorage.googleapis.com",
+      },
+      {
+        protocol: "https",
+        hostname: "img.youtube.com",
+      },
+      {
+        protocol: "https",
+        hostname: "drive.google.com",
       },
     ],
   },

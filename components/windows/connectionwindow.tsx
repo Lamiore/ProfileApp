@@ -48,16 +48,21 @@ export default function ConnectionWindow() {
     const [lanyard, setLanyard] = useState<LanyardData | null>(null);
 
     useEffect(() => {
-        // Fetch once, then poll every 30s
-        const fetchStatus = () =>
+        const fetchStatus = () => {
+            if (document.hidden) return;
             fetch(`https://api.lanyard.rest/v1/users/${DISCORD_USER_ID}`)
                 .then((r) => r.json())
                 .then((d) => { if (d.success) setLanyard(d.data); })
                 .catch(() => { });
+        };
 
         fetchStatus();
         const interval = setInterval(fetchStatus, 30000);
-        return () => clearInterval(interval);
+        document.addEventListener("visibilitychange", fetchStatus);
+        return () => {
+            clearInterval(interval);
+            document.removeEventListener("visibilitychange", fetchStatus);
+        };
     }, []);
 
     const status = lanyard?.discord_status ?? "offline";

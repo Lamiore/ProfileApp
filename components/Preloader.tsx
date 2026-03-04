@@ -19,7 +19,7 @@ export default function Preloader() {
         // Simulate minimum loading time for the animation to look good
         const timer = setTimeout(() => {
             setIsLoading(false);
-        }, 1800); // 1.8 seconds loading screen
+        }, 1200); // loading screen
 
         return () => clearTimeout(timer);
     }, [pathname]);
