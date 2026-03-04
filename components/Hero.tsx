@@ -9,14 +9,11 @@ import { playCloseSound } from "@/lib/audio";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, User } from "firebase/auth";
 
-// Dynamic imports — window components only load when actually opened
 const AboutWindow = dynamic(() => import("@/components/windows/aboutwindow"), { ssr: false });
 const ProjectWindow = dynamic(() => import("@/components/windows/projectwindow"), { ssr: false });
 const BlogWindow = dynamic(() => import("@/components/windows/blogwindow"), { ssr: false });
 const GalleryWindow = dynamic(() => import("@/components/windows/gallerywindow"), { ssr: false });
 const ConnectionWindow = dynamic(() => import("@/components/windows/connectionwindow"), { ssr: false });
-const LoginWindow = dynamic(() => import("@/components/windows/loginwindow"), { ssr: false });
-const DashboardWindow = dynamic(() => import("@/components/windows/dashboardwindow"), { ssr: false });
 
 const IMAGES = [
     "https://i.pinimg.com/avif/736x/b9/88/1d/b9881d73712f3e4aa410348dcabcb8b3.avf",
@@ -91,15 +88,6 @@ export default function Hero() {
     const [menuOpen, setMenuOpen] = useState(false);
     const focusCounter = useRef(0);
     const [windowZMap, setWindowZMap] = useState<Record<string, number>>({});
-    const [user, setUser] = useState<User | null>(null);
-
-    // Listen to Firebase auth state
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
-        });
-        return () => unsubscribe();
-    }, []);
 
 
     // Detect mobile viewport (debounced)
@@ -165,28 +153,6 @@ export default function Hero() {
             return next;
         });
     }, []);
-
-    const handleLoginSuccess = useCallback(() => {
-        closeWindow("Login");
-        // Open Dashboard if not open, otherwise bring to front
-        setOpenWindows((prev) => {
-            if (prev.includes("Dashboard")) {
-                bringToFront("Dashboard");
-                return prev;
-            } else {
-                if (isMobile && prev.length > 0) {
-                    setWindowZMap({});
-                    focusCounter.current = 1;
-                    setWindowZMap({ "Dashboard": 1 });
-                    return ["Dashboard"];
-                }
-                focusCounter.current += 1;
-                setWindowZMap((z) => ({ ...z, ["Dashboard"]: focusCounter.current }));
-                return [...prev, "Dashboard"];
-            }
-        });
-        if (isMobile) setMenuOpen(false);
-    }, [closeWindow, bringToFront, isMobile, setWindowZMap]);
 
     const BASE_Z = 50; // z-index dasar window
 
@@ -820,23 +786,14 @@ export default function Hero() {
                                 onClose={() => closeWindow(name)}
                                 onMenuToggle={() => setMenuOpen((prev) => !prev)}
                                 menuOpen={menuOpen}
-                                initialWidth={["Gallery", "Blog", "Project"].includes(name) ? 820 : ["Dashboard"].includes(name) ? 960 : 560}
-                                initialHeight={["Gallery", "Blog", "Project"].includes(name) ? 620 : ["Dashboard"].includes(name) ? 600 : 480}
+                                initialWidth={["Gallery", "Blog", "Project"].includes(name) ? 820 : 560}
+                                initialHeight={["Gallery", "Blog", "Project"].includes(name) ? 620 : 480}
                             >
-                                {name === "About" && <AboutWindow onOpenWindow={(wName) => {
-                                    if (wName === "Login" && user) {
-                                        // If already logged in, skip Login and directly open Dashboard
-                                        handleLoginSuccess();
-                                    } else {
-                                        toggleWindow(wName);
-                                    }
-                                }} />}
+                                {name === "About" && <AboutWindow />}
                                 {name === "Project" && <ProjectWindow />}
                                 {name === "Blog" && <BlogWindow />}
                                 {name === "Gallery" && <GalleryWindow />}
                                 {name === "Connect" && <ConnectionWindow />}
-                                {name === "Login" && <LoginWindow onLoginSuccess={handleLoginSuccess} />}
-                                {name === "Dashboard" && <DashboardWindow />}
                             </Window>
                         ))}
                     </AnimatePresence>

@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
-export default function AboutWindow({ onOpenWindow }: { onOpenWindow?: (name: string) => void }) {
+export default function AboutWindow() {
+    const router = useRouter();
     const skills = ["Photoshop", "After Effects", "Visual Design"];
 
     return (
@@ -12,7 +14,7 @@ export default function AboutWindow({ onOpenWindow }: { onOpenWindow?: (name: st
             <div style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
                 {/* Foto profil */}
                 <div
-                    onDoubleClick={() => onOpenWindow?.("Login")}
+                    onDoubleClick={() => router.push("/login")}
                     title="Double click for secret area"
                     style={{
                         width: "80px",

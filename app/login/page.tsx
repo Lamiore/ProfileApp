@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "firebase/auth";
 
-export default function LoginWindow({ onLoginSuccess }: { onLoginSuccess?: () => void }) {
+export default function LoginPage() {
+    const router = useRouter();
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const [isSigningIn, setIsSigningIn] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
@@ -12,13 +14,13 @@ export default function LoginWindow({ onLoginSuccess }: { onLoginSuccess?: () =>
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
-                if (onLoginSuccess) onLoginSuccess();
+                router.push("/dashboard");
             } else {
                 setIsCheckingAuth(false);
             }
         });
         return () => unsubscribe();
-    }, [onLoginSuccess]);
+    }, [router]);
 
     const handleGoogleLogin = async () => {
         setIsSigningIn(true);
@@ -26,7 +28,7 @@ export default function LoginWindow({ onLoginSuccess }: { onLoginSuccess?: () =>
         try {
             const provider = new GoogleAuthProvider();
             await signInWithPopup(auth, provider);
-            if (onLoginSuccess) onLoginSuccess();
+            router.push("/dashboard");
         } catch (error: unknown) {
             console.error("Google sign in error", error);
             setErrorMsg(error instanceof Error ? error.message : "Failed to sign in with Google.");
@@ -37,7 +39,14 @@ export default function LoginWindow({ onLoginSuccess }: { onLoginSuccess?: () =>
 
     if (isCheckingAuth) {
         return (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", minHeight: "260px" }}>
+            <div style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100vh",
+                width: "100vw",
+                background: "#111111",
+            }}>
                 <style>{`@keyframes loginSpin { to { transform: rotate(360deg); } }`}</style>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(224,224,224,0.3)" strokeWidth="2.5" style={{ animation: "loginSpin 0.8s linear infinite" }}>
                     <circle cx="12" cy="12" r="9" strokeOpacity="0.2" />
@@ -48,18 +57,32 @@ export default function LoginWindow({ onLoginSuccess }: { onLoginSuccess?: () =>
     }
 
     return (
-        <>
+        <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100vh",
+            width: "100vw",
+            background: "#111111",
+            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        }}>
             <style>{`@keyframes loginSpin { to { transform: rotate(360deg); } }`}</style>
+
             <div style={{
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                height: "100%",
-                minHeight: "300px",
-                padding: "8px",
                 textAlign: "center",
-                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                padding: "48px 32px",
+                borderRadius: "20px",
+                background: "rgba(26, 26, 26, 0.75)",
+                backdropFilter: "blur(40px) saturate(180%)",
+                WebkitBackdropFilter: "blur(40px) saturate(180%)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+                maxWidth: "400px",
+                width: "90%",
             }}>
 
                 {/* Lock icon */}
@@ -198,6 +221,6 @@ export default function LoginWindow({ onLoginSuccess }: { onLoginSuccess?: () =>
                     Access restricted to authorized accounts
                 </p>
             </div>
-        </>
+        </div>
     );
 }
