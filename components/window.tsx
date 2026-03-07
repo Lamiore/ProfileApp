@@ -405,6 +405,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
                     style={{
                         padding: "24px",
                         overflowY: "auto",
+                        scrollbarWidth: "none",
                         height: isMaximized ? "calc(100vh - 48px)" : `calc(${size.h}px - 48px)`,
                         color: "#E0E0E0",
                         boxSizing: "border-box",
