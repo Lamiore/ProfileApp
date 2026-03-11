@@ -475,7 +475,7 @@ export default function Hero() {
     }, []);
 
     return (
-        <div className="relative w-screen h-screen overflow-hidden">
+        <div className="relative w-screen overflow-hidden" style={{ height: "100dvh" }}>
 
             {/* Infinite Grid Background */}
             <div ref={viewportRef} className="absolute inset-0" style={{ cursor: "grab" }}>
@@ -495,7 +495,7 @@ export default function Hero() {
             </div>
 
             {/* Navbar — logo kiri, buttons kanan atas */}
-            <div className="absolute top-0 left-0 right-0 z-[55] flex items-center justify-between p-12" style={{ pointerEvents: "none" }}>
+            <div className="absolute top-0 left-0 right-0 z-[55] flex items-center justify-between p-6 md:p-12" style={{ pointerEvents: "none" }}>
                 {/* Logo */}
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
@@ -537,8 +537,12 @@ export default function Hero() {
                                 onClick={() => toggleWindow(btn)}
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 3.0 + i * 0.08 }}
-                                whileHover={{ scale: 1.05 }}
+                                transition={{
+                                    delay: 3.0 + i * 0.08,
+                                    scale: { type: "spring", stiffness: 400, damping: 20 },
+                                    y: { type: "spring", stiffness: 400, damping: 20 },
+                                }}
+                                whileHover={{ scale: 1.15, y: -2 }}
                                 whileTap={{ scale: 0.96 }}
                                 className="relative flex items-center gap-2 px-5 py-2.5 text-sm tracking-widest uppercase cursor-pointer overflow-hidden"
                                 style={{
@@ -557,6 +561,7 @@ export default function Hero() {
                                     fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                                     fontWeight: 700,
                                     transition: "background 0.2s, color 0.2s, border 0.2s",
+                                    transformOrigin: "center center",
                                 }}
                             >
                                 <span style={{ opacity: 0.75, display: "flex", alignItems: "center" }}>{buttonIcons[btn]}</span>
@@ -574,7 +579,7 @@ export default function Hero() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.4 }}
                     onClick={() => setMenuOpen((prev) => !prev)}
-                    className="absolute top-0 right-0 z-[70] p-12"
+                    className="absolute top-0 right-0 z-[70] p-6 md:p-12"
                     style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer" }}
                     aria-label={menuOpen ? "Close menu" : "Open menu"}
                 >
@@ -726,7 +731,7 @@ export default function Hero() {
 
             {/* Content — kiri bawah */}
             <div
-                className="absolute inset-0 z-10 flex flex-col justify-end p-12"
+                className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-12"
                 style={{ pointerEvents: "none" }}
             >
                 {/* Typography — kiri */}

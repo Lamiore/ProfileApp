@@ -48,20 +48,51 @@ export default function ConnectionWindow() {
     const [lanyard, setLanyard] = useState<LanyardData | null>(null);
 
     useEffect(() => {
-        const fetchStatus = () => {
-            if (document.hidden) return;
-            fetch(`https://api.lanyard.rest/v1/users/${DISCORD_USER_ID}`)
-                .then((r) => r.json())
-                .then((d) => { if (d.success) setLanyard(d.data); })
-                .catch(() => { });
+        let ws: WebSocket | null = null;
+        let heartbeatTimer: ReturnType<typeof setInterval> | null = null;
+        let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+        let alive = true;
+
+        const connect = () => {
+            if (!alive) return;
+            ws = new WebSocket("wss://api.lanyard.rest/socket");
+
+            ws.onmessage = (event) => {
+                const msg = JSON.parse(event.data);
+
+                // op 1 = Hello → start heartbeat + subscribe
+                if (msg.op === 1) {
+                    const interval: number = msg.d.heartbeat_interval;
+                    heartbeatTimer = setInterval(() => {
+                        ws?.readyState === WebSocket.OPEN && ws.send(JSON.stringify({ op: 3 }));
+                    }, interval);
+
+                    ws?.send(JSON.stringify({ op: 2, d: { subscribe_to_id: DISCORD_USER_ID } }));
+                }
+
+                // op 0 = Event (INIT_STATE or PRESENCE_UPDATE)
+                if (msg.op === 0 && (msg.t === "INIT_STATE" || msg.t === "PRESENCE_UPDATE")) {
+                    setLanyard(msg.d);
+                }
+            };
+
+            ws.onclose = () => {
+                if (heartbeatTimer) clearInterval(heartbeatTimer);
+                if (alive) {
+                    reconnectTimer = setTimeout(connect, 3000);
+                }
+            };
+
+            ws.onerror = () => ws?.close();
         };
 
-        fetchStatus();
-        const interval = setInterval(fetchStatus, 30000);
-        document.addEventListener("visibilitychange", fetchStatus);
+        connect();
+
         return () => {
-            clearInterval(interval);
-            document.removeEventListener("visibilitychange", fetchStatus);
+            alive = false;
+            if (heartbeatTimer) clearInterval(heartbeatTimer);
+            if (reconnectTimer) clearTimeout(reconnectTimer);
+            ws?.close();
         };
     }, []);
 
