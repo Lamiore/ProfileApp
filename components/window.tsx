@@ -45,9 +45,10 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
     const initW = initialWidth ?? DEFAULT_W;
     const initH = initialHeight ?? DEFAULT_H;
 
-    const [position, setPosition] = useState({ x: 0, y: 0 });
-    const [size, setSize] = useState({ w: initW, h: initH });
+    const positionRef = useRef({ x: 0, y: 0 });
+    const sizeRef = useRef({ w: initW, h: initH });
     const [initialized, setInitialized] = useState(false);
+    const [, forceUpdate] = useState(0);
     const [isMinimized, setIsMinimized] = useState(false);
     const [isMaximized, setIsMaximized] = useState(false);
     const [hoveringButtons, setHoveringButtons] = useState(false);
@@ -86,13 +87,15 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
     // On first mount → center + random scatter. On size prop change → only resize, keep position.
     useEffect(() => {
         if (isMobile) return; // skip on mobile — always fullscreen
-        setSize({ w: initW, h: initH });
+        sizeRef.current = { w: initW, h: initH };
         if (!initialized) {
-            setPosition({
+            positionRef.current = {
                 x: (window.innerWidth - initW) / 2 + randomOffset.x,
                 y: (window.innerHeight - initH) / 2 + randomOffset.y,
-            });
+            };
             setInitialized(true);
+        } else {
+            forceUpdate(f => f + 1);
         }
     }, [initW, initH, isMobile, initialized, randomOffset]);
 
@@ -108,20 +111,23 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
             isDragging: true,
             startX: e.clientX,
             startY: e.clientY,
-            offsetX: position.x,
-            offsetY: position.y,
+            offsetX: positionRef.current.x,
+            offsetY: positionRef.current.y,
         };
 
         const onMouseMove = (e: MouseEvent) => {
             if (!dragRef.current.isDragging) return;
             const newX = dragRef.current.offsetX + (e.clientX - dragRef.current.startX);
             const newY = dragRef.current.offsetY + (e.clientY - dragRef.current.startY);
-            // Clamp so window stays within viewport
-            // Allow dragging title bar up to screen edges; keep at least 48px of title bar visible
             const TITLE_H = 48;
-            const clampedX = Math.min(Math.max(newX, 0), window.innerWidth - size.w);
+            const clampedX = Math.min(Math.max(newX, 0), window.innerWidth - sizeRef.current.w);
             const clampedY = Math.min(Math.max(newY, 0), window.innerHeight - TITLE_H);
-            setPosition({ x: clampedX, y: clampedY });
+            positionRef.current = { x: clampedX, y: clampedY };
+            // Direct DOM update — skip React re-render during drag
+            if (windowRef.current) {
+                (windowRef.current as HTMLElement).style.left = `${clampedX}px`;
+                (windowRef.current as HTMLElement).style.top = `${clampedY}px`;
+            }
         };
 
         const onMouseUp = () => {
@@ -142,19 +148,26 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
             isResizing: true,
             startX: e.clientX,
             startY: e.clientY,
-            startW: size.w,
-            startH: size.h,
+            startW: sizeRef.current.w,
+            startH: sizeRef.current.h,
         };
 
         const onMouseMove = (e: MouseEvent) => {
             if (!resizeRef.current.isResizing) return;
             const newW = Math.max(MIN_W, resizeRef.current.startW + (e.clientX - resizeRef.current.startX));
             const newH = Math.max(MIN_H, resizeRef.current.startH + (e.clientY - resizeRef.current.startY));
-            setSize({ w: newW, h: newH });
+            sizeRef.current = { w: newW, h: newH };
+            // Direct DOM update — skip React re-render during resize
+            if (windowRef.current) {
+                (windowRef.current as HTMLElement).style.width = `${newW}px`;
+                (windowRef.current as HTMLElement).style.height = `${newH}px`;
+            }
         };
 
         const onMouseUp = () => {
             resizeRef.current.isResizing = false;
+            // One re-render to sync content area height
+            forceUpdate(f => f + 1);
             window.removeEventListener("mousemove", onMouseMove);
             window.removeEventListener("mouseup", onMouseUp);
         };
@@ -200,10 +213,10 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
         }
         : {
             position: "fixed",
-            left: position.x,
-            top: position.y,
-            width: `${size.w}px`,
-            height: isMinimized ? "48px" : `${size.h}px`,
+            left: positionRef.current.x,
+            top: positionRef.current.y,
+            width: `${sizeRef.current.w}px`,
+            height: isMinimized ? "48px" : `${sizeRef.current.h}px`,
             minWidth: `${MIN_W}px`,
             minHeight: isMinimized ? "48px" : `${MIN_H}px`,
             zIndex,
@@ -406,7 +419,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
                         padding: "24px",
                         overflowY: "auto",
                         scrollbarWidth: "none",
-                        height: isMaximized ? "calc(100vh - 48px)" : `calc(${size.h}px - 48px)`,
+                        height: isMaximized ? "calc(100vh - 48px)" : `calc(${sizeRef.current.h}px - 48px)`,
                         color: "#E0E0E0",
                         boxSizing: "border-box",
                     }}

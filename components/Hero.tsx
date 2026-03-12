@@ -86,12 +86,16 @@ export default function Hero() {
     const [menuOpen, setMenuOpen] = useState(false);
     const focusCounter = useRef(0);
     const [windowZMap, setWindowZMap] = useState<Record<string, number>>({});
-
+    const isMobileRef = useRef(false);
 
     // Detect mobile viewport (debounced)
     useEffect(() => {
         let timeoutId: ReturnType<typeof setTimeout>;
-        const check = () => setIsMobile(window.innerWidth <= 768);
+        const check = () => {
+            const mobile = window.innerWidth <= 768;
+            setIsMobile(mobile);
+            isMobileRef.current = mobile;
+        };
         check(); // run once on mount
         const handleResize = () => {
             clearTimeout(timeoutId);
@@ -106,6 +110,7 @@ export default function Hero() {
 
     // Buka/tutup window + sound — memoized to prevent child re-renders
     const toggleWindow = useCallback((name: string) => {
+        const mobile = isMobileRef.current;
         setOpenWindows((prev) => {
             if (prev.includes(name)) {
                 playCloseSound();
@@ -118,7 +123,7 @@ export default function Hero() {
                 return prev.filter((w) => w !== name);
             }
             // On mobile: only 1 window at a time — close existing before opening new
-            if (isMobile && prev.length > 0) {
+            if (mobile && prev.length > 0) {
                 playCloseSound();
                 setWindowZMap({});
                 focusCounter.current = 1;
@@ -131,8 +136,8 @@ export default function Hero() {
             return [...prev, name];
         });
         // Auto-close mobile menu when opening a window
-        if (isMobile) setMenuOpen(false);
-    }, [isMobile]);
+        if (mobile) setMenuOpen(false);
+    }, []);
 
     // Bawa window ke paling depan — only update z-index, never reorder array
     const bringToFront = useCallback((name: string) => {

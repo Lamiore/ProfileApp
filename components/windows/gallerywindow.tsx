@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Window from "@/components/window";
@@ -134,7 +134,7 @@ export default function GalleryWindow() {
     const gap = cols <= 2 ? 16 : 24;
 
     // Open preview — images get natural-size window, videos get 16:9 window
-    const openPreview = (item: GalleryItem) => {
+    const openPreview = useCallback((item: GalleryItem) => {
         if (item.type === "youtube" || item.type === "gdrive") {
             const maxW = window.innerWidth * 0.8;
             const maxH = window.innerHeight * 0.8;
@@ -180,7 +180,7 @@ export default function GalleryWindow() {
             };
             img.src = item.url;
         }
-    };
+    }, []);
 
     return (
         <>
@@ -197,8 +197,9 @@ export default function GalleryWindow() {
                     <motion.div
                         key={i}
                         initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.04, duration: 0.35 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.1 }}
+                        transition={{ delay: Math.min(i * 0.04, 0.4), duration: 0.35 }}
                         onClick={() => openPreview(item)}
                         style={{
                             breakInside: "avoid",

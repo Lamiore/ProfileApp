@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['framer-motion', 'lucide-react', 'radix-ui'],
   },
   images: {
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 604800, // 7 days
     remotePatterns: [
       {
         protocol: "https",

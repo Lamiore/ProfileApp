@@ -1,11 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+
+const skills = ["Photoshop", "After Effects", "Visual Design"];
+
+const timeline = [
+    { year: "2025", desc: "Mulai menemukan ritme. Lumayan paham cara mainnya dan siap eksplor lebih jauh." },
+    { year: "2024", desc: "Ekspansi skill ke dunia logika dengan mempelajari bahasa pemrograman." },
+    { year: "2023", desc: "Menyusun fondasi digital lewat eksplorasi pembuatan website." },
+    { year: "2022", desc: "Mengasah insting visual dan terjun langsung lewat PKL di studio foto." },
+    { year: "2021", desc: "Menghidupkan imajinasi visual melalui Photoshop dan After Effects." },
+    { year: "2020", desc: "Langkah pertama merangkai jejak digital. Awal mula eksplorasi di ekosistem Windows." },
+];
 
 export default function AboutWindow() {
-    const router = useRouter();
-    const skills = ["Photoshop", "After Effects", "Visual Design"];
 
     return (
         <div style={{ position: "relative", display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -14,8 +22,6 @@ export default function AboutWindow() {
             <div style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
                 {/* Foto profil */}
                 <div
-                    onDoubleClick={() => router.push("/login")}
-                    title="Double click for secret area"
                     style={{
                         width: "80px",
                         height: "80px",
@@ -24,7 +30,6 @@ export default function AboutWindow() {
                         overflow: "hidden",
                         border: "2px solid rgba(255,255,255,0.1)",
                         position: "relative",
-                        cursor: "pointer"
                     }}
                 >
                     <Image
@@ -83,14 +88,7 @@ export default function AboutWindow() {
                     Perjalanan
                 </p>
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                    {[
-                        { year: "2025", desc: "Mulai menemukan ritme. Lumayan paham cara mainnya dan siap eksplor lebih jauh." },
-                        { year: "2024", desc: "Ekspansi skill ke dunia logika dengan mempelajari bahasa pemrograman." },
-                        { year: "2023", desc: "Menyusun fondasi digital lewat eksplorasi pembuatan website." },
-                        { year: "2022", desc: "Mengasah insting visual dan terjun langsung lewat PKL di studio foto." },
-                        { year: "2021", desc: "Menghidupkan imajinasi visual melalui Photoshop dan After Effects." },
-                        { year: "2020", desc: "Langkah pertama merangkai jejak digital. Awal mula eksplorasi di ekosistem Windows." },
-                    ].map((item, i) => (
+                    {timeline.map((item, i) => (
                         <div key={i} style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
                             <span style={{ fontSize: "11px", color: "rgba(224, 224, 224, 0.4)", fontVariantNumeric: "tabular-nums", width: "32px", flexShrink: 0, paddingTop: "2px" }}>
                                 {item.year}
