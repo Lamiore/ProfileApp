@@ -244,8 +244,8 @@
 
 @media (max-width: 768px) {
   .hero-text {
-    font-size: clamp(1.75rem, 8.5vw, 2.75rem);
-    line-height: 1.15;
+    font-size: clamp(3.2rem, 14vw, 5.5rem);
+    line-height: 1.08;
   }
 
   .hero-hover {
