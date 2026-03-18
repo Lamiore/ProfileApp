@@ -125,7 +125,6 @@ export default function Hero() {
             // On mobile: only 1 window at a time — close existing before opening new
             if (mobile && prev.length > 0) {
                 playCloseSound();
-                setWindowZMap({});
                 focusCounter.current = 1;
                 setWindowZMap({ [name]: 1 });
                 return [name];
@@ -144,8 +143,6 @@ export default function Hero() {
         focusCounter.current += 1;
         setWindowZMap((z) => ({ ...z, [name]: focusCounter.current }));
     }, []);
-
-
 
     const closeWindow = useCallback((name: string) => {
         playCloseSound();
@@ -187,8 +184,7 @@ export default function Hero() {
         if (!viewport || !container || !grid) return;
 
         const imageFor = (baseX: number, baseY: number) => {
-            const i = (baseX + baseY * CONFIG.COLS) % IMAGES.length;
-            return IMAGES[(i + IMAGES.length) % IMAGES.length];
+            return IMAGES[(baseX + baseY * CONFIG.COLS) % IMAGES.length];
         };
 
         const state = {
@@ -222,10 +218,6 @@ export default function Hero() {
         let tilesX = 1;
         let tilesY = 1;
         let rafId: number;
-        let rafRunning = false;
-        let driftTimer: ReturnType<typeof setTimeout>;
-        // assigned after animate is defined below
-        let startRaf: () => void = () => { };
 
         const calculateCellSizeAndTiling = () => {
             const vw = window.innerWidth;
@@ -289,9 +281,6 @@ export default function Hero() {
         const resetIdle = () => {
             state.lastInteractionTime = performance.now();
             state.driftActive = false;
-            clearTimeout(driftTimer);
-            driftTimer = setTimeout(startRaf, IDLE_DELAY_MS + 16);
-            startRaf();
         };
 
         const onMouseDown = (e: MouseEvent) => {
@@ -428,7 +417,7 @@ export default function Hero() {
                 Math.abs(state.containerRotationX - prevRotX) > 0.0001 ||
                 Math.abs(state.containerRotationY - prevRotY) > 0.0001
             ) {
-                if (window.innerWidth <= 768) {
+                if (isMobileRef.current) {
                     container.style.transform = `scale(${state.containerScale})`;
                 } else {
                     container.style.transform = `scale(${state.containerScale}) skewY(${state.containerRotationX}deg) skewX(${state.containerRotationY}deg)`;
@@ -533,7 +522,7 @@ export default function Hero() {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 3.0 }}
-                        className="flex gap-2 flex-wrap justify-end"
+                        className="flex gap-4 flex-wrap justify-end"
                         style={{ pointerEvents: "auto", position: "relative", zIndex: 60 }}
                     >
                         {buttons.map((btn, i) => (
@@ -549,7 +538,7 @@ export default function Hero() {
                                 }}
                                 whileHover={{ scale: 1.15, y: -2 }}
                                 whileTap={{ scale: 0.96 }}
-                                className="relative flex items-center gap-2 px-5 py-2.5 text-sm tracking-widest uppercase cursor-pointer overflow-hidden"
+                                className="relative flex items-center gap-2 px-6 py-3 text-sm tracking-widest uppercase cursor-pointer overflow-hidden"
                                 style={{
                                     borderRadius: "999px",
                                     color: openWindows.includes(btn) ? "#fff" : "#E0E0E0",
@@ -558,9 +547,7 @@ export default function Hero() {
                                         : "rgba(26, 26, 26, 0.35)",
                                     backdropFilter: "blur(20px) saturate(180%)",
                                     WebkitBackdropFilter: "blur(20px) saturate(180%)",
-                                    border: openWindows.includes(btn)
-                                        ? "1px solid rgba(255,255,255,0.2)"
-                                        : "1px solid rgba(255, 255, 255, 0.2)",
+                                    border: "1px solid rgba(255,255,255,0.2)",
                                     boxShadow: "0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.2)",
                                     textShadow: "none",
                                     fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
@@ -677,20 +664,16 @@ export default function Hero() {
                                 right: "40px",
                                 width: "48px",
                                 height: "48px",
-                                borderRadius: "18px",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                background: "linear-gradient(145deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.20) 50%, rgba(255,255,255,0.38) 100%)",
-                                backdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
-                                WebkitBackdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
-                                border: "1px solid rgba(255,255,255,0.70)",
-                                boxShadow: "0 2px 12px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.90) inset, 0 -1px 0 rgba(0,0,0,0.06) inset",
+                                background: "none",
+                                border: "none",
                                 cursor: "pointer",
                                 zIndex: 70,
                             }}
                         >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" strokeWidth="2.2" strokeLinecap="round">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" strokeWidth="2.2" strokeLinecap="round">
                                 <line x1="18" y1="6" x2="6" y2="18" />
                                 <line x1="6" y1="6" x2="18" y2="18" />
                             </svg>

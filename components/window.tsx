@@ -60,11 +60,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
         const check = () => {
             const mobile = window.innerWidth <= 768;
             setIsMobile(mobile);
-            if (mobile) {
-                setIsMaximized(true);
-            } else {
-                setIsMaximized(false);
-            }
+            setIsMaximized(mobile);
         };
         check();
         const handleResize = () => {
@@ -86,7 +82,11 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
 
     // On first mount → center + random scatter. On size prop change → only resize, keep position.
     useEffect(() => {
-        if (isMobile) return; // skip on mobile — always fullscreen
+        if (isMobile) {
+            // On mobile always fullscreen — just mark initialized so entry animation plays
+            if (!initialized) setInitialized(true);
+            return;
+        }
         sizeRef.current = { w: initW, h: initH };
         if (!initialized) {
             positionRef.current = {
@@ -125,8 +125,8 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
             positionRef.current = { x: clampedX, y: clampedY };
             // Direct DOM update — skip React re-render during drag
             if (windowRef.current) {
-                (windowRef.current as HTMLElement).style.left = `${clampedX}px`;
-                (windowRef.current as HTMLElement).style.top = `${clampedY}px`;
+                windowRef.current.style.left = `${clampedX}px`;
+                windowRef.current.style.top = `${clampedY}px`;
             }
         };
 
@@ -159,8 +159,8 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
             sizeRef.current = { w: newW, h: newH };
             // Direct DOM update — skip React re-render during resize
             if (windowRef.current) {
-                (windowRef.current as HTMLElement).style.width = `${newW}px`;
-                (windowRef.current as HTMLElement).style.height = `${newH}px`;
+                windowRef.current.style.width = `${newW}px`;
+                windowRef.current.style.height = `${newH}px`;
             }
         };
 

@@ -77,8 +77,39 @@ interface GalleryItem {
     videoId?: string;
 }
 
+const CACHE_KEY = "gallery_items_v1";
+
+function loadCache(): GalleryItem[] {
+    try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        return raw ? JSON.parse(raw) : [];
+    } catch {
+        return [];
+    }
+}
+
+function saveCache(items: GalleryItem[]) {
+    try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify(items));
+    } catch { /* storage full — ignore */ }
+}
+
+function parseItems(docs: { data: () => Record<string, string> }[]): GalleryItem[] {
+    return docs
+        .map((doc) => {
+            const url = doc.data().url;
+            if (!url) return null;
+            const ytId = getYouTubeId(url);
+            if (ytId) return { url, type: "youtube" as const, videoId: ytId };
+            const gDriveId = getGDriveId(url);
+            if (gDriveId) return { url, type: "gdrive" as const, videoId: gDriveId };
+            return { url, type: "image" as const };
+        })
+        .filter(Boolean) as GalleryItem[];
+}
+
 export default function GalleryWindow() {
-    const [items, setItems] = useState<GalleryItem[]>([]);
+    const [items, setItems] = useState<GalleryItem[]>(() => loadCache());
     const [previewItem, setPreviewItem] = useState<GalleryItem | null>(null);
     const [previewSize, setPreviewSize] = useState({ w: 560, h: 480 });
     const [cols, setCols] = useState(4);
@@ -86,34 +117,18 @@ export default function GalleryWindow() {
 
     useEffect(() => {
         const q = query(collection(db, "images"), orderBy("createdAt", "desc"));
-        const parseItems = (docs: { data: () => Record<string, string> }[]) =>
-            docs
-                .map((doc) => {
-                    const url = doc.data().url;
-                    if (!url) return null;
-                    const ytId = getYouTubeId(url);
-                    if (ytId) {
-                        return { url, type: "youtube" as const, videoId: ytId };
-                    }
-                    const gDriveId = getGDriveId(url);
-                    if (gDriveId) {
-                        return { url, type: "gdrive" as const, videoId: gDriveId };
-                    }
-                    return { url, type: "image" as const };
-                })
-                .filter(Boolean) as GalleryItem[];
+        const onFresh = (snap: { docs: { data: () => Record<string, string> }[] }) => {
+            const fresh = parseItems(snap.docs);
+            setItems(fresh);
+            saveCache(fresh);
+        };
 
-        const unsubscribe = onSnapshot(
-            q,
-            (snapshot) => setItems(parseItems(snapshot.docs)),
-            (error) => {
-                console.error("Error fetching images, falling back to unordered:", error);
-                onSnapshot(collection(db, "images"), (snap) =>
-                    setItems(parseItems(snap.docs))
-                );
-            }
-        );
-        return () => unsubscribe();
+        let fallbackUnsub: (() => void) | null = null;
+        const unsubscribe = onSnapshot(q, onFresh, (error) => {
+            console.error("Error fetching images, falling back to unordered:", error);
+            fallbackUnsub = onSnapshot(collection(db, "images"), onFresh);
+        });
+        return () => { unsubscribe(); fallbackUnsub?.(); };
     }, []);
 
     useEffect(() => {
@@ -195,7 +210,7 @@ export default function GalleryWindow() {
             >
                 {items.map((item, i) => (
                     <motion.div
-                        key={i}
+                        key={item.url}
                         initial={{ opacity: 0, y: 12 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, amount: 0.1 }}
@@ -224,6 +239,9 @@ export default function GalleryWindow() {
                                     ? `Video ${i + 1}`
                                     : `Gallery ${i + 1}`
                             }
+                            onError={(e) => {
+                                (e.currentTarget as HTMLImageElement).style.display = "none";
+                            }}
                             style={{
                                 display: "block",
                                 width: "100%",

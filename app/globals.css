@@ -140,11 +140,8 @@
   letter-spacing: -0.02em;
   user-select: none;
   transition: opacity 0.3s ease;
-  text-shadow:
-    -1px -1px 0 rgba(0, 0, 0, 1),
-    1px -1px 0 rgba(0, 0, 0, 1),
-    -1px 1px 0 rgba(0, 0, 0, 1),
-    1px 1px 0 rgba(0, 0, 0, 1);
+  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.8);
+  text-shadow: none;
 }
 
 .logo:hover {
