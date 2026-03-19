@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: "created by ilham",
 };
 
-import Preloader from "@/components/Preloader";
+import PageTransitionProvider from "@/components/PageTransition";
 
 export default function RootLayout({
   children,
@@ -29,8 +29,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Preloader />
-        {children}
+        <PageTransitionProvider>
+          {children}
+        </PageTransitionProvider>
       </body>
     </html>
   );
