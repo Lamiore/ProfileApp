@@ -8,7 +8,7 @@ import BlurOverlay from "@/components/BlurOverlay";
 import { playCloseSound } from "@/lib/audio";
 
 const AboutWindow = dynamic(() => import("@/components/windows/aboutwindow"), { ssr: false });
-const ProjectWindow = dynamic(() => import("@/components/windows/projectwindow"), { ssr: false });
+const WorkWindow = dynamic(() => import("@/components/windows/workwindow"), { ssr: false });
 const BlogWindow = dynamic(() => import("@/components/windows/blogwindow"), { ssr: false });
 const GalleryWindow = dynamic(() => import("@/components/windows/gallerywindow"), { ssr: false });
 const ConnectionWindow = dynamic(() => import("@/components/windows/connectionwindow"), { ssr: false });
@@ -37,7 +37,7 @@ const CONFIG = {
     mobileTileOverscan: 0,
 };
 
-const buttons = ["About", "Project", "Blog", "Gallery", "Connect"];
+const buttons = ["About", "Blog", "Gallery", "Work", "Connect"];
 
 const buttonIcons: Record<string, React.ReactNode> = {
     About: (
@@ -46,12 +46,10 @@ const buttonIcons: Record<string, React.ReactNode> = {
             <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
         </svg>
     ),
-    Project: (
+    Work: (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="3" width="7" height="7" rx="1" />
-            <rect x="14" y="3" width="7" height="7" rx="1" />
-            <rect x="3" y="14" width="7" height="7" rx="1" />
-            <rect x="14" y="14" width="7" height="7" rx="1" />
+            <rect x="2" y="7" width="20" height="14" rx="2" />
+            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
         </svg>
     ),
     Blog: (
@@ -84,6 +82,7 @@ export default function Hero() {
     const [openWindows, setOpenWindows] = useState<string[]>([]);
     const [isMobile, setIsMobile] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [peeking, setPeeking] = useState(false);
     const focusCounter = useRef(0);
     const [windowZMap, setWindowZMap] = useState<Record<string, number>>({});
     const isMobileRef = useRef(false);
@@ -111,10 +110,10 @@ export default function Hero() {
     // Buka/tutup window + sound — memoized to prevent child re-renders
     const toggleWindow = useCallback((name: string) => {
         const mobile = isMobileRef.current;
+        setPeeking(false);
         setOpenWindows((prev) => {
             if (prev.includes(name)) {
                 playCloseSound();
-                // Clean up z-map entry
                 setWindowZMap((z) => {
                     const next = { ...z };
                     delete next[name];
@@ -122,19 +121,18 @@ export default function Hero() {
                 });
                 return prev.filter((w) => w !== name);
             }
-            // On mobile: only 1 window at a time — close existing before opening new
+            // Mobile: only 1 window at a time
             if (mobile && prev.length > 0) {
                 playCloseSound();
                 focusCounter.current = 1;
                 setWindowZMap({ [name]: 1 });
                 return [name];
             }
-            // Assign z-index for new window
+            // Desktop: allow multiple windows
             focusCounter.current += 1;
             setWindowZMap((z) => ({ ...z, [name]: focusCounter.current }));
             return [...prev, name];
         });
-        // Auto-close mobile menu when opening a window
         if (mobile) setMenuOpen(false);
     }, []);
 
@@ -155,6 +153,157 @@ export default function Hero() {
     }, []);
 
     const BASE_Z = 50; // z-index dasar window
+
+    // Compute dynamic grid layout for open windows (desktop only)
+    // Work & Blog = big, About & Connect = small (same size), Gallery = wide/long
+    const gridLayout = (() => {
+        if (isMobile || openWindows.length === 0) return {} as Record<string, { x: number; y: number; w: number; h: number }>;
+        const vw = typeof window !== "undefined" ? window.innerWidth : 1440;
+        const vh = typeof window !== "undefined" ? window.innerHeight : 900;
+        const pad = 48;
+        const topPad = 100;
+        const gap = 16;
+        const areaW = vw - pad * 2;
+        const areaH = vh - topPad - pad;
+        const layout: Record<string, { x: number; y: number; w: number; h: number }> = {};
+        const wins = openWindows;
+        const count = wins.length;
+
+        const big = ["Work", "Blog", "Gallery"];
+        const small = ["About", "Connect"];
+
+        if (count === 1) {
+            // Single window centered at comfortable size
+            const w = Math.min(areaW, 820);
+            const h = Math.min(areaH, 620);
+            layout[wins[0]] = { x: pad + (areaW - w) / 2, y: topPad + (areaH - h) / 2, w, h };
+        } else if (count === 2) {
+            const bothSmall = wins.every(n => small.includes(n));
+            const bothBig = wins.every(n => big.includes(n));
+            if (bothSmall) {
+                // Two small windows side by side, capped size
+                const cellW = (areaW - gap) / 2;
+                const h = Math.min(areaH, 480);
+                const yOff = (areaH - h) / 2;
+                wins.forEach((name, i) => {
+                    layout[name] = { x: pad + i * (cellW + gap), y: topPad + yOff, w: cellW, h };
+                });
+            } else if (bothBig) {
+                // Two big windows side by side, full height
+                const cellW = (areaW - gap) / 2;
+                wins.forEach((name, i) => {
+                    layout[name] = { x: pad + i * (cellW + gap), y: topPad, w: cellW, h: areaH };
+                });
+            } else {
+                // Mixed: big gets 60%, small gets 40%
+                const bigW = areaW * 0.6 - gap / 2;
+                const smallW = areaW * 0.4 - gap / 2;
+                wins.forEach((name, i) => {
+                    const isBig = big.includes(name);
+                    const w = isBig ? bigW : smallW;
+                    // Place big first, small second (or vice versa based on order)
+                    const prevW = i === 0 ? 0 : (big.includes(wins[0]) ? bigW + gap : smallW + gap);
+                    layout[name] = { x: pad + prevW, y: topPad, w, h: areaH };
+                });
+            }
+        } else if (count === 3) {
+            // Sort: big windows top row, small bottom — or adapt
+            const bigWins = wins.filter(n => big.includes(n));
+            const smallWins = wins.filter(n => small.includes(n));
+
+            if (bigWins.length >= 2) {
+                // Top row: 2 big windows (65% height), bottom: remaining (35% height)
+                const topH = areaH * 0.65 - gap / 2;
+                const botH = areaH * 0.35 - gap / 2;
+                const cellW = (areaW - gap) / 2;
+                bigWins.slice(0, 2).forEach((name, i) => {
+                    layout[name] = { x: pad + i * (cellW + gap), y: topPad, w: cellW, h: topH };
+                });
+                const rest = wins.filter(n => !layout[n]);
+                rest.forEach((name) => {
+                    layout[name] = { x: pad, y: topPad + topH + gap, w: areaW, h: botH };
+                });
+            } else {
+                // 2 columns, top big full row, bottom 2 small
+                const topH = areaH * 0.6 - gap / 2;
+                const botH = areaH * 0.4 - gap / 2;
+                if (bigWins.length === 1) {
+                    layout[bigWins[0]] = { x: pad, y: topPad, w: areaW, h: topH };
+                    smallWins.forEach((name, i) => {
+                        const cellW = (areaW - gap) / 2;
+                        layout[name] = { x: pad + i * (cellW + gap), y: topPad + topH + gap, w: cellW, h: botH };
+                    });
+                } else {
+                    // All small — uniform grid
+                    const cellW = (areaW - gap) / 2;
+                    wins.forEach((name, i) => {
+                        if (i < 2) {
+                            layout[name] = { x: pad + i * (cellW + gap), y: topPad, w: cellW, h: topH };
+                        } else {
+                            layout[name] = { x: pad, y: topPad + topH + gap, w: areaW, h: botH };
+                        }
+                    });
+                }
+            }
+        } else if (count === 4) {
+            // Sort: big on top, small on bottom
+            const bigWins = wins.filter(n => big.includes(n));
+            const smallWins = wins.filter(n => small.includes(n));
+            const topRow = bigWins.length >= 2 ? bigWins.slice(0, 2) : [...bigWins, ...smallWins].slice(0, 2);
+            const botRow = wins.filter(n => !topRow.includes(n));
+
+            const topH = areaH * 0.6 - gap / 2;
+            const botH = areaH * 0.4 - gap / 2;
+            const cellW = (areaW - gap) / 2;
+
+            topRow.forEach((name, i) => {
+                layout[name] = { x: pad + i * (cellW + gap), y: topPad, w: cellW, h: topH };
+            });
+            botRow.forEach((name, i) => {
+                layout[name] = { x: pad + i * (cellW + gap), y: topPad + topH + gap, w: cellW, h: botH };
+            });
+        } else {
+            // 5 windows:
+            // Left 2 cols: Work & Blog (top, big) + About & Connect (bottom, small same size)
+            // Right col: Gallery (full height, tall)
+            const galleryW = areaW * 0.35;
+            const leftW = areaW - galleryW - gap;
+            const topH = areaH * 0.6 - gap / 2;
+            const botH = areaH * 0.4 - gap / 2;
+            const leftCellW = (leftW - gap) / 2;
+
+            // Categorize
+            const topCandidates: string[] = wins.filter(n => n === "Work" || n === "Blog");
+            const botSmall: string[] = wins.filter(n => small.includes(n));
+            const remaining = wins.filter(n => !topCandidates.includes(n) && n !== "Gallery" && !botSmall.includes(n));
+
+            // Left top row: Work & Blog (or fill with remaining)
+            const leftTop = [...topCandidates, ...remaining].slice(0, 2);
+            // Left bottom row: About & Connect
+            const leftBot = botSmall.slice(0, 2);
+            // Fill any unplaced into leftBot
+            const placed = new Set([...leftTop, ...leftBot, "Gallery"]);
+            const unplaced = wins.filter(n => !placed.has(n));
+            leftBot.push(...unplaced);
+
+            // Left top
+            leftTop.forEach((name, i) => {
+                layout[name] = { x: pad + i * (leftCellW + gap), y: topPad, w: leftCellW, h: topH };
+            });
+
+            // Left bottom
+            const botCellW = leftBot.length > 1 ? (leftW - gap) / 2 : leftW;
+            leftBot.forEach((name, i) => {
+                layout[name] = { x: pad + i * (botCellW + gap), y: topPad + topH + gap, w: botCellW, h: botH };
+            });
+
+            // Gallery: right column, full height
+            if (wins.includes("Gallery")) {
+                layout["Gallery"] = { x: pad + leftW + gap, y: topPad, w: galleryW, h: areaH };
+            }
+        }
+        return layout;
+    })();
 
     // Hero hover image interaction
     useEffect(() => {
@@ -500,8 +649,8 @@ export default function Hero() {
                     <div
                         className="logo"
                         style={{
-                            filter: openWindows.length > 0 ? "blur(8px)" : "none",
-                            opacity: openWindows.length > 0 ? 0.5 : 1,
+                            filter: openWindows.length > 0 && !peeking ? "blur(8px)" : "none",
+                            opacity: openWindows.length > 0 && !peeking ? 0.5 : 1,
                             transition: "filter 0.4s ease, opacity 0.4s ease",
                             pointerEvents: "none",
                             userSelect: "none"
@@ -765,13 +914,13 @@ export default function Hero() {
                     </div>
 
 
-                    {/* BlurOverlay hanya muncul kalau ada window terbuka */}
+                    {/* BlurOverlay — click to peek/unpeek (show desktop) */}
                     <AnimatePresence>
                         {openWindows.length > 0 && (
-                            <BlurOverlay onClose={() => { playCloseSound(); setOpenWindows([]); setWindowZMap({}); focusCounter.current = 0; }} />
+                            <BlurOverlay onClose={() => setPeeking(p => !p)} peeking={peeking} />
                         )}
                     </AnimatePresence>
-                    {/* Render semua window yang terbuka, stacked by z-index */}
+                    {/* Render windows — grid positions on desktop, fullscreen on mobile */}
                     <AnimatePresence>
                         {openWindows.map((name, index) => (
                             <Window
@@ -780,13 +929,15 @@ export default function Hero() {
                                 zIndex={BASE_Z + (windowZMap[name] ?? index)}
                                 onFocus={() => bringToFront(name)}
                                 onClose={() => closeWindow(name)}
-                                onMenuToggle={() => setMenuOpen((prev) => !prev)}
+                                onMenuToggle={isMobile ? () => setMenuOpen((prev) => !prev) : undefined}
                                 menuOpen={menuOpen}
-                                initialWidth={["Gallery", "Blog", "Project"].includes(name) ? 820 : 560}
-                                initialHeight={["Gallery", "Blog", "Project"].includes(name) ? 620 : 480}
+                                initialWidth={gridLayout[name]?.w ?? (["Gallery", "Blog", "Work"].includes(name) ? 820 : 560)}
+                                initialHeight={gridLayout[name]?.h ?? (["Gallery", "Blog", "Work"].includes(name) ? 620 : 480)}
+                                gridPosition={gridLayout[name]}
+                                peeking={peeking}
                             >
                                 {name === "About" && <AboutWindow />}
-                                {name === "Project" && <ProjectWindow />}
+                                {name === "Work" && <WorkWindow />}
                                 {name === "Blog" && <BlogWindow />}
                                 {name === "Gallery" && <GalleryWindow />}
                                 {name === "Connect" && <ConnectionWindow />}

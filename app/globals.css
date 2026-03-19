@@ -149,9 +149,9 @@
 }
 
 .flip-text {
-  --clr-1: #E0E0E0;
-  --clr-2: #888888;
-  --clr-3: #FFFFFF;
+  --clr-1: #cee056;
+  --clr-2: #ffc300;
+  --clr-3: #f3f3f2;
   --translate-distance: 1lh;
   --duration: 3s;
   --timing-function: cubic-bezier(0.66, 0, 0.34, 1);

@@ -14,6 +14,8 @@ interface WindowProps {
     zIndex?: number;
     initialWidth?: number;
     initialHeight?: number;
+    gridPosition?: { x: number; y: number; w: number; h: number };
+    peeking?: boolean;
     children: React.ReactNode;
 }
 
@@ -37,7 +39,7 @@ const trafficButtonStyle = (color: string): React.CSSProperties => ({
     transition: "filter 0.15s ease",
 });
 
-export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen = false, zIndex = 50, initialWidth, initialHeight, children }: WindowProps) {
+export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen = false, zIndex = 50, initialWidth, initialHeight, gridPosition, peeking = false, children }: WindowProps) {
     const windowRef = useRef<HTMLDivElement>(null);
     const dragRef = useRef({ isDragging: false, startX: 0, startY: 0, offsetX: 0, offsetY: 0 });
     const resizeRef = useRef({ isResizing: false, startX: 0, startY: 0, startW: 0, startH: 0 });
@@ -74,30 +76,38 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
         };
     }, []);
 
-    // Random spawn offset – generated once on mount, stays fixed
-    const [randomOffset] = useState(() => ({
-        x: (Math.random() - 0.5) * 180, // -180 to +180 px
-        y: (Math.random() - 0.5) * 120, // -120 to +120 px
-    }));
-
-    // On first mount → center + random scatter. On size prop change → only resize, keep position.
+    // On first mount → center or gridPosition. On size prop change → only resize, keep position.
     useEffect(() => {
         if (isMobile) {
-            // On mobile always fullscreen — just mark initialized so entry animation plays
             if (!initialized) setInitialized(true);
             return;
         }
         sizeRef.current = { w: initW, h: initH };
         if (!initialized) {
-            positionRef.current = {
-                x: (window.innerWidth - initW) / 2 + randomOffset.x,
-                y: (window.innerHeight - initH) / 2 + randomOffset.y,
-            };
+            positionRef.current = gridPosition
+                ? { x: gridPosition.x, y: gridPosition.y }
+                : {
+                    x: (window.innerWidth - initW) / 2,
+                    y: (window.innerHeight - initH) / 2,
+                };
             setInitialized(true);
         } else {
             forceUpdate(f => f + 1);
         }
-    }, [initW, initH, isMobile, initialized, randomOffset]);
+    }, [initW, initH, isMobile, initialized, gridPosition]);
+
+    // Update position and size when grid layout changes (windows reflow)
+    useEffect(() => {
+        if (!gridPosition || isMobile || !initialized) return;
+        positionRef.current = { x: gridPosition.x, y: gridPosition.y };
+        sizeRef.current = { w: gridPosition.w, h: gridPosition.h };
+        if (windowRef.current) {
+            windowRef.current.style.left = `${gridPosition.x}px`;
+            windowRef.current.style.top = `${gridPosition.y}px`;
+            windowRef.current.style.width = `${gridPosition.w}px`;
+            windowRef.current.style.height = `${gridPosition.h}px`;
+        }
+    }, [gridPosition?.x, gridPosition?.y, gridPosition?.w, gridPosition?.h, isMobile, initialized]);
 
     // Play open sound on mount
     useEffect(() => {
@@ -195,53 +205,75 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
     };
 
     const windowStyle: React.CSSProperties = isMaximized
-        ? {
-            position: "fixed",
-            left: 0,
-            top: 0,
-            width: "100vw",
-            height: "100vh",
-            zIndex,
-            borderRadius: 0,
-            overflow: "hidden",
-            background: "rgba(26, 26, 26, 0.75)",
-            backdropFilter: "blur(40px) saturate(180%)",
-            WebkitBackdropFilter: "blur(40px) saturate(180%)",
-            border: "none",
-            boxShadow: "none",
-            pointerEvents: "auto",
-        }
-        : {
-            position: "fixed",
-            left: positionRef.current.x,
-            top: positionRef.current.y,
-            width: `${sizeRef.current.w}px`,
-            height: isMinimized ? "48px" : `${sizeRef.current.h}px`,
-            minWidth: `${MIN_W}px`,
-            minHeight: isMinimized ? "48px" : `${MIN_H}px`,
-            zIndex,
-            borderRadius: "12px",
-            overflow: "hidden",
-            background: "rgba(26, 26, 26, 0.55)",
-            backdropFilter: "blur(40px) saturate(180%)",
-            WebkitBackdropFilter: "blur(40px) saturate(180%)",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.8) inset",
-            pointerEvents: "auto",
+            ? {
+                position: "fixed",
+                left: 0,
+                top: 0,
+                width: "100vw",
+                height: "100vh",
+                zIndex,
+                borderRadius: 0,
+                overflow: "hidden",
+                background: "rgba(26, 26, 26, 0.75)",
+                backdropFilter: "blur(40px) saturate(180%)",
+                WebkitBackdropFilter: "blur(40px) saturate(180%)",
+                border: "none",
+                boxShadow: "none",
+                pointerEvents: "auto",
+            }
+            : {
+                position: "fixed",
+                left: positionRef.current.x,
+                top: positionRef.current.y,
+                width: `${sizeRef.current.w}px`,
+                height: isMinimized ? "48px" : `${sizeRef.current.h}px`,
+                minWidth: `${MIN_W}px`,
+                minHeight: isMinimized ? "48px" : `${MIN_H}px`,
+                zIndex,
+                borderRadius: "12px",
+                overflow: "hidden",
+                background: "rgba(26, 26, 26, 0.55)",
+                backdropFilter: "blur(40px) saturate(180%)",
+                WebkitBackdropFilter: "blur(40px) saturate(180%)",
+                transition: gridPosition ? "left 0.4s cubic-bezier(0.16,1,0.3,1), top 0.4s cubic-bezier(0.16,1,0.3,1), width 0.4s cubic-bezier(0.16,1,0.3,1), height 0.4s cubic-bezier(0.16,1,0.3,1)" : undefined,
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.8) inset",
+                pointerEvents: "auto",
+            };
+
+    // Compute slide direction: windows fly outward from screen center
+    const peekAnim = (() => {
+        if (!peeking) return null;
+        const vw = typeof window !== "undefined" ? window.innerWidth : 1440;
+        const vh = typeof window !== "undefined" ? window.innerHeight : 900;
+        const cx = positionRef.current.x + sizeRef.current.w / 2;
+        const cy = positionRef.current.y + sizeRef.current.h / 2;
+        const dx = cx - vw / 2;
+        const dy = cy - vh / 2;
+        const angle = Math.atan2(dy, dx);
+        const dist = Math.max(vw, vh);
+        return {
+            x: Math.cos(angle) * dist,
+            y: Math.sin(angle) * dist,
+            scale: 0.8,
+            opacity: 0,
         };
+    })();
 
     return (
         <motion.div
             ref={windowRef}
-            initial={{ opacity: 0, scale: 0.92, y: 20 }}
+            initial={{ opacity: 0, scale: 0.92, x: 0, y: 20 }}
             animate={
-                initialized
-                    ? { opacity: 1, scale: 1, y: 0 }
-                    : { opacity: 0, scale: 0.92, y: 20 }
+                peeking && peekAnim
+                    ? peekAnim
+                    : initialized
+                        ? { opacity: 1, scale: 1, x: 0, y: 0 }
+                        : { opacity: 0, scale: 0.92, x: 0, y: 20 }
             }
-            exit={{ opacity: 0, scale: 0.92, y: 20 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            style={windowStyle}
+            exit={{ opacity: 0, scale: 0.92, x: 0, y: 20 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            style={{ ...windowStyle, pointerEvents: peeking ? "none" : "auto" }}
             onMouseDown={onFocus}
         >
             {/* Title Bar */}
