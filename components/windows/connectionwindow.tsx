@@ -1,6 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import dynamic from "next/dynamic";
+
+const DarkMap = dynamic(() => import("@/components/DarkMap"), { ssr: false });
 
 const DISCORD_USER_ID = "501362625943175199";
 const DISCORD_SERVER_INVITE = "https://discord.com/users/501362625943175199";
@@ -301,6 +304,37 @@ export default function ConnectionWindow() {
                         <span style={{ marginLeft: "auto", color: "rgba(224, 224, 224, 0.2)", fontSize: "14px" }}>↗</span>
                     </a>
                 ))}
+            </div>
+
+            {/* Location Map */}
+            <div style={{
+                borderRadius: "10px",
+                overflow: "hidden",
+                height: "300px",
+                border: "1px solid rgba(255,255,255,0.08)",
+                position: "relative",
+                marginTop: "4px",
+            }}>
+                <DarkMap lat={1.4848} lng={124.8421} zoom={12} />
+                <div style={{
+                    position: "absolute",
+                    top: "10px",
+                    left: "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    padding: "5px 10px",
+                    borderRadius: "6px",
+                    background: "rgba(0,0,0,0.7)",
+                    backdropFilter: "blur(4px)",
+                    zIndex: 1000,
+                }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                        <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    <span style={{ fontSize: "11px", color: "#E0E0E0", fontWeight: 500 }}>Manado, Sulawesi Utara</span>
+                </div>
             </div>
         </div>
     );

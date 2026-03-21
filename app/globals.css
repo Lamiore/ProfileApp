@@ -734,6 +734,34 @@
   overflow: hidden;
 }
 
+
+/* ── Map Pulse ── */
+.map-pulse-container {
+  background: none !important;
+  border: none !important;
+  position: relative;
+  overflow: visible !important;
+}
+
+/* Lingkaran pulse fade in-out */
+.map-pulse-ring {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(224, 224, 224, 0.2);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: map-pulse-zone 2.8s ease-out infinite;
+}
+
+@keyframes map-pulse-zone {
+  0%   { width: 14px;  height: 14px;  opacity: 0.6; }
+  70%  { width: 180px; height: 180px; opacity: 0.25; }
+  100% { width: 250px; height: 250px; opacity: 0; }
+}
+
 @keyframes avatar-accessory {
   15% {
     transform: translateX(0);

@@ -82,10 +82,10 @@ export default function Hero() {
     const [openWindows, setOpenWindows] = useState<string[]>([]);
     const [isMobile, setIsMobile] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
-    const [peeking, setPeeking] = useState(false);
     const focusCounter = useRef(0);
     const [windowZMap, setWindowZMap] = useState<Record<string, number>>({});
     const isMobileRef = useRef(false);
+    const [peeking, setPeeking] = useState(false);
 
     // Detect mobile viewport (debounced)
     useEffect(() => {
