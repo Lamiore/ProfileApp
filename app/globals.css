@@ -580,6 +580,97 @@
   }
 }
 
+/* ── Work Window ── */
+.wnd-work-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.wnd-work-card {
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.wnd-work-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.wnd-work-card-img {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.wnd-work-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.wnd-work-card:hover .wnd-work-card-img img {
+  transform: scale(1.05);
+}
+
+.wnd-work-card-img-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.15);
+}
+
+.wnd-work-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: flex-end;
+  padding: 12px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.wnd-work-card:hover .wnd-work-card-overlay {
+  opacity: 1;
+}
+
+.wnd-work-card-desc {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.wnd-work-card-info {
+  padding: 10px 12px;
+}
+
+.wnd-work-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #E0E0E0;
+  margin: 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /* ── Blog Window ── */
 .wnd-blog-grid {
   display: grid;
