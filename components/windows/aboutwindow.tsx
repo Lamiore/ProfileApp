@@ -57,6 +57,46 @@ export default function AboutWindow() {
                 </div>
             </div>
 
+            {/* Name Card button */}
+            <button
+                onClick={() => navigateTo("/card")}
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "14px 18px",
+                    borderRadius: "12px",
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    cursor: "pointer",
+                    textDecoration: "none",
+                    transition: "background 0.2s, border-color 0.2s",
+                    width: "100%",
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgba(255,255,255,0.12)";
+                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
+                }}
+            >
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="2" y="4" width="20" height="16" rx="2" />
+                        <circle cx="9" cy="11" r="2.5" />
+                        <path d="M5 18c0-2.2 1.8-4 4-4s4 1.8 4 4" />
+                        <line x1="16" y1="9" x2="20" y2="9" />
+                        <line x1="16" y1="13" x2="20" y2="13" />
+                    </svg>
+                    <span style={{ fontSize: "13px", fontWeight: 600, color: "#E0E0E0" }}>Name Card</span>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(224,224,224,0.4)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M7 17l9.2-9.2M17 17V7H7" />
+                </svg>
+            </button>
+
             {/* Divider */}
             <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }} />
 
@@ -102,49 +142,6 @@ export default function AboutWindow() {
                     ))}
                 </div>
             </div>
-
-            {/* Divider */}
-            <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }} />
-
-            {/* Name Card button */}
-            <button
-                onClick={() => navigateTo("/card")}
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "14px 18px",
-                    borderRadius: "12px",
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    cursor: "pointer",
-                    textDecoration: "none",
-                    transition: "background 0.2s, border-color 0.2s",
-                    width: "100%",
-                }}
-                onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgba(255,255,255,0.12)";
-                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
-                }}
-                onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "rgba(255,255,255,0.06)";
-                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
-                }}
-            >
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="2" y="4" width="20" height="16" rx="2" />
-                        <circle cx="9" cy="11" r="2.5" />
-                        <path d="M5 18c0-2.2 1.8-4 4-4s4 1.8 4 4" />
-                        <line x1="16" y1="9" x2="20" y2="9" />
-                        <line x1="16" y1="13" x2="20" y2="13" />
-                    </svg>
-                    <span style={{ fontSize: "13px", fontWeight: 600, color: "#E0E0E0" }}>Name Card</span>
-                </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(224,224,224,0.4)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M7 17l9.2-9.2M17 17V7H7" />
-                </svg>
-            </button>
 
         </div>
     );

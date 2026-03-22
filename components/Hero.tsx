@@ -12,6 +12,7 @@ const WorkWindow = dynamic(() => import("@/components/windows/workwindow"), { ss
 const BlogWindow = dynamic(() => import("@/components/windows/blogwindow"), { ssr: false });
 const GalleryWindow = dynamic(() => import("@/components/windows/gallerywindow"), { ssr: false });
 const ConnectionWindow = dynamic(() => import("@/components/windows/connectionwindow"), { ssr: false });
+const AdminWindow = dynamic(() => import("@/components/windows/adminwindow"), { ssr: false });
 
 const IMAGES = [
     "https://i.pinimg.com/avif/736x/b9/88/1d/b9881d73712f3e4aa410348dcabcb8b3.avf",
@@ -86,6 +87,8 @@ export default function Hero() {
     const [windowZMap, setWindowZMap] = useState<Record<string, number>>({});
     const isMobileRef = useRef(false);
     const [peeking, setPeeking] = useState(false);
+    const logoClickCount = useRef(0);
+    const logoClickTimer = useRef<ReturnType<typeof setTimeout>>(null);
 
     // Detect mobile viewport (debounced)
     useEffect(() => {
@@ -135,6 +138,17 @@ export default function Hero() {
         });
         if (mobile) setMenuOpen(false);
     }, []);
+
+    const handleLogoClick = useCallback(() => {
+        logoClickCount.current += 1;
+        if (logoClickTimer.current) clearTimeout(logoClickTimer.current);
+        if (logoClickCount.current >= 3) {
+            logoClickCount.current = 0;
+            toggleWindow("Admin");
+        } else {
+            logoClickTimer.current = setTimeout(() => { logoClickCount.current = 0; }, 500);
+        }
+    }, [toggleWindow]);
 
     // Bawa window ke paling depan — only update z-index, never reorder array
     const bringToFront = useCallback((name: string) => {
@@ -648,11 +662,12 @@ export default function Hero() {
                 >
                     <div
                         className="logo"
+                        onClick={handleLogoClick}
                         style={{
                             filter: openWindows.length > 0 && !peeking ? "blur(8px)" : "none",
                             opacity: openWindows.length > 0 && !peeking ? 0.5 : 1,
                             transition: "filter 0.4s ease, opacity 0.4s ease",
-                            pointerEvents: "none",
+                            cursor: "default",
                             userSelect: "none"
                         }}
                     >
@@ -941,6 +956,7 @@ export default function Hero() {
                                 {name === "Blog" && <BlogWindow />}
                                 {name === "Gallery" && <GalleryWindow />}
                                 {name === "Connect" && <ConnectionWindow />}
+                                {name === "Admin" && <AdminWindow />}
                             </Window>
                         ))}
                     </AnimatePresence>

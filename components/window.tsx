@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 
 import { playOpenSound, playCloseSound } from "@/lib/audio";
@@ -43,6 +43,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
     const windowRef = useRef<HTMLDivElement>(null);
     const dragRef = useRef({ isDragging: false, startX: 0, startY: 0, offsetX: 0, offsetY: 0 });
     const resizeRef = useRef({ isResizing: false, startX: 0, startY: 0, startW: 0, startH: 0 });
+    const rafRef = useRef<number>(0);
 
     const initW = initialWidth ?? DEFAULT_W;
     const initH = initialHeight ?? DEFAULT_H;
@@ -55,6 +56,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
     const [isMaximized, setIsMaximized] = useState(false);
     const [hoveringButtons, setHoveringButtons] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [interacting, setInteracting] = useState(false);
 
     // Detect mobile
     useEffect(() => {
@@ -114,9 +116,17 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
         playOpenSound();
     }, []);
 
+    // Cleanup RAF on unmount
+    useEffect(() => {
+        return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+    }, []);
+
     // Title bar drag (disabled when maximized or minimized)
-    const onTitleMouseDown = (e: React.MouseEvent) => {
+    const onTitleMouseDown = useCallback((e: React.MouseEvent) => {
         if (isMaximized || isMinimized) return;
+        const el = windowRef.current;
+        if (!el) return;
+
         dragRef.current = {
             isDragging: true,
             startX: e.clientX,
@@ -125,35 +135,62 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
             offsetY: positionRef.current.y,
         };
 
+        // Switch to perf mode: disable blur, use will-change, use transform for offset
+        el.classList.add("wnd-dragging");
+        setInteracting(true);
+
+        // Track pending mouse position for RAF
+        let pendingX = positionRef.current.x;
+        let pendingY = positionRef.current.y;
+        let ticking = false;
+
+        const update = () => {
+            ticking = false;
+            if (!dragRef.current.isDragging) return;
+            positionRef.current = { x: pendingX, y: pendingY };
+            el.style.left = `${pendingX}px`;
+            el.style.top = `${pendingY}px`;
+        };
+
         const onMouseMove = (e: MouseEvent) => {
             if (!dragRef.current.isDragging) return;
             const newX = dragRef.current.offsetX + (e.clientX - dragRef.current.startX);
             const newY = dragRef.current.offsetY + (e.clientY - dragRef.current.startY);
             const TITLE_H = 48;
-            const clampedX = Math.min(Math.max(newX, 0), window.innerWidth - sizeRef.current.w);
-            const clampedY = Math.min(Math.max(newY, 0), window.innerHeight - TITLE_H);
-            positionRef.current = { x: clampedX, y: clampedY };
-            // Direct DOM update — skip React re-render during drag
-            if (windowRef.current) {
-                windowRef.current.style.left = `${clampedX}px`;
-                windowRef.current.style.top = `${clampedY}px`;
+            pendingX = Math.min(Math.max(newX, 0), window.innerWidth - sizeRef.current.w);
+            pendingY = Math.min(Math.max(newY, 0), window.innerHeight - TITLE_H);
+
+            if (!ticking) {
+                ticking = true;
+                rafRef.current = requestAnimationFrame(update);
             }
         };
 
         const onMouseUp = () => {
             dragRef.current.isDragging = false;
+            if (rafRef.current) cancelAnimationFrame(rafRef.current);
+            // Commit final position
+            positionRef.current = { x: pendingX, y: pendingY };
+            el.style.left = `${pendingX}px`;
+            el.style.top = `${pendingY}px`;
+            // Restore blur
+            el.classList.remove("wnd-dragging");
+            setInteracting(false);
             window.removeEventListener("mousemove", onMouseMove);
             window.removeEventListener("mouseup", onMouseUp);
         };
 
         window.addEventListener("mousemove", onMouseMove);
         window.addEventListener("mouseup", onMouseUp);
-    };
+    }, [isMaximized, isMinimized]);
 
     // Resize handle (bottom-right corner)
-    const onResizeMouseDown = (e: React.MouseEvent) => {
+    const onResizeMouseDown = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
         if (isMaximized) return;
+        const el = windowRef.current;
+        if (!el) return;
+
         resizeRef.current = {
             isResizing: true,
             startX: e.clientX,
@@ -162,20 +199,40 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
             startH: sizeRef.current.h,
         };
 
+        el.classList.add("wnd-dragging");
+        setInteracting(true);
+
+        let pendingW = sizeRef.current.w;
+        let pendingH = sizeRef.current.h;
+        let ticking = false;
+
+        const update = () => {
+            ticking = false;
+            if (!resizeRef.current.isResizing) return;
+            sizeRef.current = { w: pendingW, h: pendingH };
+            el.style.width = `${pendingW}px`;
+            el.style.height = `${pendingH}px`;
+        };
+
         const onMouseMove = (e: MouseEvent) => {
             if (!resizeRef.current.isResizing) return;
-            const newW = Math.max(MIN_W, resizeRef.current.startW + (e.clientX - resizeRef.current.startX));
-            const newH = Math.max(MIN_H, resizeRef.current.startH + (e.clientY - resizeRef.current.startY));
-            sizeRef.current = { w: newW, h: newH };
-            // Direct DOM update — skip React re-render during resize
-            if (windowRef.current) {
-                windowRef.current.style.width = `${newW}px`;
-                windowRef.current.style.height = `${newH}px`;
+            pendingW = Math.max(MIN_W, resizeRef.current.startW + (e.clientX - resizeRef.current.startX));
+            pendingH = Math.max(MIN_H, resizeRef.current.startH + (e.clientY - resizeRef.current.startY));
+
+            if (!ticking) {
+                ticking = true;
+                rafRef.current = requestAnimationFrame(update);
             }
         };
 
         const onMouseUp = () => {
             resizeRef.current.isResizing = false;
+            if (rafRef.current) cancelAnimationFrame(rafRef.current);
+            sizeRef.current = { w: pendingW, h: pendingH };
+            el.style.width = `${pendingW}px`;
+            el.style.height = `${pendingH}px`;
+            el.classList.remove("wnd-dragging");
+            setInteracting(false);
             // One re-render to sync content area height
             forceUpdate(f => f + 1);
             window.removeEventListener("mousemove", onMouseMove);
@@ -184,7 +241,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
 
         window.addEventListener("mousemove", onMouseMove);
         window.addEventListener("mouseup", onMouseUp);
-    };
+    }, [isMaximized]);
 
     const handleMinimize = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -232,12 +289,15 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
                 zIndex,
                 borderRadius: "12px",
                 overflow: "hidden",
-                background: "rgba(26, 26, 26, 0.55)",
-                backdropFilter: "blur(40px) saturate(180%)",
-                WebkitBackdropFilter: "blur(40px) saturate(180%)",
-                transition: gridPosition ? "left 0.4s cubic-bezier(0.16,1,0.3,1), top 0.4s cubic-bezier(0.16,1,0.3,1), width 0.4s cubic-bezier(0.16,1,0.3,1), height 0.4s cubic-bezier(0.16,1,0.3,1)" : undefined,
+                background: interacting ? "rgba(26, 26, 26, 0.88)" : "rgba(26, 26, 26, 0.55)",
+                backdropFilter: interacting ? "none" : "blur(40px) saturate(180%)",
+                WebkitBackdropFilter: interacting ? "none" : "blur(40px) saturate(180%)",
+                willChange: interacting ? "left, top, width, height" : "auto",
+                transition: gridPosition && !interacting ? "left 0.4s cubic-bezier(0.16,1,0.3,1), top 0.4s cubic-bezier(0.16,1,0.3,1), width 0.4s cubic-bezier(0.16,1,0.3,1), height 0.4s cubic-bezier(0.16,1,0.3,1)" : undefined,
                 border: "1px solid rgba(255, 255, 255, 0.1)",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.8) inset",
+                boxShadow: interacting
+                    ? "0 12px 40px rgba(0,0,0,0.35)"
+                    : "0 8px 32px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.08) inset",
                 pointerEvents: "auto",
             };
 
