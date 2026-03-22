@@ -46,34 +46,38 @@ export default function BlogDetailPage() {
             background: "#0a0a0a",
             color: "#E0E0E0",
             fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+            position: "relative",
         }}>
+            {/* Back button — fixed top-left like card page */}
+            <button
+                onClick={() => navigateTo("/")}
+                style={{
+                    position: "fixed",
+                    top: "32px",
+                    left: "32px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    fontSize: "13px",
+                    color: "rgba(224,224,224,0.5)",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: "8px 0",
+                    transition: "color 0.2s",
+                    zIndex: 10,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = "#E0E0E0"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(224,224,224,0.5)"; }}
+            >
+                <ArrowLeft size={16} /> Kembali
+            </button>
+
             <div style={{
                 maxWidth: "680px",
                 margin: "0 auto",
-                padding: "40px 24px 80px",
+                padding: "80px 24px 80px",
             }}>
-                {/* Back button */}
-                <button
-                    onClick={() => navigateTo("/")}
-                    style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "6px",
-                        fontSize: "13px",
-                        color: "rgba(224,224,224,0.5)",
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        padding: "8px 0",
-                        marginBottom: "32px",
-                        transition: "color 0.2s",
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.color = "#E0E0E0"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(224,224,224,0.5)"; }}
-                >
-                    <ArrowLeft size={16} /> Kembali
-                </button>
-
                 {loading ? (
                     <div style={{ textAlign: "center", padding: "4rem 0", color: "rgba(224,224,224,0.4)", fontSize: "13px" }}>
                         Memuat...

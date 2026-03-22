@@ -7,8 +7,8 @@ import { db, auth, provider } from "@/lib/firebase";
 import {
     Trash2, CheckCircle, AlertCircle,
     Briefcase, LogIn, LogOut, Image as ImageIcon,
-    Copy, FileText, Type, Image,
-    ChevronUp, ChevronDown, Link2, Settings, Plus,
+    Copy, FileText, Type, Image, Columns,
+    ChevronUp, ChevronDown, Link2, Settings, Plus, Pencil,
 } from "lucide-react";
 
 /* ═══════════════════ HELPERS ═══════════════════ */
@@ -246,10 +246,11 @@ function GalleryTab() {
 /* ═══════════════════ BLOG TAB ═══════════════════ */
 
 interface BlogBlock { id: number; type: "text" | "image"; content: string; }
-interface BlogItem { id: string; title: string; thumbnail?: string; createdAt?: { toDate: () => Date }; }
+interface BlogItem { id: string; title: string; thumbnail?: string; blocks?: { type: string; content: string }[]; createdAt?: { toDate: () => Date }; }
 
 function BlogTab() {
     const [showForm, setShowForm] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
     const [blogs, setBlogs] = useState<BlogItem[]>([]);
     const [title, setTitle] = useState("");
     const [blocks, setBlocks] = useState<BlogBlock[]>([{ id: Date.now(), type: "text", content: "" }]);
@@ -274,20 +275,39 @@ function BlogTab() {
         [n[i], n[t]] = [n[t], n[i]]; setBlocks(n);
     };
 
+    const resetForm = () => {
+        setTitle(""); setBlocks([{ id: Date.now(), type: "text", content: "" }]);
+        setEditingId(null); setShowForm(false); setError("");
+    };
+
+    const startEdit = (blog: BlogItem) => {
+        setEditingId(blog.id);
+        setTitle(blog.title);
+        if (blog.blocks && blog.blocks.length > 0) {
+            setBlocks(blog.blocks.map((b, i) => ({ id: Date.now() + i, type: b.type as "text" | "image", content: b.content })));
+        } else {
+            setBlocks([{ id: Date.now(), type: "text", content: "" }]);
+        }
+        setShowForm(true);
+        setError("");
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!title.trim()) return;
         setSubmitting(true); setError("");
         const thumbnail = blocks.find(b => b.type === "image" && b.content.trim())?.content.trim() || null;
         try {
-            const slug = toSlug(title);
-            if (!slug) { setError("Judul tidak valid untuk URL."); setSubmitting(false); return; }
-            await setDoc(doc(db, "blogs", slug), {
-                title: title.trim(), slug,
+            const docId = editingId || toSlug(title);
+            if (!docId) { setError("Judul tidak valid untuk URL."); setSubmitting(false); return; }
+            const data: Record<string, unknown> = {
+                title: title.trim(), slug: docId,
                 blocks: blocks.map(({ type, content }) => ({ type, content: content.trim() })),
-                thumbnail, createdAt: serverTimestamp(),
-            });
-            setSuccess(true); setTitle(""); setBlocks([{ id: Date.now(), type: "text", content: "" }]); setShowForm(false);
+                thumbnail,
+            };
+            if (!editingId) data.createdAt = serverTimestamp();
+            await setDoc(doc(db, "blogs", docId), data, { merge: editingId ? true : false });
+            setSuccess(true); resetForm();
             setTimeout(() => setSuccess(false), 3000);
         } catch { setError("Gagal menyimpan blog."); }
         finally { setSubmitting(false); }
@@ -302,8 +322,8 @@ function BlogTab() {
             {showForm ? (
                 <div className="adm-card" style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span className="adm-card-label">Tulis Blog</span>
-                        <button type="button" className="adm-btn-ghost" onClick={() => { setShowForm(false); setError(""); }}>Batal</button>
+                        <span className="adm-card-label">{editingId ? "Edit Blog" : "Tulis Blog"}</span>
+                        <button type="button" className="adm-btn-ghost" onClick={resetForm}>Batal</button>
                     </div>
                     <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                         <div className="adm-field">
@@ -348,17 +368,17 @@ function BlogTab() {
                         {error && <div className="adm-toast adm-toast-error"><AlertCircle size={14} /> {error}</div>}
 
                         <button type="submit" className="adm-btn-primary" disabled={submitting || !title.trim()}>
-                            <FileText size={14} /> {submitting ? "Menyimpan..." : "Publikasikan"}
+                            <FileText size={14} /> {submitting ? "Menyimpan..." : editingId ? "Simpan Perubahan" : "Publikasikan"}
                         </button>
                     </form>
                 </div>
             ) : (
-                <button type="button" className="adm-btn-outline" onClick={() => setShowForm(true)} style={{ width: "100%" }}>
+                <button type="button" className="adm-btn-outline" onClick={() => { setEditingId(null); setShowForm(true); }} style={{ width: "100%" }}>
                     <Plus size={14} /> Tulis Blog Baru
                 </button>
             )}
 
-            {success && <div className="adm-toast adm-toast-success"><CheckCircle size={14} /> Blog berhasil dipublikasikan!</div>}
+            {success && <div className="adm-toast adm-toast-success"><CheckCircle size={14} /> {editingId ? "Blog berhasil diperbarui!" : "Blog berhasil dipublikasikan!"}</div>}
 
             {/* List */}
             <div className="adm-list-header">
@@ -369,17 +389,22 @@ function BlogTab() {
                 <div className="adm-list">
                     {blogs.map((blog) => (
                         <SwipeDeleteItem key={blog.id} onDelete={() => handleDelete(blog.id)}>
-                            <div className="adm-list-thumb">
-                                {blog.thumbnail ? (
-                                    <img src={blog.thumbnail} alt="" referrerPolicy="no-referrer" />
-                                ) : (
-                                    <div className="adm-list-thumb-empty"><FileText size={16} /></div>
-                                )}
+                            <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, cursor: "pointer" }} onClick={() => startEdit(blog)}>
+                                <div className="adm-list-thumb">
+                                    {blog.thumbnail ? (
+                                        <img src={blog.thumbnail} alt="" referrerPolicy="no-referrer" />
+                                    ) : (
+                                        <div className="adm-list-thumb-empty"><FileText size={16} /></div>
+                                    )}
+                                </div>
+                                <div className="adm-list-info">
+                                    <span className="adm-list-name">{blog.title}</span>
+                                    <span className="adm-list-date">{formatDate(blog.createdAt)}</span>
+                                </div>
                             </div>
-                            <div className="adm-list-info">
-                                <span className="adm-list-name">{blog.title}</span>
-                                <span className="adm-list-date">{formatDate(blog.createdAt)}</span>
-                            </div>
+                            <button type="button" className="adm-list-edit" onClick={(e) => { e.stopPropagation(); startEdit(blog); }}>
+                                <Pencil size={13} />
+                            </button>
                         </SwipeDeleteItem>
                     ))}
                 </div>
@@ -392,14 +417,16 @@ function BlogTab() {
 
 /* ═══════════════════ WORK TAB ═══════════════════ */
 
-interface WorkItem { id: string; title: string; imageUrl?: string; description?: string; createdAt?: { toDate: () => Date }; }
+interface WorkBlock { id: number; type: "text" | "image" | "comparison"; content: string; }
+interface WorkItem { id: string; title: string; imageUrl?: string; description?: string; blocks?: WorkBlock[]; createdAt?: { toDate: () => Date }; }
 
 function WorkTab() {
     const [showForm, setShowForm] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
     const [works, setWorks] = useState<WorkItem[]>([]);
     const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
     const [imageUrl, setImageUrl] = useState("");
+    const [blocks, setBlocks] = useState<WorkBlock[]>([{ id: Date.now(), type: "text", content: "" }]);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
@@ -412,16 +439,66 @@ function WorkTab() {
         return () => unsub();
     }, []);
 
+    const addBlock = (type: "text" | "image" | "comparison") => {
+        const content = type === "comparison" ? JSON.stringify({ beforeUrl: "", afterUrl: "", beforeLabel: "Before", afterLabel: "After" }) : "";
+        setBlocks(p => [...p, { id: Date.now(), type, content }]);
+    };
+    const updateBlock = (id: number, content: string) => setBlocks(p => p.map(b => b.id === id ? { ...b, content } : b));
+    const updateComparisonField = (id: number, field: string, value: string) => {
+        setBlocks(p => p.map(b => {
+            if (b.id !== id) return b;
+            try {
+                const data = JSON.parse(b.content);
+                data[field] = value;
+                return { ...b, content: JSON.stringify(data) };
+            } catch { return b; }
+        }));
+    };
+    const removeBlock = (id: number) => setBlocks(p => p.filter(b => b.id !== id));
+    const moveBlock = (i: number, dir: number) => {
+        const n = [...blocks]; const t = i + dir;
+        if (t < 0 || t >= n.length) return;
+        [n[i], n[t]] = [n[t], n[i]]; setBlocks(n);
+    };
+
+    const resetForm = () => {
+        setTitle(""); setImageUrl(""); setBlocks([{ id: Date.now(), type: "text", content: "" }]);
+        setEditingId(null); setShowForm(false); setError("");
+    };
+
+    const startEdit = (work: WorkItem) => {
+        setEditingId(work.id);
+        setTitle(work.title);
+        setImageUrl(work.imageUrl || "");
+        if (work.blocks && work.blocks.length > 0) {
+            setBlocks(work.blocks.map((b, i) => ({ id: Date.now() + i, type: b.type as "text" | "image" | "comparison", content: b.content })));
+        } else {
+            const initialBlocks: WorkBlock[] = [];
+            if (work.description) initialBlocks.push({ id: Date.now(), type: "text", content: work.description });
+            if (initialBlocks.length === 0) initialBlocks.push({ id: Date.now(), type: "text", content: "" });
+            setBlocks(initialBlocks);
+        }
+        setShowForm(true);
+        setError("");
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!title.trim() || !imageUrl.trim()) return;
+        if (!title.trim()) return;
         setSubmitting(true); setError("");
         try {
-            await addDoc(collection(db, "works"), {
-                title: title.trim(), description: description.trim(),
-                imageUrl: imageUrl.trim(), createdAt: serverTimestamp(),
-            });
-            setSuccess(true); setTitle(""); setDescription(""); setImageUrl(""); setShowForm(false);
+            const docId = editingId || toSlug(title);
+            if (!docId) { setError("Judul tidak valid untuk URL."); setSubmitting(false); return; }
+            const description = blocks.find(b => b.type === "text" && b.content.trim())?.content.trim() || "";
+            const data: Record<string, unknown> = {
+                title: title.trim(), slug: docId,
+                imageUrl: imageUrl.trim() || null,
+                description,
+                blocks: blocks.map(({ type, content }) => ({ type, content: content.trim() })),
+            };
+            if (!editingId) data.createdAt = serverTimestamp();
+            await setDoc(doc(db, "works", docId), data, { merge: editingId ? true : false });
+            setSuccess(true); resetForm();
             setTimeout(() => setSuccess(false), 3000);
         } catch { setError("Gagal menyimpan."); }
         finally { setSubmitting(false); }
@@ -436,8 +513,8 @@ function WorkTab() {
             {showForm ? (
                 <div className="adm-card" style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span className="adm-card-label">Tambah Work</span>
-                        <button type="button" className="adm-btn-ghost" onClick={() => { setShowForm(false); setError(""); }}>Batal</button>
+                        <span className="adm-card-label">{editingId ? "Edit Work" : "Tambah Work"}</span>
+                        <button type="button" className="adm-btn-ghost" onClick={resetForm}>Batal</button>
                     </div>
                     <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                         <div className="adm-field">
@@ -456,25 +533,85 @@ function WorkTab() {
                         </div>
 
                         <div className="adm-field">
-                            <label className="adm-label">Deskripsi</label>
-                            <textarea className="adm-input adm-textarea" placeholder="Deskripsi singkat..." value={description}
-                                onChange={(e) => { setDescription(e.target.value); setError(""); }} disabled={submitting} rows={3} />
+                            <label className="adm-label">Konten</label>
+                            <div className="adm-blocks">
+                                {blocks.map((block, i) => {
+                                    const cmpData = block.type === "comparison" ? (() => { try { return JSON.parse(block.content); } catch { return { beforeUrl: "", afterUrl: "", beforeLabel: "Before", afterLabel: "After" }; } })() : null;
+                                    return (
+                                    <div key={block.id} className="adm-block-item">
+                                        <div className="adm-block-controls">
+                                            <button type="button" className="adm-block-btn" onClick={() => moveBlock(i, -1)} disabled={i === 0}><ChevronUp size={14} /></button>
+                                            <div className="adm-block-type">{block.type === "comparison" ? <Columns size={11} /> : block.type === "image" ? <Image size={11} /> : <Type size={11} />}</div>
+                                            <button type="button" className="adm-block-btn" onClick={() => moveBlock(i, 1)} disabled={i === blocks.length - 1}><ChevronDown size={14} /></button>
+                                        </div>
+                                        <div className="adm-block-content">
+                                            {block.type === "text" ? (
+                                                <textarea className="adm-input adm-textarea" placeholder="Tulis konten..." value={block.content}
+                                                    onChange={(e) => updateBlock(block.id, e.target.value)} disabled={submitting} rows={3} />
+                                            ) : block.type === "comparison" && cmpData ? (
+                                                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                                                    <div style={{ display: "flex", gap: "8px" }}>
+                                                        <input type="text" className="adm-input" placeholder="Label before" value={cmpData.beforeLabel}
+                                                            onChange={(e) => updateComparisonField(block.id, "beforeLabel", e.target.value)} disabled={submitting}
+                                                            style={{ flex: 1 }} />
+                                                        <input type="text" className="adm-input" placeholder="Label after" value={cmpData.afterLabel}
+                                                            onChange={(e) => updateComparisonField(block.id, "afterLabel", e.target.value)} disabled={submitting}
+                                                            style={{ flex: 1 }} />
+                                                    </div>
+                                                    <input type="url" className="adm-input" placeholder="Before image URL..." value={cmpData.beforeUrl}
+                                                        onChange={(e) => updateComparisonField(block.id, "beforeUrl", e.target.value)} disabled={submitting} />
+                                                    <input type="url" className="adm-input" placeholder="After image URL..." value={cmpData.afterUrl}
+                                                        onChange={(e) => updateComparisonField(block.id, "afterUrl", e.target.value)} disabled={submitting} />
+                                                    {cmpData.beforeUrl && cmpData.afterUrl && (
+                                                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", marginTop: "4px" }}>
+                                                            <div style={{ position: "relative" }}>
+                                                                <img src={cmpData.beforeUrl} alt="" referrerPolicy="no-referrer"
+                                                                    style={{ width: "100%", borderRadius: "6px", maxHeight: "80px", objectFit: "cover", display: "block" }} />
+                                                                <span style={{ position: "absolute", top: "4px", left: "4px", fontSize: "9px", padding: "2px 6px", borderRadius: "4px", background: "rgba(0,0,0,0.5)", color: "#fff" }}>{cmpData.beforeLabel}</span>
+                                                            </div>
+                                                            <div style={{ position: "relative" }}>
+                                                                <img src={cmpData.afterUrl} alt="" referrerPolicy="no-referrer"
+                                                                    style={{ width: "100%", borderRadius: "6px", maxHeight: "80px", objectFit: "cover", display: "block" }} />
+                                                                <span style={{ position: "absolute", top: "4px", left: "4px", fontSize: "9px", padding: "2px 6px", borderRadius: "4px", background: "rgba(0,0,0,0.5)", color: "#fff" }}>{cmpData.afterLabel}</span>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <input type="url" className="adm-input" placeholder="https://example.com/image.jpg" value={block.content}
+                                                        onChange={(e) => updateBlock(block.id, e.target.value)} disabled={submitting} />
+                                                    {block.content.trim() && <img src={block.content} alt="" referrerPolicy="no-referrer"
+                                                        style={{ width: "100%", borderRadius: "8px", marginTop: "8px", maxHeight: "140px", objectFit: "cover" }} />}
+                                                </>
+                                            )}
+                                        </div>
+                                        <button type="button" className="adm-block-remove" onClick={() => removeBlock(block.id)}><Trash2 size={13} /></button>
+                                    </div>
+                                    );
+                                })}
+                            </div>
+                            <div className="adm-block-actions">
+                                <button type="button" className="adm-btn-outline" onClick={() => addBlock("text")}><Type size={13} /> Teks</button>
+                                <button type="button" className="adm-btn-outline" onClick={() => addBlock("image")}><Image size={13} /> Gambar</button>
+                                <button type="button" className="adm-btn-outline" onClick={() => addBlock("comparison")}><Columns size={13} /> Comparison</button>
+                            </div>
                         </div>
 
                         {error && <div className="adm-toast adm-toast-error"><AlertCircle size={14} /> {error}</div>}
 
-                        <button type="submit" className="adm-btn-primary" disabled={submitting || !title.trim() || !imageUrl.trim()}>
-                            <Briefcase size={14} /> {submitting ? "Menyimpan..." : "Tambah Work"}
+                        <button type="submit" className="adm-btn-primary" disabled={submitting || !title.trim()}>
+                            <Briefcase size={14} /> {submitting ? "Menyimpan..." : editingId ? "Simpan Perubahan" : "Tambah Work"}
                         </button>
                     </form>
                 </div>
             ) : (
-                <button type="button" className="adm-btn-outline" onClick={() => setShowForm(true)} style={{ width: "100%" }}>
+                <button type="button" className="adm-btn-outline" onClick={() => { setEditingId(null); setShowForm(true); }} style={{ width: "100%" }}>
                     <Plus size={14} /> Tambah Work
                 </button>
             )}
 
-            {success && <div className="adm-toast adm-toast-success"><CheckCircle size={14} /> Work berhasil ditambahkan!</div>}
+            {success && <div className="adm-toast adm-toast-success"><CheckCircle size={14} /> {editingId ? "Work berhasil diperbarui!" : "Work berhasil ditambahkan!"}</div>}
 
             {/* List */}
             <div className="adm-list-header">
@@ -485,17 +622,22 @@ function WorkTab() {
                 <div className="adm-list">
                     {works.map((work) => (
                         <SwipeDeleteItem key={work.id} onDelete={() => handleDelete(work.id)}>
-                            <div className="adm-list-thumb">
-                                {work.imageUrl ? (
-                                    <img src={work.imageUrl} alt="" referrerPolicy="no-referrer" />
-                                ) : (
-                                    <div className="adm-list-thumb-empty"><Briefcase size={16} /></div>
-                                )}
+                            <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, cursor: "pointer" }} onClick={() => startEdit(work)}>
+                                <div className="adm-list-thumb">
+                                    {work.imageUrl ? (
+                                        <img src={work.imageUrl} alt="" referrerPolicy="no-referrer" />
+                                    ) : (
+                                        <div className="adm-list-thumb-empty"><Briefcase size={16} /></div>
+                                    )}
+                                </div>
+                                <div className="adm-list-info">
+                                    <span className="adm-list-name">{work.title}</span>
+                                    <span className="adm-list-date">{work.description || formatDate(work.createdAt)}</span>
+                                </div>
                             </div>
-                            <div className="adm-list-info">
-                                <span className="adm-list-name">{work.title}</span>
-                                <span className="adm-list-date">{work.description || formatDate(work.createdAt)}</span>
-                            </div>
+                            <button type="button" className="adm-list-edit" onClick={(e) => { e.stopPropagation(); startEdit(work); }}>
+                                <Pencil size={13} />
+                            </button>
                         </SwipeDeleteItem>
                     ))}
                 </div>

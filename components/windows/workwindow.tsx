@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { usePageTransition } from "@/components/PageTransition";
 import { Image as ImageIcon } from "lucide-react";
 
 interface Work {
@@ -15,6 +16,7 @@ interface Work {
 
 export default function WorkWindow() {
     const [works, setWorks] = useState<Work[]>([]);
+    const { navigateTo } = usePageTransition();
 
     useEffect(() => {
         const q = query(collection(db, "works"), orderBy("createdAt", "desc"));
@@ -29,7 +31,12 @@ export default function WorkWindow() {
             {works.length > 0 ? (
                 <div className="wnd-work-grid">
                     {works.map((work) => (
-                        <div key={work.id} className="wnd-work-card">
+                        <div
+                            key={work.id}
+                            className="wnd-work-card"
+                            onClick={() => navigateTo(`/work/${work.id}`)}
+                            style={{ cursor: "pointer" }}
+                        >
                             <div className="wnd-work-card-img">
                                 {work.imageUrl ? (
                                     <img src={work.imageUrl} alt={work.title} referrerPolicy="no-referrer" />

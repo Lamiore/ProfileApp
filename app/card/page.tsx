@@ -192,7 +192,7 @@ export default function CardPage() {
                         }}
                     >
                         <img
-                            src="/namecard_front.png"
+                            src="/image/card/namecard_front.png"
                             alt="Name Card Front"
                             draggable={false}
                             style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
@@ -214,7 +214,7 @@ export default function CardPage() {
                         }}
                     >
                         <img
-                            src="/namecard_back.png"
+                            src="/image/card/namecard_back.png"
                             alt="Name Card Back"
                             draggable={false}
                             style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}

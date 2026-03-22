@@ -657,7 +657,7 @@ export default function Hero() {
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 2.8 }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
                     style={{ pointerEvents: "auto" }}
                 >
                     <div
@@ -685,7 +685,7 @@ export default function Hero() {
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 3.0 }}
+                        transition={{ duration: 0.6, delay: 0.5 }}
                         className="flex gap-4 flex-wrap justify-end"
                         style={{ pointerEvents: "auto", position: "relative", zIndex: 60 }}
                     >
@@ -696,7 +696,7 @@ export default function Hero() {
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{
-                                    delay: 3.0 + i * 0.08,
+                                    delay: 0.5 + i * 0.08,
                                     scale: { type: "spring", stiffness: 400, damping: 20 },
                                     y: { type: "spring", stiffness: 400, damping: 20 },
                                 }}
@@ -892,7 +892,7 @@ export default function Hero() {
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            transition={{ duration: 0.8, delay: 2.9 }}
+                            transition={{ duration: 0.8, delay: 0.4 }}
                             className="hero-text"
                             style={{ pointerEvents: "none" }}
                         >
@@ -900,7 +900,7 @@ export default function Hero() {
                                 <motion.span
                                     initial={{ y: "100%", opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
-                                    transition={{ duration: 1.2, delay: 3.0, ease: [0.16, 1, 0.3, 1] }}
+                                    transition={{ duration: 1.2, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
                                     style={{ display: "inline-block" }}
                                 >
                                     Simplicity is the
@@ -910,7 +910,7 @@ export default function Hero() {
                                 <motion.span
                                     initial={{ y: "100%", opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
-                                    transition={{ duration: 1.2, delay: 3.1, ease: [0.16, 1, 0.3, 1] }}
+                                    transition={{ duration: 1.2, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
                                     style={{ display: "inline-block" }}
                                 >
                                     <span className="hero-hover unhover">
