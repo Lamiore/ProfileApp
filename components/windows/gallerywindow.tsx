@@ -7,6 +7,17 @@ import Window from "@/components/window";
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
+function useIsMobile() {
+    const [mobile, setMobile] = useState(false);
+    useEffect(() => {
+        const check = () => setMobile(window.innerWidth <= 768);
+        check();
+        window.addEventListener("resize", check);
+        return () => window.removeEventListener("resize", check);
+    }, []);
+    return mobile;
+}
+
 const MIN_COL_WIDTH = 160; // px per column minimum
 
 const getCols = (width: number) => {
@@ -114,6 +125,7 @@ export default function GalleryWindow() {
     const [previewSize, setPreviewSize] = useState({ w: 560, h: 480 });
     const [cols, setCols] = useState(4);
     const containerRef = useRef<HTMLDivElement>(null);
+    const isMobile = useIsMobile();
 
     useEffect(() => {
         const q = query(collection(db, "images"), orderBy("createdAt", "desc"));
@@ -233,7 +245,7 @@ export default function GalleryWindow() {
                             cursor: "pointer",
                             position: "relative",
                         }}
-                        whileHover={{ scale: 1.02 }}
+                        whileHover={isMobile ? undefined : { scale: 1.02 }}
                     >
                         <img
                             src={
@@ -293,24 +305,116 @@ export default function GalleryWindow() {
                 ))}
             </div>
 
-            {/* Preview — popup Window via portal */}
+            {/* Preview — mobile: fullscreen overlay, desktop: popup Window */}
             {typeof document !== "undefined" &&
                 createPortal(
                     <AnimatePresence>
-                        {previewItem && (
-                            <>
-                            {/* Backdrop — click to close preview */}
+                        {previewItem && isMobile ? (
+                            /* ── Mobile: lightweight fullscreen preview ── */
                             <motion.div
+                                key="mobile-preview"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                style={{
+                                    position: "fixed",
+                                    inset: 0,
+                                    zIndex: 200,
+                                    background: "#0a0a0a",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                }}
+                            >
+                                {/* Header */}
+                                <div style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    padding: "12px 16px",
+                                    flexShrink: 0,
+                                }}>
+                                    <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)" }}>
+                                        {previewItem.type === "youtube" || previewItem.type === "gdrive"
+                                            ? "Video"
+                                            : `${(previewIndex ?? 0) + 1} / ${items.length}`}
+                                    </span>
+                                    <button
+                                        onClick={() => setPreviewIndex(null)}
+                                        style={{
+                                            background: "none",
+                                            border: "none",
+                                            cursor: "pointer",
+                                            padding: "4px",
+                                            display: "flex",
+                                        }}
+                                    >
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" strokeWidth="2" strokeLinecap="round">
+                                            <line x1="18" y1="6" x2="6" y2="18" />
+                                            <line x1="6" y1="6" x2="18" y2="18" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                {/* Content */}
+                                <div style={{ flex: 1, position: "relative", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                                    {previewItem.type === "youtube" && previewItem.videoId ? (
+                                        <iframe
+                                            src={`https://www.youtube.com/embed/${previewItem.videoId}?autoplay=1&rel=0`}
+                                            title="YouTube Video"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowFullScreen
+                                            style={{ width: "100%", height: "100%", border: "none" }}
+                                        />
+                                    ) : previewItem.type === "gdrive" && previewItem.videoId ? (
+                                        <iframe
+                                            src={`https://drive.google.com/file/d/${previewItem.videoId}/preview`}
+                                            title="Google Drive Video"
+                                            allow="autoplay"
+                                            allowFullScreen
+                                            style={{ width: "100%", height: "100%", border: "none" }}
+                                        />
+                                    ) : (
+                                        <img
+                                            src={previewItem.url}
+                                            alt="Preview"
+                                            style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", display: "block" }}
+                                        />
+                                    )}
+
+                                    {/* Nav buttons */}
+                                    {previewIndex !== null && previewIndex > 0 && (
+                                        <button onClick={(e) => { e.stopPropagation(); goPrev(); }} style={{
+                                            position: "absolute", left: "8px", top: "50%", transform: "translateY(-50%)",
+                                            width: "40px", height: "40px", borderRadius: "50%",
+                                            background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.1)",
+                                            color: "#E0E0E0", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                                        }}>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+                                        </button>
+                                    )}
+                                    {previewIndex !== null && previewIndex < items.length - 1 && (
+                                        <button onClick={(e) => { e.stopPropagation(); goNext(); }} style={{
+                                            position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)",
+                                            width: "40px", height: "40px", borderRadius: "50%",
+                                            background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.1)",
+                                            color: "#E0E0E0", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                                        }}>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+                                        </button>
+                                    )}
+                                </div>
+                            </motion.div>
+                        ) : previewItem ? (
+                            /* ── Desktop: Window-based preview ── */
+                            <>
+                            <motion.div
+                                key="desktop-backdrop"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: 0.2 }}
                                 onClick={() => setPreviewIndex(null)}
-                                style={{
-                                    position: "fixed",
-                                    inset: 0,
-                                    zIndex: 99,
-                                }}
+                                style={{ position: "fixed", inset: 0, zIndex: 99 }}
                             />
                             <Window
                                 title={
@@ -330,12 +434,7 @@ export default function GalleryWindow() {
                                             title="YouTube Video"
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                             allowFullScreen
-                                            style={{
-                                                width: "100%",
-                                                height: "100%",
-                                                border: "none",
-                                                borderRadius: "6px",
-                                            }}
+                                            style={{ width: "100%", height: "100%", border: "none", borderRadius: "6px" }}
                                         />
                                     ) : previewItem.type === "gdrive" && previewItem.videoId ? (
                                         <iframe
@@ -343,92 +442,44 @@ export default function GalleryWindow() {
                                             title="Google Drive Video"
                                             allow="autoplay"
                                             allowFullScreen
-                                            style={{
-                                                width: "100%",
-                                                height: "100%",
-                                                border: "none",
-                                                borderRadius: "6px",
-                                            }}
+                                            style={{ width: "100%", height: "100%", border: "none", borderRadius: "6px" }}
                                         />
                                     ) : (
-                                        <img
-                                            src={previewItem.url}
-                                            alt="Preview"
-                                            style={{
-                                                width: "100%",
-                                                height: "100%",
-                                                objectFit: "contain",
-                                                display: "block",
-                                                borderRadius: "6px",
-                                            }}
-                                        />
+                                        <img src={previewItem.url} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "contain", display: "block", borderRadius: "6px" }} />
                                     )}
 
-                                    {/* Prev button */}
                                     {previewIndex !== null && previewIndex > 0 && (
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); goPrev(); }}
-                                            style={{
-                                                position: "absolute",
-                                                left: "8px",
-                                                top: "50%",
-                                                transform: "translateY(-50%)",
-                                                width: "36px",
-                                                height: "36px",
-                                                borderRadius: "50%",
-                                                background: "rgba(0,0,0,0.5)",
-                                                backdropFilter: "blur(8px)",
-                                                border: "1px solid rgba(255,255,255,0.15)",
-                                                color: "#E0E0E0",
-                                                cursor: "pointer",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                transition: "background 0.2s, transform 0.2s",
-                                            }}
+                                        <button onClick={(e) => { e.stopPropagation(); goPrev(); }} style={{
+                                            position: "absolute", left: "8px", top: "50%", transform: "translateY(-50%)",
+                                            width: "36px", height: "36px", borderRadius: "50%",
+                                            background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)",
+                                            border: "1px solid rgba(255,255,255,0.15)", color: "#E0E0E0", cursor: "pointer",
+                                            display: "flex", alignItems: "center", justifyContent: "center",
+                                        }}
                                             onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.7)"; }}
                                             onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.5)"; }}
                                         >
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                                <polyline points="15 18 9 12 15 6" />
-                                            </svg>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
                                         </button>
                                     )}
-
-                                    {/* Next button */}
                                     {previewIndex !== null && previewIndex < items.length - 1 && (
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); goNext(); }}
-                                            style={{
-                                                position: "absolute",
-                                                right: "8px",
-                                                top: "50%",
-                                                transform: "translateY(-50%)",
-                                                width: "36px",
-                                                height: "36px",
-                                                borderRadius: "50%",
-                                                background: "rgba(0,0,0,0.5)",
-                                                backdropFilter: "blur(8px)",
-                                                border: "1px solid rgba(255,255,255,0.15)",
-                                                color: "#E0E0E0",
-                                                cursor: "pointer",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                transition: "background 0.2s, transform 0.2s",
-                                            }}
+                                        <button onClick={(e) => { e.stopPropagation(); goNext(); }} style={{
+                                            position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)",
+                                            width: "36px", height: "36px", borderRadius: "50%",
+                                            background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)",
+                                            border: "1px solid rgba(255,255,255,0.15)", color: "#E0E0E0", cursor: "pointer",
+                                            display: "flex", alignItems: "center", justifyContent: "center",
+                                        }}
                                             onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.7)"; }}
                                             onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.5)"; }}
                                         >
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                                <polyline points="9 18 15 12 9 6" />
-                                            </svg>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
                                         </button>
                                     )}
                                 </div>
                             </Window>
                             </>
-                        )}
+                        ) : null}
                     </AnimatePresence>,
                     document.body
                 )}

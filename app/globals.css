@@ -239,6 +239,60 @@
   }
 }
 
+/* ── Mobile Full View (no window) ── */
+.mobile-fullview {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #0a0a0a;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+}
+
+.mobile-fullview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: #0a0a0a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.mobile-fullview-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.mobile-fullview-menu-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  flex-shrink: 0;
+}
+
+.mobile-fullview-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 24px;
+  color: #E0E0E0;
+}
+
+.mobile-fullview-content::-webkit-scrollbar {
+  display: none;
+}
+
 /* ── Hero Typography ── */
 .hero-text {
   font-size: clamp(2rem, 7vw, 6.5rem);
@@ -747,6 +801,30 @@
   overflow: hidden;
 }
 
+
+/* ── Mobile optimizations for window content ── */
+@media (max-width: 768px) {
+  /* Work grid: single column on mobile */
+  .wnd-work-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .wnd-work-card-img {
+    aspect-ratio: 16 / 9;
+  }
+
+  /* Blog grid: single column on mobile */
+  .wnd-blog-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  /* Mobile fullview: tighter padding */
+  .mobile-fullview-content {
+    padding: 16px;
+  }
+}
 
 /* ── Admin Window ── */
 

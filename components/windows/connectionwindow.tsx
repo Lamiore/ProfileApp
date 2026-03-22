@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 
 const DarkMap = dynamic(() => import("@/components/DarkMap"), { ssr: false });
@@ -310,7 +310,7 @@ export default function ConnectionWindow() {
             <div style={{
                 borderRadius: "10px",
                 overflow: "hidden",
-                height: "300px",
+                height: typeof window !== "undefined" && window.innerWidth <= 768 ? "200px" : "300px",
                 border: "1px solid rgba(255,255,255,0.08)",
                 position: "relative",
                 marginTop: "4px",

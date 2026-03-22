@@ -794,10 +794,8 @@ export default function Hero() {
                         style={{
                             position: "fixed",
                             inset: 0,
-                            zIndex: 65,
-                            background: "rgba(26, 26, 26, 0.85)",
-                            backdropFilter: "blur(40px) saturate(180%)",
-                            WebkitBackdropFilter: "blur(40px) saturate(180%)",
+                            zIndex: 110,
+                            background: "#0a0a0a",
                             display: "flex",
                             flexDirection: "column",
                             alignItems: "center",
@@ -929,23 +927,22 @@ export default function Hero() {
                     </div>
 
 
-                    {/* BlurOverlay — click to peek/unpeek (show desktop) */}
+                    {/* BlurOverlay — click to peek/unpeek (show desktop) — desktop only */}
                     <AnimatePresence>
-                        {openWindows.length > 0 && (
+                        {!isMobile && openWindows.length > 0 && (
                             <BlurOverlay onClose={() => setPeeking(p => !p)} peeking={peeking} />
                         )}
                     </AnimatePresence>
-                    {/* Render windows — grid positions on desktop, fullscreen on mobile */}
+
+                    {/* Desktop: windowed mode with blur, drag, resize */}
                     <AnimatePresence>
-                        {openWindows.map((name, index) => (
+                        {!isMobile && openWindows.map((name, index) => (
                             <Window
                                 key={name}
                                 title={name}
                                 zIndex={BASE_Z + (windowZMap[name] ?? index)}
                                 onFocus={() => bringToFront(name)}
                                 onClose={() => closeWindow(name)}
-                                onMenuToggle={isMobile ? () => setMenuOpen((prev) => !prev) : undefined}
-                                menuOpen={menuOpen}
                                 initialWidth={gridLayout[name]?.w ?? (["Gallery", "Blog", "Work"].includes(name) ? 820 : 560)}
                                 initialHeight={gridLayout[name]?.h ?? (["Gallery", "Blog", "Work"].includes(name) ? 620 : 480)}
                                 gridPosition={gridLayout[name]}
@@ -962,6 +959,48 @@ export default function Hero() {
                     </AnimatePresence>
                 </div>
             </div>
+
+            {/* Mobile: full-screen solid view — no window, no blur, rendered at root level */}
+            <AnimatePresence>
+                {isMobile && openWindows.length > 0 && (() => {
+                    const name = openWindows[openWindows.length - 1];
+                    return (
+                        <motion.div
+                            key={`mobile-${name}`}
+                            initial={{ opacity: 0, y: 40 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 40 }}
+                            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                            className="mobile-fullview"
+                        >
+                            {/* Mobile header */}
+                            <div className="mobile-fullview-header">
+                                <span className="mobile-fullview-title">{name}</span>
+                                <button
+                                    onClick={() => setMenuOpen(prev => !prev)}
+                                    aria-label="Menu"
+                                    className="mobile-fullview-menu-btn"
+                                >
+                                    <div style={{ width: "20px", height: "14px", position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                                        <span style={{ display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#E0E0E0", transformOrigin: "center", transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)", transform: menuOpen ? "rotate(45deg) translateY(6px)" : "none" }} />
+                                        <span style={{ display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#E0E0E0", transition: "opacity 0.2s, transform 0.2s", opacity: menuOpen ? 0 : 1, transform: menuOpen ? "scaleX(0)" : "scaleX(1)" }} />
+                                        <span style={{ display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#E0E0E0", transformOrigin: "center", transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)", transform: menuOpen ? "rotate(-45deg) translateY(-6px)" : "none" }} />
+                                    </div>
+                                </button>
+                            </div>
+                            {/* Mobile content */}
+                            <div className="mobile-fullview-content">
+                                {name === "About" && <AboutWindow />}
+                                {name === "Work" && <WorkWindow />}
+                                {name === "Blog" && <BlogWindow />}
+                                {name === "Gallery" && <GalleryWindow />}
+                                {name === "Connect" && <ConnectionWindow />}
+                                {name === "Admin" && <AdminWindow />}
+                            </div>
+                        </motion.div>
+                    );
+                })()}
+            </AnimatePresence>
 
         </div>
     );
