@@ -1704,17 +1704,20 @@
 }
 
 /* Dragging state — disable all transitions for instant feedback */
-.comparison-container.dragging .image-before {
+.comparison-container.cmp-dragging .image-before {
   transition: none !important;
 }
 
-.comparison-container.dragging .slider-line,
-.comparison-container.dragging .slider-knob {
+.comparison-container.cmp-dragging .slider-line,
+.comparison-container.cmp-dragging .slider-knob {
   transition: none !important;
 }
 
 /* Smooth transitions when not dragging */
-.comparison-container .image-before,
+.comparison-container .image-before {
+  transition: clip-path 0.1s ease-out;
+}
+
 .comparison-container .slider-line,
 .comparison-container .slider-knob {
   transition: left 0.1s ease-out;

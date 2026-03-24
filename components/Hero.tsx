@@ -371,10 +371,10 @@ export default function Hero() {
             driftBlendFactor: 0,  // 0 = no drift, 1 = full drift
         };
 
-        const IDLE_DELAY_MS = 500;   // mulai drift lebih cepat
-        const DRIFT_SPEED = 1.0;     // kecepatan drift lebih tinggi
-        const DRIFT_RADIUS_X = 280;  // jangkauan horizontal lebih jauh
-        const DRIFT_RADIUS_Y = 180;  // jangkauan vertikal lebih jauh
+        const IDLE_DELAY_MS = 1500;  // waktu tunggu sedang
+        const DRIFT_SPEED = 0.6;     // kecepatan sedang
+        const DRIFT_RADIUS_X = 180;  // jangkauan horizontal sedang
+        const DRIFT_RADIUS_Y = 120;  // jangkauan vertikal sedang
 
         let cellWidth = 0;
         let cellHeight = 0;
