@@ -696,31 +696,6 @@
   color: rgba(255, 255, 255, 0.15);
 }
 
-.wnd-work-card-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: flex-end;
-  padding: 12px;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-}
-
-.wnd-work-card:hover .wnd-work-card-overlay {
-  opacity: 1;
-}
-
-.wnd-work-card-desc {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.8);
-  margin: 0;
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
 
 .wnd-work-card-info {
   padding: 10px 12px;

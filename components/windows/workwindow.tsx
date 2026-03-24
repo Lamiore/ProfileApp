@@ -45,10 +45,6 @@ export default function WorkWindow() {
                                         <ImageIcon size={28} />
                                     </div>
                                 )}
-                                {/* Hover overlay with description */}
-                                <div className="wnd-work-card-overlay">
-                                    <p className="wnd-work-card-desc">{work.description || "No description"}</p>
-                                </div>
                             </div>
                             <div className="wnd-work-card-info">
                                 <h3 className="wnd-work-card-title">{work.title}</h3>
