@@ -35,8 +35,8 @@ const connections = [
     },
     {
         label: "Instagram",
-        value: "@lam.webp",
-        href: "https://www.instagram.com/lam.webp/",
+        value: "@ikanguramegarorica",
+        href: "https://www.instagram.com/ikanguramegarorica/",
         icon: "📸",
     },
     {

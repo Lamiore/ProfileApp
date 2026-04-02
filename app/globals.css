@@ -305,10 +305,63 @@
   text-shadow: 4px 4px 10px rgba(0, 0, 0, 1);
 }
 
+.hero-intro {
+  max-width: min(30rem, 32vw);
+  padding-right: 0.25rem;
+  text-align: right;
+  color: rgba(224, 224, 224, 0.92);
+  text-shadow: 0 8px 30px rgba(0, 0, 0, 0.28);
+}
+
+.hero-intro-line {
+  overflow: hidden;
+}
+
+.hero-intro-eyebrow {
+  margin: 0;
+  font-family: 'Helvetica 1957', Helvetica, Arial, sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-shadow: 4px 4px 10px rgba(0, 0, 0, 1);
+}
+
+.hero-intro-body {
+  margin: 0.55rem 0 0;
+  font-family: 'Helvetica 1957', Helvetica, Arial, sans-serif;
+  font-size: 1.16rem;
+  font-weight: 700;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+  color: rgba(224, 224, 224, 0.68);
+  text-shadow: 4px 4px 10px rgba(0, 0, 0, 1);
+}
+
 @media (max-width: 768px) {
   .hero-text {
     font-size: clamp(3.2rem, 14vw, 5.5rem);
     line-height: 1.08;
+  }
+
+  .hero-intro {
+    max-width: min(18rem, calc(100vw - 7rem));
+    position: absolute;
+    top: 6.2rem;
+    right: 1.5rem;
+    padding-right: 0;
+    text-align: right;
+    z-index: 65;
+  }
+
+  .hero-intro-mobile .hero-intro-eyebrow {
+    font-size: 2rem;
+    line-height: 1.05;
+  }
+
+  .hero-intro-mobile .hero-intro-body {
+    margin-top: 0.45rem;
+    font-size: 1.08rem;
+    line-height: 1.45;
   }
 
   .hero-hover {

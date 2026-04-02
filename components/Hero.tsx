@@ -40,6 +40,21 @@ const CONFIG = {
 
 const buttons = ["About", "Blog", "Gallery", "Work", "Connect"];
 
+const introCopy = {
+    eyebrow: "Hi, I'm Lam.",
+    body: "This is my space for work, writing, and visual experiments.",
+};
+
+const introContainerMotion = {
+    initial: { opacity: 0, y: -14, filter: "blur(10px)" },
+    animate: { opacity: 1, y: 0, filter: "blur(0px)" },
+};
+
+const introLineMotion = {
+    initial: { opacity: 0, y: "110%" },
+    animate: { opacity: 1, y: 0 },
+};
+
 const buttonIcons: Record<string, React.ReactNode> = {
     About: (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -682,105 +697,173 @@ export default function Hero() {
 
                 {/* Nav Buttons — desktop only */}
                 {!isMobile && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.5 }}
-                        className="flex gap-4 flex-wrap justify-end"
+                    <div
+                        className="flex flex-col items-end gap-5"
                         style={{ pointerEvents: "auto", position: "relative", zIndex: 60 }}
                     >
-                        {buttons.map((btn, i) => (
-                            <motion.button
-                                key={btn}
-                                onClick={() => toggleWindow(btn)}
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{
-                                    delay: 0.5 + i * 0.08,
-                                    scale: { type: "spring", stiffness: 400, damping: 20 },
-                                    y: { type: "spring", stiffness: 400, damping: 20 },
-                                }}
-                                whileHover={{ scale: 1.15, y: -2 }}
-                                whileTap={{ scale: 0.96 }}
-                                className="relative flex items-center gap-2 px-6 py-3 text-sm tracking-widest uppercase cursor-pointer overflow-hidden"
-                                style={{
-                                    borderRadius: "999px",
-                                    color: openWindows.includes(btn) ? "#fff" : "#E0E0E0",
-                                    background: openWindows.includes(btn)
-                                        ? "rgba(255,255,255,0.2)"
-                                        : "rgba(26, 26, 26, 0.35)",
-                                    backdropFilter: "blur(20px) saturate(180%)",
-                                    WebkitBackdropFilter: "blur(20px) saturate(180%)",
-                                    border: "1px solid rgba(255,255,255,0.2)",
-                                    boxShadow: "0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.2)",
-                                    textShadow: "none",
-                                    fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                                    fontWeight: 700,
-                                    transition: "background 0.2s, color 0.2s, border 0.2s",
-                                    transformOrigin: "center center",
-                                }}
-                            >
-                                <span style={{ opacity: 0.75, display: "flex", alignItems: "center" }}>{buttonIcons[btn]}</span>
-                                {btn}
-                            </motion.button>
-                        ))}
-                    </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.5 }}
+                            className="flex gap-4 flex-wrap justify-end"
+                        >
+                            {buttons.map((btn, i) => (
+                                <motion.button
+                                    key={btn}
+                                    onClick={() => toggleWindow(btn)}
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{
+                                        delay: 0.5 + i * 0.08,
+                                        scale: { type: "spring", stiffness: 400, damping: 20 },
+                                        y: { type: "spring", stiffness: 400, damping: 20 },
+                                    }}
+                                    whileHover={{ scale: 1.15, y: -2 }}
+                                    whileTap={{ scale: 0.96 }}
+                                    className="relative flex items-center gap-2 px-6 py-3 text-sm tracking-widest uppercase cursor-pointer overflow-hidden"
+                                    style={{
+                                        borderRadius: "999px",
+                                        color: openWindows.includes(btn) ? "#fff" : "#E0E0E0",
+                                        background: openWindows.includes(btn)
+                                            ? "rgba(255,255,255,0.2)"
+                                            : "rgba(26, 26, 26, 0.35)",
+                                        backdropFilter: "blur(20px) saturate(180%)",
+                                        WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                                        border: "1px solid rgba(255,255,255,0.2)",
+                                        boxShadow: "0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.2)",
+                                        textShadow: "none",
+                                        fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                                        fontWeight: 700,
+                                        transition: "background 0.2s, color 0.2s, border 0.2s",
+                                        transformOrigin: "center center",
+                                    }}
+                                >
+                                    <span style={{ opacity: 0.75, display: "flex", alignItems: "center" }}>{buttonIcons[btn]}</span>
+                                    {btn}
+                                </motion.button>
+                            ))}
+                        </motion.div>
+
+                        <motion.div
+                            initial={introContainerMotion.initial}
+                            animate={introContainerMotion.animate}
+                            transition={{ duration: 0.7, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                            className="hero-intro"
+                            style={{
+                                filter: openWindows.length > 0 && !peeking ? "blur(6px)" : "none",
+                                opacity: openWindows.length > 0 && !peeking ? 0.45 : 1,
+                                transition: "filter 0.4s ease, opacity 0.4s ease",
+                            }}
+                        >
+                            <div className="hero-intro-line">
+                                <motion.p
+                                    initial={introLineMotion.initial}
+                                    animate={introLineMotion.animate}
+                                    transition={{ duration: 0.85, delay: 1, ease: [0.16, 1, 0.3, 1] }}
+                                    className="hero-intro-eyebrow"
+                                >
+                                    {introCopy.eyebrow}
+                                </motion.p>
+                            </div>
+                            <div className="hero-intro-line">
+                                <motion.p
+                                    initial={introLineMotion.initial}
+                                    animate={introLineMotion.animate}
+                                    transition={{ duration: 0.9, delay: 1.08, ease: [0.16, 1, 0.3, 1] }}
+                                    className="hero-intro-body"
+                                >
+                                    {introCopy.body}
+                                </motion.p>
+                            </div>
+                        </motion.div>
+                    </div>
                 )}
             </div>
 
             {/* Mobile Hamburger Button — only visible when no window is open */}
             {isMobile && openWindows.length === 0 && !menuOpen && (
-                <motion.button
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.4 }}
-                    onClick={() => setMenuOpen((prev) => !prev)}
-                    className="absolute top-0 right-0 z-[70] p-6 md:p-12"
-                    style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer" }}
-                    aria-label={menuOpen ? "Close menu" : "Open menu"}
-                >
-                    {/* iOS 26 Liquid Glass pill */}
-                    <div
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            width: "48px",
-                            height: "48px",
-                            borderRadius: "18px",
-                            /* Liquid glass layers */
-                            background: "linear-gradient(145deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.20) 50%, rgba(255,255,255,0.38) 100%)",
-                            backdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
-                            WebkitBackdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
-                            border: "1px solid rgba(255,255,255,0.70)",
-                            boxShadow: [
-                                "0 2px 12px rgba(0,0,0,0.10)",
-                                "0 1px 0 rgba(255,255,255,0.90) inset",
-                                "0 -1px 0 rgba(0,0,0,0.06) inset",
-                                "inset 1px 0 0 rgba(255,255,255,0.60)",
-                            ].join(", "),
-                            transition: "box-shadow 0.25s, background 0.25s",
-                        }}
+                <>
+                    <motion.button
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.4 }}
+                        onClick={() => setMenuOpen((prev) => !prev)}
+                        className="absolute top-0 right-0 z-[70] p-6 md:p-12"
+                        style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer" }}
+                        aria-label={menuOpen ? "Close menu" : "Open menu"}
                     >
-                        <div style={{ width: "22px", height: "16px", position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                            <span
-                                style={{
-                                    display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#E0E0E0",
-                                }}
-                            />
-                            <span
-                                style={{
-                                    display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#E0E0E0",
-                                }}
-                            />
-                            <span
-                                style={{
-                                    display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#E0E0E0",
-                                }}
-                            />
+                        {/* iOS 26 Liquid Glass pill */}
+                        <div
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                width: "48px",
+                                height: "48px",
+                                borderRadius: "18px",
+                                /* Liquid glass layers */
+                                background: "linear-gradient(145deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.20) 50%, rgba(255,255,255,0.38) 100%)",
+                                backdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
+                                WebkitBackdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
+                                border: "1px solid rgba(255,255,255,0.70)",
+                                boxShadow: [
+                                    "0 2px 12px rgba(0,0,0,0.10)",
+                                    "0 1px 0 rgba(255,255,255,0.90) inset",
+                                    "0 -1px 0 rgba(0,0,0,0.06) inset",
+                                    "inset 1px 0 0 rgba(255,255,255,0.60)",
+                                ].join(", "),
+                                transition: "box-shadow 0.25s, background 0.25s",
+                            }}
+                        >
+                            <div style={{ width: "22px", height: "16px", position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                                <span
+                                    style={{
+                                        display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#E0E0E0",
+                                    }}
+                                />
+                                <span
+                                    style={{
+                                        display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#E0E0E0",
+                                    }}
+                                />
+                                <span
+                                    style={{
+                                        display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#E0E0E0",
+                                    }}
+                                />
+                            </div>
                         </div>
-                    </div>
-                </motion.button>
+                    </motion.button>
+
+                    <motion.div
+                        initial={introContainerMotion.initial}
+                        animate={introContainerMotion.animate}
+                        transition={{ duration: 0.6, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        className="hero-intro hero-intro-mobile"
+                        style={{ pointerEvents: "none" }}
+                    >
+                        <div className="hero-intro-line">
+                            <motion.p
+                                initial={introLineMotion.initial}
+                                animate={introLineMotion.animate}
+                                transition={{ duration: 0.8, delay: 0.58, ease: [0.16, 1, 0.3, 1] }}
+                                className="hero-intro-eyebrow"
+                            >
+                                {introCopy.eyebrow}
+                            </motion.p>
+                        </div>
+                        <div className="hero-intro-line">
+                            <motion.p
+                                initial={introLineMotion.initial}
+                                animate={introLineMotion.animate}
+                                transition={{ duration: 0.85, delay: 0.66, ease: [0.16, 1, 0.3, 1] }}
+                                className="hero-intro-body"
+                            >
+                                {introCopy.body}
+                            </motion.p>
+                        </div>
+                    </motion.div>
+                </>
             )}
 
             {/* Mobile Slide-Down Menu */}
