@@ -42,7 +42,7 @@ const buttons = ["About", "Blog", "Gallery", "Work", "Connect"];
 
 const introCopy = {
     eyebrow: "Hi, I'm Lam.",
-    body: "Work,\u00A0thoughts, and visuals.",
+    body: "I Design,\u00A0Write, and explore.",
 };
 
 const introContainerMotion = {
@@ -95,39 +95,83 @@ export default function Hero() {
     const viewportRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const gridRef = useRef<HTMLDivElement>(null);
+    const logoRef = useRef<HTMLDivElement>(null);
+    const navButtonsRef = useRef<HTMLDivElement>(null);
+    const navMeasureRef = useRef<HTMLDivElement>(null);
     const [openWindows, setOpenWindows] = useState<string[]>([]);
     const [isMobile, setIsMobile] = useState(false);
+    const [useCompactNav, setUseCompactNav] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const focusCounter = useRef(0);
     const [windowZMap, setWindowZMap] = useState<Record<string, number>>({});
     const isMobileRef = useRef(false);
+    const useCompactNavRef = useRef(false);
     const [peeking, setPeeking] = useState(false);
     const logoClickCount = useRef(0);
     const logoClickTimer = useRef<ReturnType<typeof setTimeout>>(null);
 
-    // Detect mobile viewport (debounced)
+    // Detect mobile viewport and compact nav state (debounced)
     useEffect(() => {
         let timeoutId: ReturnType<typeof setTimeout>;
         const check = () => {
             const mobile = window.innerWidth <= 768;
             setIsMobile(mobile);
             isMobileRef.current = mobile;
+
+            if (mobile) {
+                setUseCompactNav(true);
+                useCompactNavRef.current = true;
+                return;
+            }
+
+            const logoRect = logoRef.current?.getBoundingClientRect();
+            const navRect = (navButtonsRef.current ?? navMeasureRef.current)?.getBoundingClientRect();
+            if (!logoRect || !navRect) {
+                setUseCompactNav(false);
+                useCompactNavRef.current = false;
+                return;
+            }
+
+            const minGap = 32;
+            const shouldCompact = navRect.left <= logoRect.right + minGap;
+            setUseCompactNav(shouldCompact);
+            useCompactNavRef.current = shouldCompact;
         };
-        check(); // run once on mount
-        const handleResize = () => {
+        const scheduleCheck = () => {
             clearTimeout(timeoutId);
-            timeoutId = setTimeout(check, 150);
+            timeoutId = setTimeout(() => {
+                requestAnimationFrame(check);
+            }, 100);
+        };
+
+        check();
+        const handleResize = () => {
+            scheduleCheck();
         };
         window.addEventListener("resize", handleResize);
+        scheduleCheck();
         return () => {
             clearTimeout(timeoutId);
             window.removeEventListener("resize", handleResize);
         };
     }, []);
 
+    useEffect(() => {
+        if (!useCompactNav) setMenuOpen(false);
+    }, [useCompactNav]);
+
+    useEffect(() => {
+        useCompactNavRef.current = useCompactNav;
+    }, [useCompactNav]);
+
+    useEffect(() => {
+        if (!useCompactNav) return;
+        setOpenWindows((prev) => (prev.length > 1 ? [prev[prev.length - 1]] : prev));
+    }, [useCompactNav]);
+
     // Buka/tutup window + sound — memoized to prevent child re-renders
     const toggleWindow = useCallback((name: string) => {
-        const mobile = isMobileRef.current;
+        const mobileLike = isMobileRef.current || useCompactNavRef.current;
         setPeeking(false);
         setOpenWindows((prev) => {
             if (prev.includes(name)) {
@@ -140,7 +184,7 @@ export default function Hero() {
                 return prev.filter((w) => w !== name);
             }
             // Mobile: only 1 window at a time
-            if (mobile && prev.length > 0) {
+            if (mobileLike && prev.length > 0) {
                 playCloseSound();
                 focusCounter.current = 1;
                 setWindowZMap({ [name]: 1 });
@@ -151,7 +195,7 @@ export default function Hero() {
             setWindowZMap((z) => ({ ...z, [name]: focusCounter.current }));
             return [...prev, name];
         });
-        if (mobile) setMenuOpen(false);
+        if (mobileLike) setMenuOpen(false);
     }, []);
 
     const handleLogoClick = useCallback(() => {
@@ -186,7 +230,7 @@ export default function Hero() {
     // Compute dynamic grid layout for open windows (desktop only)
     // Work & Blog = big, About & Connect = small (same size), Gallery = wide/long
     const gridLayout = (() => {
-        if (isMobile || openWindows.length === 0) return {} as Record<string, { x: number; y: number; w: number; h: number }>;
+        if (isMobile || useCompactNav || openWindows.length === 0) return {} as Record<string, { x: number; y: number; w: number; h: number }>;
         const vw = typeof window !== "undefined" ? window.innerWidth : 1440;
         const vh = typeof window !== "undefined" ? window.innerHeight : 900;
         const pad = 48;
@@ -674,6 +718,7 @@ export default function Hero() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.3 }}
                     style={{ pointerEvents: "auto", position: "relative", zIndex: 55 }}
+                    ref={logoRef}
                 >
                     <div
                         className="logo"
@@ -696,7 +741,7 @@ export default function Hero() {
                 </motion.div>
 
                 {/* Nav Buttons — desktop only */}
-                {!isMobile && (
+                {!useCompactNav && (
                     <div
                         className="flex flex-col items-end gap-5"
                         style={{ pointerEvents: "none", position: "relative", zIndex: 60 }}
@@ -707,6 +752,7 @@ export default function Hero() {
                             transition={{ duration: 0.6, delay: 0.5 }}
                             className="flex gap-4 flex-wrap justify-end"
                             style={{ pointerEvents: "auto" }}
+                            ref={navButtonsRef}
                         >
                             {buttons.map((btn, i) => (
                                 <motion.button
@@ -746,6 +792,32 @@ export default function Hero() {
                         </motion.div>
                     </div>
                 )}
+            </div>
+
+            <div
+                aria-hidden="true"
+                className="absolute top-0 right-0 p-6 md:p-12"
+                style={{ visibility: "hidden", pointerEvents: "none", zIndex: -1 }}
+            >
+                <div
+                    ref={navMeasureRef}
+                    className="flex gap-4 flex-wrap justify-end"
+                >
+                    {buttons.map((btn) => (
+                        <div
+                            key={`measure-${btn}`}
+                            className="relative flex items-center gap-2 px-6 py-3 text-sm tracking-widest uppercase overflow-hidden"
+                            style={{
+                                borderRadius: "999px",
+                                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                                fontWeight: 700,
+                            }}
+                        >
+                            <span style={{ opacity: 0.75, display: "flex", alignItems: "center" }}>{buttonIcons[btn]}</span>
+                            {btn}
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {!isMobile && (
@@ -790,7 +862,7 @@ export default function Hero() {
             )}
 
             {/* Mobile Hamburger Button — only visible when no window is open */}
-            {isMobile && openWindows.length === 0 && !menuOpen && (
+            {useCompactNav && (!isMobile || openWindows.length === 0) && !menuOpen && (
                 <>
                     <motion.button
                         initial={{ opacity: 0, y: -10 }}
@@ -844,41 +916,43 @@ export default function Hero() {
                         </div>
                     </motion.button>
 
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.8, delay: 0.4 }}
-                        className="hero-intro hero-intro-mobile hero-text"
-                        style={{ pointerEvents: "none" }}
-                    >
-                        <div className="hero-line">
-                            <motion.span
-                                initial={{ y: "100%", opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ duration: 1.2, delay: 0.58, ease: [0.16, 1, 0.3, 1] }}
-                                style={{ display: "inline-block" }}
-                            >
-                                {introCopy.eyebrow}
-                            </motion.span>
-                        </div>
-                        <div className="hero-line">
-                            <motion.span
-                                initial={{ y: "100%", opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ duration: 1.2, delay: 0.68, ease: [0.16, 1, 0.3, 1] }}
-                                className="hero-intro-body"
-                                style={{ display: "inline-block" }}
-                            >
-                                {introCopy.body}
-                            </motion.span>
-                        </div>
-                    </motion.div>
+                    {isMobile && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.8, delay: 0.4 }}
+                            className="hero-intro hero-intro-mobile hero-text"
+                            style={{ pointerEvents: "none" }}
+                        >
+                            <div className="hero-line">
+                                <motion.span
+                                    initial={{ y: "100%", opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ duration: 1.2, delay: 0.58, ease: [0.16, 1, 0.3, 1] }}
+                                    style={{ display: "inline-block" }}
+                                >
+                                    {introCopy.eyebrow}
+                                </motion.span>
+                            </div>
+                            <div className="hero-line">
+                                <motion.span
+                                    initial={{ y: "100%", opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ duration: 1.2, delay: 0.68, ease: [0.16, 1, 0.3, 1] }}
+                                    className="hero-intro-body"
+                                    style={{ display: "inline-block" }}
+                                >
+                                    {introCopy.body}
+                                </motion.span>
+                            </div>
+                        </motion.div>
+                    )}
                 </>
             )}
 
             {/* Mobile Slide-Down Menu */}
             <AnimatePresence>
-                {isMobile && menuOpen && (
+                {useCompactNav && (!isMobile || openWindows.length === 0) && menuOpen && (
                     <motion.div
                         initial={{ x: "100%" }}
                         animate={{ x: 0 }}
@@ -1022,14 +1096,14 @@ export default function Hero() {
 
                     {/* BlurOverlay — click to peek/unpeek (show desktop) — desktop only */}
                     <AnimatePresence>
-                        {!isMobile && openWindows.length > 0 && (
+                        {!isMobile && !useCompactNav && openWindows.length > 0 && (
                             <BlurOverlay onClose={() => setPeeking(p => !p)} peeking={peeking} />
                         )}
                     </AnimatePresence>
 
                     {/* Desktop: windowed mode with blur, drag, resize */}
                     <AnimatePresence>
-                        {!isMobile && openWindows.map((name, index) => (
+                        {!isMobile && !useCompactNav && openWindows.map((name, index) => (
                             <Window
                                 key={name}
                                 title={name}
@@ -1055,7 +1129,7 @@ export default function Hero() {
 
             {/* Mobile: full-screen solid view — no window, no blur, rendered at root level */}
             <AnimatePresence>
-                {isMobile && openWindows.length > 0 && (() => {
+                {(isMobile || useCompactNav) && openWindows.length > 0 && (() => {
                     const name = openWindows[openWindows.length - 1];
                     return (
                         <motion.div
