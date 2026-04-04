@@ -171,7 +171,7 @@
   overflow-y: hidden;
   display: inline-flex;
   gap: 0;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 700;
 }
 
@@ -295,12 +295,12 @@
 
 /* ── Hero Typography ── */
 .hero-text {
-  font-size: clamp(2rem, 7vw, 6.5rem);
-  font-weight: 400;
-  line-height: 1.1;
+  font-size: clamp(2.5rem, 7vw, 6rem);
+  font-weight: 700;
+  line-height: 0.95;
   letter-spacing: -0.03em;
   color: #E0E0E0;
-  font-family: 'Helvetica 1957', Helvetica, Arial, sans-serif;
+  font-family: var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif;
   user-select: none;
   text-shadow: 4px 4px 10px rgba(0, 0, 0, 1);
 }
@@ -311,18 +311,42 @@
   text-align: right;
 }
 
+.hero-label {
+  display: block;
+  font-family: var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(0.65rem, 0.8vw, 0.75rem);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(224, 224, 224, 0.4);
+  margin-bottom: 16px;
+}
+
+.hero-intro-eyebrow {
+  font-family: var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  color: #E0E0E0;
+  text-shadow: 4px 4px 10px rgba(0, 0, 0, 1);
+}
+
 .hero-intro-body {
-  font-size: 0.62em;
-  line-height: 1.18;
-  max-width: 6.5em;
-  margin-left: auto;
-  text-wrap: pretty;
+  font-family: var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: rgba(224, 224, 224, 0.6);
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+  margin-top: 8px;
 }
 
 @media (max-width: 768px) {
   .hero-text {
-    font-size: clamp(3.2rem, 14vw, 5.5rem);
-    line-height: 1.08;
+    font-size: clamp(2.2rem, 10vw, 4rem);
+    line-height: 0.95;
   }
 
   .hero-intro {
@@ -335,14 +359,22 @@
     z-index: 65;
   }
 
-  .hero-hover {
-    padding-right: clamp(5rem, 22vw, 8rem);
+  .hero-label {
+    font-size: 0.6rem;
+    margin-bottom: 12px;
+  }
+
+  .hero-intro-eyebrow {
+    font-size: clamp(1.8rem, 8vw, 3rem);
   }
 
   .hero-intro-body {
-    font-size: clamp(2rem, 8vw, 3rem);
-    max-width: 16ch;
-    text-wrap: balance;
+    font-size: clamp(0.85rem, 3.5vw, 1.2rem);
+    max-width: 20ch;
+  }
+
+  .hero-hover {
+    padding-right: clamp(5rem, 22vw, 8rem);
   }
 
   .hero-img {
