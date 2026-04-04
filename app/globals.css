@@ -295,58 +295,81 @@
 
 /* ── Hero Typography ── */
 .hero-text {
-  font-size: clamp(2.5rem, 7vw, 6rem);
+  font-size: clamp(2.7rem, 7.4vw, 6.45rem);
   font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: -0.03em;
-  color: #E0E0E0;
+  line-height: 1.01;
+  letter-spacing: -0.038em;
+  color: #F5F5F5;
   font-family: var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif;
   user-select: none;
-  text-shadow: 4px 4px 10px rgba(0, 0, 0, 1);
+  text-shadow: 0 10px 32px rgba(0, 0, 0, 0.4);
 }
 
 .hero-intro {
-  max-width: min(44rem, 42vw);
+  display: grid;
+  gap: 0.95rem;
+  max-width: min(36rem, 36vw);
   padding-right: 0.25rem;
   text-align: right;
+  justify-items: end;
 }
 
 .hero-label {
   display: block;
   font-family: var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: clamp(0.65rem, 0.8vw, 0.75rem);
-  font-weight: 500;
+  font-size: clamp(0.72rem, 0.9vw, 0.88rem);
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: rgba(224, 224, 224, 0.4);
-  margin-bottom: 16px;
+  letter-spacing: 0.26em;
+  color: #F5F5F5;
+  text-shadow: 0 8px 22px rgba(0, 0, 0, 0.34);
+  margin-bottom: 0;
+}
+
+.hero-label-accent {
+  color: #F5F5F5;
 }
 
 .hero-intro-eyebrow {
   font-family: var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: clamp(2rem, 5vw, 4rem);
+  font-size: clamp(3.2rem, 6vw, 5.9rem);
   font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: -0.03em;
-  color: #E0E0E0;
-  text-shadow: 4px 4px 10px rgba(0, 0, 0, 1);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  color: #F5F5F5;
+  text-shadow: 0 12px 38px rgba(0, 0, 0, 0.42);
 }
 
 .hero-intro-body {
   font-family: var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: clamp(1rem, 2vw, 1.5rem);
-  font-weight: 400;
-  line-height: 1.4;
-  letter-spacing: -0.01em;
-  color: rgba(224, 224, 224, 0.6);
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
-  margin-top: 8px;
+  font-size: clamp(1.28rem, 2vw, 1.8rem);
+  font-weight: 500;
+  line-height: 1.34;
+  letter-spacing: 0.02em;
+  color: rgba(245, 245, 245, 0.76);
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  margin-top: 0.1rem;
+}
+
+.hero-philosophy {
+  display: grid;
+  gap: 1rem;
+}
+
+.hero-quote-block {
+  display: grid;
+  gap: 0.35rem;
+  align-items: start;
+}
+
+.hero-quote-line {
+  line-height: 1.03;
 }
 
 @media (max-width: 768px) {
   .hero-text {
     font-size: clamp(2.2rem, 10vw, 4rem);
-    line-height: 0.95;
+    line-height: 0.98;
   }
 
   .hero-intro {
@@ -357,20 +380,23 @@
     padding-right: 0;
     text-align: right;
     z-index: 65;
+    gap: 0.75rem;
   }
 
   .hero-label {
-    font-size: 0.6rem;
-    margin-bottom: 12px;
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
   }
 
   .hero-intro-eyebrow {
-    font-size: clamp(1.8rem, 8vw, 3rem);
+    font-size: clamp(1.95rem, 8vw, 3rem);
+    line-height: 1.02;
   }
 
   .hero-intro-body {
-    font-size: clamp(0.85rem, 3.5vw, 1.2rem);
+    font-size: clamp(0.98rem, 3.5vw, 1.2rem);
     max-width: 20ch;
+    letter-spacing: 0.01em;
   }
 
   .hero-hover {
@@ -391,16 +417,16 @@
 .hero-hover {
   position: relative;
   display: inline-block;
-  color: #b0b0b0;
+  color: #D6D6D6;
   transition: color 0.5s ease, padding-right 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   cursor: pointer;
   pointer-events: auto;
   padding-right: clamp(8rem, 14vw, 16rem);
-  text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.45);
+  text-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
 }
 
 .hero-hover:hover {
-  color: #E0E0E0;
+  color: #F5F5F5;
 }
 
 .hero-hover.unhover {

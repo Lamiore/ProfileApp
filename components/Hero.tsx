@@ -46,14 +46,10 @@ const introCopy = {
     body: "I Design,\u00A0Build, and Explore.",
 };
 
-const introContainerMotion = {
-    initial: { opacity: 0, y: -14 },
-    animate: { opacity: 1, y: 0 },
-};
-
-const introLineMotion = {
-    initial: { opacity: 0, y: "110%" },
-    animate: { opacity: 1, y: 0 },
+const philosophyCopy = {
+    label: "PHILOSOPHY",
+    lineOne: "Simplicity is the",
+    lineTwo: "sophistication.",
 };
 
 const buttonIcons: Record<string, React.ReactNode> = {
@@ -827,9 +823,9 @@ export default function Hero() {
                     style={{ pointerEvents: "none", paddingTop: "7.5rem" }}
                 >
                     <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.8, delay: 0.4 }}
+                        initial={{ opacity: 0, y: 18 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.75, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
                         className="hero-intro"
                         style={{
                             filter: openWindows.length > 0 && !peeking ? "blur(6px)" : "none",
@@ -928,9 +924,9 @@ export default function Hero() {
 
                     {isMobile && (
                         <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.8, delay: 0.4 }}
+                            initial={{ opacity: 0, y: 18 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.75, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
                             className="hero-intro hero-intro-mobile"
                             style={{ pointerEvents: "none" }}
                         >
@@ -1072,29 +1068,39 @@ export default function Hero() {
             >
                 {/* Typography — kiri */}
                 <div className="flex flex-col items-start gap-8">
-                    <div className="flex flex-col gap-2">
+                    <div className="hero-philosophy">
                         <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.8, delay: 0.4 }}
-                            className="hero-text"
-                            style={{ pointerEvents: "none" }}
+                            initial={{ opacity: 0, y: 18 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.75, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                            className="hero-quote-block"
+                            style={{ pointerEvents: "auto" }}
                         >
+                            <motion.span
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.7, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                                className="hero-label hero-label-accent"
+                            >
+                                {philosophyCopy.label}
+                            </motion.span>
                             <div className="hero-line">
                                 <motion.span
                                     initial={{ y: "100%", opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
-                                    transition={{ duration: 1.2, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                                    transition={{ duration: 1.1, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                                    className="hero-text hero-quote-line"
                                     style={{ display: "inline-block" }}
                                 >
-                                    Simplicity is the
+                                    {philosophyCopy.lineOne}
                                 </motion.span>
                             </div>
                             <div className="hero-line">
                                 <motion.span
                                     initial={{ y: "100%", opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
-                                    transition={{ duration: 1.2, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                                    transition={{ duration: 1.1, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
+                                    className="hero-text hero-quote-line"
                                     style={{ display: "inline-block" }}
                                 >
                                     <span className="hero-hover unhover">
@@ -1106,7 +1112,7 @@ export default function Hero() {
                                             />
                                         </span>
                                     </span>
-                                    {" "}sophistication.
+                                    {" "}{philosophyCopy.lineTwo}
                                 </motion.span>
                             </div>
                         </motion.div>
