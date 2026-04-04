@@ -41,13 +41,14 @@ const CONFIG = {
 const buttons = ["About", "Blog", "Gallery", "Work", "Connect"];
 
 const introCopy = {
+    label: "INTRODUCTION",
     eyebrow: "Hi, I'm Lam.",
-    body: "I Design,\u00A0Write, and explore.",
+    body: "I Design,\u00A0Build, and Explore.",
 };
 
 const introContainerMotion = {
-    initial: { opacity: 0, y: -14, filter: "blur(10px)" },
-    animate: { opacity: 1, y: 0, filter: "blur(0px)" },
+    initial: { opacity: 0, y: -14 },
+    animate: { opacity: 1, y: 0 },
 };
 
 const introLineMotion = {
@@ -779,7 +780,7 @@ export default function Hero() {
                                         border: "1px solid rgba(255,255,255,0.2)",
                                         boxShadow: "0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.2)",
                                         textShadow: "none",
-                                        fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                                        fontFamily: "var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif",
                                         fontWeight: 700,
                                         transition: "background 0.2s, color 0.2s, border 0.2s",
                                         transformOrigin: "center center",
@@ -809,7 +810,7 @@ export default function Hero() {
                             className="relative flex items-center gap-2 px-6 py-3 text-sm tracking-widest uppercase overflow-hidden"
                             style={{
                                 borderRadius: "999px",
-                                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                                fontFamily: "var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif",
                                 fontWeight: 700,
                             }}
                         >
@@ -829,18 +830,27 @@ export default function Hero() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
-                        className="hero-intro hero-text"
+                        className="hero-intro"
                         style={{
                             filter: openWindows.length > 0 && !peeking ? "blur(6px)" : "none",
                             opacity: openWindows.length > 0 && !peeking ? 0.45 : 1,
                             transition: "filter 0.4s ease, opacity 0.4s ease",
                         }}
                     >
+                        <motion.span
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.8, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                            className="hero-label"
+                        >
+                            {introCopy.label}
+                        </motion.span>
                         <div className="hero-line">
                             <motion.span
                                 initial={{ y: "100%", opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ duration: 1.2, delay: 1, ease: [0.16, 1, 0.3, 1] }}
+                                className="hero-intro-eyebrow"
                                 style={{ display: "inline-block" }}
                             >
                                 {introCopy.eyebrow}
@@ -921,14 +931,23 @@ export default function Hero() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.8, delay: 0.4 }}
-                            className="hero-intro hero-intro-mobile hero-text"
+                            className="hero-intro hero-intro-mobile"
                             style={{ pointerEvents: "none" }}
                         >
+                            <motion.span
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                                className="hero-label"
+                            >
+                                {introCopy.label}
+                            </motion.span>
                             <div className="hero-line">
                                 <motion.span
                                     initial={{ y: "100%", opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ duration: 1.2, delay: 0.58, ease: [0.16, 1, 0.3, 1] }}
+                                    className="hero-intro-eyebrow"
                                     style={{ display: "inline-block" }}
                                 >
                                     {introCopy.eyebrow}
@@ -1032,7 +1051,7 @@ export default function Hero() {
                                         color: openWindows.includes(btn) ? "#fff" : "#A0A0A0",
                                         background: "transparent",
                                         border: "none",
-                                        fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                                        fontFamily: "var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif",
                                         fontWeight: 700,
                                         transition: "color 0.2s",
                                     }}
