@@ -781,7 +781,7 @@ export default function Hero() {
                                         boxShadow: "0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.2)",
                                         textShadow: "none",
                                         fontFamily: "var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif",
-                                        fontWeight: 700,
+                                        fontWeight: 600,
                                         transition: "background 0.2s, color 0.2s, border 0.2s",
                                         transformOrigin: "center center",
                                     }}
@@ -811,7 +811,7 @@ export default function Hero() {
                             style={{
                                 borderRadius: "999px",
                                 fontFamily: "var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif",
-                                fontWeight: 700,
+                                fontWeight: 600,
                             }}
                         >
                             <span style={{ opacity: 0.75, display: "flex", alignItems: "center" }}>{buttonIcons[btn]}</span>
@@ -1052,7 +1052,7 @@ export default function Hero() {
                                         background: "transparent",
                                         border: "none",
                                         fontFamily: "var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif",
-                                        fontWeight: 700,
+                                        fontWeight: 600,
                                         transition: "color 0.2s",
                                     }}
                                 >
