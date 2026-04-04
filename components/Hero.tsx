@@ -43,7 +43,8 @@ const buttons = ["About", "Blog", "Gallery", "Work", "Connect"];
 const introCopy = {
     label: "INTRODUCTION",
     eyebrow: "Hi, I'm Lam.",
-    body: "I Design,\u00A0Build, and Explore.",
+    bodyLead: "I Design,\u00A0Build,",
+    bodyTail: "and Explore.",
 };
 
 const philosophyCopy = {
@@ -860,7 +861,8 @@ export default function Hero() {
                                 className="hero-intro-body"
                                 style={{ display: "inline-block" }}
                             >
-                                {introCopy.body}
+                                <span className="hero-intro-body-line">{introCopy.bodyLead}</span>
+                                <span className="hero-intro-body-line">{introCopy.bodyTail}</span>
                             </motion.span>
                         </div>
                     </motion.div>
@@ -957,7 +959,8 @@ export default function Hero() {
                                     className="hero-intro-body"
                                     style={{ display: "inline-block" }}
                                 >
-                                    {introCopy.body}
+                                    <span className="hero-intro-body-line">{introCopy.bodyLead}</span>
+                                    <span className="hero-intro-body-line">{introCopy.bodyTail}</span>
                                 </motion.span>
                             </div>
                         </motion.div>
@@ -1074,7 +1077,7 @@ export default function Hero() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.75, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
                             className="hero-quote-block"
-                            style={{ pointerEvents: "auto" }}
+                            style={{ pointerEvents: "none" }}
                         >
                             <motion.span
                                 initial={{ opacity: 0 }}
