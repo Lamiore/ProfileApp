@@ -108,6 +108,10 @@ export default function Hero() {
     const windowsOpenRef = useRef(false);
     const logoClickCount = useRef(0);
     const logoClickTimer = useRef<ReturnType<typeof setTimeout>>(null);
+    const introRef = useRef<HTMLDivElement>(null);
+    const introMobileRef = useRef<HTMLDivElement>(null);
+    const philosophyRef = useRef<HTMLDivElement>(null);
+    const [showSizeWarning, setShowSizeWarning] = useState(false);
 
     // Detect mobile viewport and compact nav state (debounced)
     useEffect(() => {
@@ -158,6 +162,46 @@ export default function Hero() {
     useEffect(() => {
         if (!useCompactNav) setMenuOpen(false);
     }, [useCompactNav]);
+
+    // Detect overlap between intro (top-right) and philosophy (bottom-left)
+    useEffect(() => {
+        let resizeTimeout: ReturnType<typeof setTimeout>;
+        let initialTimeout: ReturnType<typeof setTimeout>;
+
+        const checkOverlap = () => {
+            const introEl = introRef.current ?? introMobileRef.current;
+            const philEl = philosophyRef.current;
+            if (!introEl || !philEl) {
+                setShowSizeWarning(false);
+                return;
+            }
+            const ir = introEl.getBoundingClientRect();
+            const pr = philEl.getBoundingClientRect();
+            // Check if rects overlap with a small margin (16px buffer)
+            const margin = -16;
+            const overlap =
+                ir.left < pr.right + margin &&
+                ir.right > pr.left - margin &&
+                ir.top < pr.bottom + margin &&
+                ir.bottom > pr.top - margin;
+            setShowSizeWarning(overlap);
+        };
+
+        const scheduleCheck = () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => requestAnimationFrame(checkOverlap), 100);
+        };
+
+        // Wait for entrance animations to finish before first check
+        initialTimeout = setTimeout(checkOverlap, 1800);
+
+        window.addEventListener("resize", scheduleCheck);
+        return () => {
+            clearTimeout(resizeTimeout);
+            clearTimeout(initialTimeout);
+            window.removeEventListener("resize", scheduleCheck);
+        };
+    }, [isMobile, useCompactNav]);
 
     useEffect(() => {
         useCompactNavRef.current = useCompactNav;
@@ -836,6 +880,7 @@ export default function Hero() {
                     style={{ pointerEvents: "none", paddingTop: "7.5rem" }}
                 >
                     <motion.div
+                        ref={introRef}
                         initial={{ opacity: 0, y: 18 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.75, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
@@ -938,6 +983,7 @@ export default function Hero() {
 
                     {isMobile && (
                         <motion.div
+                            ref={introMobileRef}
                             initial={{ opacity: 0, y: 18 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.75, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
@@ -1085,11 +1131,17 @@ export default function Hero() {
                 <div className="flex flex-col items-start gap-8">
                     <div className="hero-philosophy">
                         <motion.div
+                            ref={philosophyRef}
                             initial={{ opacity: 0, y: 18 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.75, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
                             className="hero-quote-block"
-                            style={{ pointerEvents: "none" }}
+                            style={{
+                                pointerEvents: "none",
+                                filter: openWindows.length > 0 && !peeking ? "blur(6px)" : "none",
+                                opacity: openWindows.length > 0 && !peeking ? 0.45 : 1,
+                                transition: "filter 0.4s ease, opacity 0.4s ease",
+                            }}
                         >
                             <motion.span
                                 initial={{ opacity: 0 }}
@@ -1166,6 +1218,71 @@ export default function Hero() {
                     </AnimatePresence>
                 </div>
             </div>
+
+            {/* Size warning overlay */}
+            <AnimatePresence>
+                {showSizeWarning && openWindows.length === 0 && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.4 }}
+                        style={{
+                            position: "fixed",
+                            inset: 0,
+                            zIndex: 200,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            background: "rgba(0, 0, 0, 0.85)",
+                            backdropFilter: "blur(8px)",
+                            WebkitBackdropFilter: "blur(8px)",
+                            padding: "32px",
+                        }}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, y: 16, scale: 0.96 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 16, scale: 0.96 }}
+                            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                            style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                gap: "16px",
+                                textAlign: "center",
+                                maxWidth: "380px",
+                            }}
+                        >
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="15 3 21 3 21 9" />
+                                <polyline points="9 21 3 21 3 15" />
+                                <line x1="21" y1="3" x2="14" y2="10" />
+                                <line x1="3" y1="21" x2="10" y2="14" />
+                            </svg>
+                            <span style={{
+                                fontFamily: "var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif",
+                                fontSize: "18px",
+                                fontWeight: 600,
+                                color: "#fff",
+                                letterSpacing: "0.02em",
+                                lineHeight: 1.4,
+                            }}>
+                                Please resize your window
+                            </span>
+                            <span style={{
+                                fontFamily: "var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif",
+                                fontSize: "14px",
+                                fontWeight: 400,
+                                color: "rgba(255,255,255,0.5)",
+                                lineHeight: 1.6,
+                            }}>
+                                This site is best experienced in a larger window. Try maximizing your browser or using a wider screen.
+                            </span>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Mobile: full-screen solid view — no window, no blur, rendered at root level */}
             <AnimatePresence>

@@ -364,12 +364,16 @@
 .hero-philosophy {
   display: grid;
   gap: 1rem;
+  width: fit-content;
+  justify-items: start;
 }
 
 .hero-quote-block {
   display: grid;
   gap: 0.35rem;
   align-items: start;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .hero-quote-line {
