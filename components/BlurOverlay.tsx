@@ -19,11 +19,8 @@ export default function BlurOverlay({ onClose, peeking = false }: BlurOverlayPro
                 position: "fixed",
                 inset: 0,
                 zIndex: 40,
-                backdropFilter: peeking ? "blur(0px)" : "blur(8px)",
-                WebkitBackdropFilter: peeking ? "blur(0px)" : "blur(8px)",
-                background: peeking ? "transparent" : "rgba(245,240,232,0.2)",
+                background: peeking ? "transparent" : "rgba(10, 10, 10, 0.5)",
                 pointerEvents: "auto",
-                transition: "backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease, background 0.4s ease",
             }}
         />
     );

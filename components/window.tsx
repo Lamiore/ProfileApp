@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, memo } from "react";
 import { motion } from "framer-motion";
 
 import { playOpenSound, playCloseSound } from "@/lib/audio";
@@ -39,7 +39,7 @@ const trafficButtonStyle = (color: string): React.CSSProperties => ({
     transition: "filter 0.15s ease",
 });
 
-export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen = false, zIndex = 50, initialWidth, initialHeight, gridPosition, peeking = false, children }: WindowProps) {
+export default memo(function Window({ title, onClose, onFocus, onMenuToggle, menuOpen = false, zIndex = 50, initialWidth, initialHeight, gridPosition, peeking = false, children }: WindowProps) {
     const windowRef = useRef<HTMLDivElement>(null);
     const dragRef = useRef({ isDragging: false, startX: 0, startY: 0, offsetX: 0, offsetY: 0 });
     const resizeRef = useRef({ isResizing: false, startX: 0, startY: 0, startW: 0, startH: 0 });
@@ -51,7 +51,6 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
     const positionRef = useRef({ x: 0, y: 0 });
     const sizeRef = useRef({ w: initW, h: initH });
     const [initialized, setInitialized] = useState(false);
-    const [, forceUpdate] = useState(0);
     const [isMinimized, setIsMinimized] = useState(false);
     const [isMaximized, setIsMaximized] = useState(false);
     const [hoveringButtons, setHoveringButtons] = useState(false);
@@ -93,8 +92,9 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
                     y: (window.innerHeight - initH) / 2,
                 };
             setInitialized(true);
-        } else {
-            forceUpdate(f => f + 1);
+        } else if (windowRef.current) {
+            windowRef.current.style.width = `${initW}px`;
+            windowRef.current.style.height = `${initH}px`;
         }
     }, [initW, initH, isMobile, initialized, gridPosition]);
 
@@ -232,9 +232,7 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
             el.style.width = `${pendingW}px`;
             el.style.height = `${pendingH}px`;
             el.classList.remove("wnd-dragging");
-            setInteracting(false);
-            // One re-render to sync content area height
-            forceUpdate(f => f + 1);
+            setInteracting(false); // triggers re-render to sync content height
             window.removeEventListener("mousemove", onMouseMove);
             window.removeEventListener("mouseup", onMouseUp);
         };
@@ -272,8 +270,8 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
                 borderRadius: 0,
                 overflow: "hidden",
                 background: "rgba(26, 26, 26, 0.75)",
-                backdropFilter: "blur(40px) saturate(180%)",
-                WebkitBackdropFilter: "blur(40px) saturate(180%)",
+                backdropFilter: "blur(16px) saturate(140%)",
+                WebkitBackdropFilter: "blur(16px) saturate(140%)",
                 border: "none",
                 boxShadow: "none",
                 pointerEvents: "auto",
@@ -550,4 +548,4 @@ export default function Window({ title, onClose, onFocus, onMenuToggle, menuOpen
             )}
         </motion.div>
     );
-}
+});

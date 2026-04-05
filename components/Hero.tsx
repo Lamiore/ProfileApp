@@ -105,6 +105,7 @@ export default function Hero() {
     const isMobileRef = useRef(false);
     const useCompactNavRef = useRef(false);
     const [peeking, setPeeking] = useState(false);
+    const windowsOpenRef = useRef(false);
     const logoClickCount = useRef(0);
     const logoClickTimer = useRef<ReturnType<typeof setTimeout>>(null);
 
@@ -166,6 +167,10 @@ export default function Hero() {
         if (!useCompactNav) return;
         setOpenWindows((prev) => (prev.length > 1 ? [prev[prev.length - 1]] : prev));
     }, [useCompactNav]);
+
+    useEffect(() => {
+        windowsOpenRef.current = openWindows.length > 0;
+    }, [openWindows]);
 
     // Buka/tutup window + sound — memoized to prevent child re-renders
     const toggleWindow = useCallback((name: string) => {
@@ -576,6 +581,7 @@ export default function Hero() {
         };
 
         let isPaused = false;
+        let frameCount = 0;
 
         const animate = () => {
             if (document.hidden) {
@@ -583,6 +589,12 @@ export default function Hero() {
                 return; // stop loop — resumed via visibilitychange
             }
             rafId = requestAnimationFrame(animate);
+
+            // Throttle to every 3rd frame when windows are open (save CPU)
+            if (windowsOpenRef.current) {
+                frameCount++;
+                if (frameCount % 3 !== 0) return;
+            }
 
             const now = performance.now();
             const idleMs = now - state.lastInteractionTime;
@@ -772,8 +784,8 @@ export default function Hero() {
                                         background: openWindows.includes(btn)
                                             ? "rgba(255,255,255,0.2)"
                                             : "rgba(26, 26, 26, 0.35)",
-                                        backdropFilter: "blur(20px) saturate(180%)",
-                                        WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                                        backdropFilter: "blur(12px) saturate(140%)",
+                                        WebkitBackdropFilter: "blur(12px) saturate(140%)",
                                         border: "1px solid rgba(255,255,255,0.2)",
                                         boxShadow: "0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.2)",
                                         textShadow: "none",
@@ -892,8 +904,8 @@ export default function Hero() {
                                 borderRadius: "18px",
                                 /* Liquid glass layers */
                                 background: "linear-gradient(145deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.20) 50%, rgba(255,255,255,0.38) 100%)",
-                                backdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
-                                WebkitBackdropFilter: "blur(28px) saturate(200%) brightness(1.08)",
+                                backdropFilter: "blur(12px) saturate(140%)",
+                                WebkitBackdropFilter: "blur(12px) saturate(140%)",
                                 border: "1px solid rgba(255,255,255,0.70)",
                                 boxShadow: [
                                     "0 2px 12px rgba(0,0,0,0.10)",
