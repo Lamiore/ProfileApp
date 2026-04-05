@@ -874,57 +874,59 @@ export default function Hero() {
                 </div>
             </div>
 
-            {!isMobile && (
-                <div
-                    className="absolute top-0 left-0 right-0 z-10 flex justify-end p-6 md:p-12"
-                    style={{ pointerEvents: "none", paddingTop: "7.5rem" }}
+            <div
+                className="absolute top-0 left-0 right-0 z-10 flex justify-end p-6 md:p-12"
+                style={{
+                    pointerEvents: "none",
+                    paddingTop: "7.5rem",
+                    visibility: isMobile ? "hidden" : "visible",
+                }}
+            >
+                <motion.div
+                    ref={introRef}
+                    initial={{ opacity: 0, y: 18 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.75, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                    className="hero-intro"
+                    style={{
+                        filter: openWindows.length > 0 && !peeking ? "blur(6px)" : "none",
+                        opacity: openWindows.length > 0 && !peeking ? 0.45 : 1,
+                        transition: "filter 0.4s ease, opacity 0.4s ease",
+                    }}
                 >
-                    <motion.div
-                        ref={introRef}
-                        initial={{ opacity: 0, y: 18 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.75, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                        className="hero-intro"
-                        style={{
-                            filter: openWindows.length > 0 && !peeking ? "blur(6px)" : "none",
-                            opacity: openWindows.length > 0 && !peeking ? 0.45 : 1,
-                            transition: "filter 0.4s ease, opacity 0.4s ease",
-                        }}
+                    <motion.span
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.8, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                        className="hero-label"
                     >
+                        {introCopy.label}
+                    </motion.span>
+                    <div className="hero-line">
                         <motion.span
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.8, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                            className="hero-label"
+                            initial={{ y: "100%", opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ duration: 1.2, delay: 1, ease: [0.16, 1, 0.3, 1] }}
+                            className="hero-intro-eyebrow"
+                            style={{ display: "inline-block" }}
                         >
-                            {introCopy.label}
+                            {introCopy.eyebrow}
                         </motion.span>
-                        <div className="hero-line">
-                            <motion.span
-                                initial={{ y: "100%", opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ duration: 1.2, delay: 1, ease: [0.16, 1, 0.3, 1] }}
-                                className="hero-intro-eyebrow"
-                                style={{ display: "inline-block" }}
-                            >
-                                {introCopy.eyebrow}
-                            </motion.span>
-                        </div>
-                        <div className="hero-line">
-                            <motion.span
-                                initial={{ y: "100%", opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ duration: 1.2, delay: 1.1, ease: [0.16, 1, 0.3, 1] }}
-                                className="hero-intro-body"
-                                style={{ display: "inline-block" }}
-                            >
-                                <span className="hero-intro-body-line">{introCopy.bodyLead}</span>
-                                <span className="hero-intro-body-line">{introCopy.bodyTail}</span>
-                            </motion.span>
-                        </div>
-                    </motion.div>
-                </div>
-            )}
+                    </div>
+                    <div className="hero-line">
+                        <motion.span
+                            initial={{ y: "100%", opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ duration: 1.2, delay: 1.1, ease: [0.16, 1, 0.3, 1] }}
+                            className="hero-intro-body"
+                            style={{ display: "inline-block" }}
+                        >
+                            <span className="hero-intro-body-line">{introCopy.bodyLead}</span>
+                            <span className="hero-intro-body-line">{introCopy.bodyTail}</span>
+                        </motion.span>
+                    </div>
+                </motion.div>
+            </div>
 
             {/* Mobile Hamburger Button — only visible when no window is open */}
             {useCompactNav && (!isMobile || openWindows.length === 0) && !menuOpen && (
@@ -1028,7 +1030,7 @@ export default function Hero() {
 
             {/* Mobile Slide-Down Menu */}
             <AnimatePresence>
-                {useCompactNav && (!isMobile || openWindows.length === 0) && menuOpen && (
+                {useCompactNav && menuOpen && (
                     <motion.div
                         initial={{ x: "100%" }}
                         animate={{ x: 0 }}
