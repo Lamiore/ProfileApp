@@ -25,6 +25,14 @@ const formatDate = (ts: { toDate: () => Date } | undefined) => {
     return ts.toDate().toLocaleDateString("id-ID", { year: "numeric", month: "long", day: "numeric" });
 };
 
+const getExcerpt = (blocks?: BlogBlock[]) => {
+    const textBlock = blocks?.find((block) => block.type === "text" && block.content.trim());
+    if (!textBlock) return "Buka artikel untuk membaca selengkapnya.";
+
+    const normalized = textBlock.content.replace(/\s+/g, " ").trim();
+    return normalized.length > 110 ? `${normalized.slice(0, 107)}...` : normalized;
+};
+
 export default function BlogWindow() {
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const { navigateTo } = usePageTransition();
@@ -46,27 +54,42 @@ export default function BlogWindow() {
                         <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>{blogs.length} artikel</span>
                     </div>
                     <div className="wnd-blog-grid">
-                        {blogs.map((blog) => (
-                            <div
-                                key={blog.id}
-                                className="wnd-blog-card"
-                                onClick={() => navigateTo(`/blog/${blog.id}`)}
-                            >
-                                <div className="wnd-blog-card-thumb">
+                        {blogs.map((blog) => {
+                            const excerpt = getExcerpt(blog.blocks);
+
+                            return (
+                                <article
+                                    key={blog.id}
+                                    className="wnd-blog-card"
+                                    onClick={() => navigateTo(`/blog/${blog.id}`)}
+                                >
                                     {blog.thumbnail ? (
-                                        <img src={blog.thumbnail} alt={blog.title} referrerPolicy="no-referrer" />
+                                        <img
+                                            src={blog.thumbnail}
+                                            alt={blog.title}
+                                            referrerPolicy="no-referrer"
+                                            className="wnd-blog-card-backdrop"
+                                        />
                                     ) : (
-                                        <div className="wnd-blog-card-thumb-empty">
-                                            <FileText size={24} />
+                                        <div className="wnd-blog-card-thumb-empty wnd-blog-card-backdrop">
+                                            <FileText size={26} />
                                         </div>
                                     )}
-                                </div>
-                                <div className="wnd-blog-card-body">
-                                    <h3 className="wnd-blog-card-title">{blog.title}</h3>
-                                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)" }}>{formatDate(blog.createdAt)}</span>
-                                </div>
-                            </div>
-                        ))}
+                                    <div className="wnd-blog-card-content">
+                                        <div className="wnd-blog-card-category">{formatDate(blog.createdAt) || "Artikel"}</div>
+                                        <h3 className="wnd-blog-card-title">{blog.title}</h3>
+                                        <div className="wnd-blog-card-description">
+                                            <p>{excerpt}</p>
+                                            <span aria-hidden="true">
+                                                <svg viewBox="0 -960 960 960" fill="currentColor">
+                                                    <path d="M504-480 348-636q-11-11-11-28t11-28q11-11 28-11t28 11l184 184q6 6 8.5 13t2.5 15q0 8-2.5 15t-8.5 13L404-268q-11 11-28 11t-28-11q-11-11-11-28t11-28l156-156Z" />
+                                                </svg>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </article>
+                            );
+                        })}
                     </div>
                 </div>
             ) : (
