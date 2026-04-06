@@ -293,6 +293,15 @@
   display: none;
 }
 
+.blog-detail-scroll-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.blog-detail-scroll-hidden::-webkit-scrollbar {
+  display: none;
+}
+
 /* ── Hero Typography ── */
 .hero-text {
   font-size: clamp(2rem, 7vw, 6.5rem);

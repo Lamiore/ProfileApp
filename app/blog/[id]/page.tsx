@@ -54,6 +54,16 @@ export default function BlogDetailPage() {
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
 
+    useEffect(() => {
+        document.documentElement.classList.add("blog-detail-scroll-hidden");
+        document.body.classList.add("blog-detail-scroll-hidden");
+
+        return () => {
+            document.documentElement.classList.remove("blog-detail-scroll-hidden");
+            document.body.classList.remove("blog-detail-scroll-hidden");
+        };
+    }, []);
+
     const heroImage = blog?.thumbnail
         || blog?.blocks?.find(b => b.type === "image" && b.content.trim())?.content
         || null;
