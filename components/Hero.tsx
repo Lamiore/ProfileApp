@@ -616,20 +616,22 @@ export default function Hero() {
                     padding: 0;
                     text-align: left;
                     font-family: var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif;
-                    font-size: 22px;
-                    font-weight: 600;
+                    font-size: clamp(10px, min(4vw, 5.5vh), 80px);
+                    font-weight: 800;
                     letter-spacing: 0.1em;
                     text-transform: uppercase;
                     line-height: 1;
                     display: flex;
                     overflow: hidden;
                     transition: color 0.2s;
+                    color: #fff;
+                    filter: drop-shadow(0 2px 12px rgba(0,0,0,0.6));
                 }
                 .nav-char {
                     display: inline-block;
                     position: relative;
-                    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-                    transition-delay: calc(var(--ci) * 25ms);
+                    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+                    transition-delay: calc(var(--ci) * 40ms);
                 }
                 .nav-char::after {
                     content: attr(data-char);
@@ -658,7 +660,7 @@ export default function Hero() {
                             className="nav-btn"
                             style={{
                                 pointerEvents: "auto",
-                                color: openWindows.includes(btn) ? "#fff" : "rgba(224,224,224,0.55)",
+                                color: "#fff",
                             }}
                         >
                             {btn.split("").map((char, ci) => (
