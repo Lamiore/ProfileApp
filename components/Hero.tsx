@@ -608,11 +608,46 @@ export default function Hero() {
             </div>
 
             {/* Nav — kiri tengah */}
+            <style>{`
+                .nav-btn {
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    padding: 0;
+                    text-align: left;
+                    font-family: var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                    font-size: 22px;
+                    font-weight: 600;
+                    letter-spacing: 0.1em;
+                    text-transform: uppercase;
+                    line-height: 1;
+                    display: flex;
+                    overflow: hidden;
+                    transition: color 0.2s;
+                }
+                .nav-char {
+                    display: inline-block;
+                    position: relative;
+                    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                    transition-delay: calc(var(--ci) * 25ms);
+                }
+                .nav-char::after {
+                    content: attr(data-char);
+                    position: absolute;
+                    left: 0;
+                    top: 100%;
+                    width: 100%;
+                    text-align: center;
+                }
+                .nav-btn:hover .nav-char {
+                    transform: translateY(-100%);
+                }
+            `}</style>
             <div
                 className="absolute left-0 top-0 bottom-0 flex flex-col justify-center p-6 md:p-12"
                 style={{ pointerEvents: "none", zIndex: 55 }}
             >
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-5">
                     {["About", "Blog", "Gallery", "Work", "Connect"].map((btn, i) => (
                         <motion.button
                             key={btn}
@@ -620,24 +655,22 @@ export default function Hero() {
                             initial={{ opacity: 0, x: -12 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5, delay: 0.3 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
-                            whileHover={{ x: 4 }}
+                            className="nav-btn"
                             style={{
                                 pointerEvents: "auto",
-                                background: "none",
-                                border: "none",
-                                cursor: "pointer",
-                                textAlign: "left",
-                                padding: 0,
-                                fontFamily: "var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif",
-                                fontSize: "13px",
-                                fontWeight: 500,
-                                letterSpacing: "0.12em",
-                                textTransform: "uppercase",
                                 color: openWindows.includes(btn) ? "#fff" : "rgba(224,224,224,0.55)",
-                                transition: "color 0.2s",
                             }}
                         >
-                            {btn}
+                            {btn.split("").map((char, ci) => (
+                                <span
+                                    key={ci}
+                                    className="nav-char"
+                                    data-char={char}
+                                    style={{ "--ci": ci } as React.CSSProperties}
+                                >
+                                    {char}
+                                </span>
+                            ))}
                         </motion.button>
                     ))}
                 </div>
