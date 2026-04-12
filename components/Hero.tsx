@@ -38,179 +38,30 @@ const CONFIG = {
     mobileTileOverscan: 0,
 };
 
-const buttons = ["About", "Blog", "Gallery", "Work", "Connect"];
-
-const introCopy = {
-    label: "INTRODUCTION",
-    eyebrow: "Hi, I'm Lam.",
-    bodyLead: "I Design,\u00A0Build,",
-    bodyTail: "and Explore.",
-};
-
-const philosophyCopy = {
-    label: "PHILOSOPHY",
-    lineOne: "Simplicity is the",
-    lineTwo: "sophistication.",
-};
-
-const buttonIcons: Record<string, React.ReactNode> = {
-    About: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="8" r="4" />
-            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-        </svg>
-    ),
-    Work: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="2" y="7" width="20" height="14" rx="2" />
-            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
-        </svg>
-    ),
-    Blog: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 20h9" />
-            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-        </svg>
-    ),
-    Gallery: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="3" />
-            <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
-        </svg>
-    ),
-    Connect: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="6" cy="12" r="2.5" />
-            <circle cx="18" cy="6" r="2.5" />
-            <circle cx="18" cy="18" r="2.5" />
-            <line x1="8.5" y1="11" x2="15.5" y2="7" />
-            <line x1="8.5" y1="13" x2="15.5" y2="17" />
-        </svg>
-    ),
-};
 
 export default function Hero() {
     const viewportRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const gridRef = useRef<HTMLDivElement>(null);
-    const logoRef = useRef<HTMLDivElement>(null);
-    const navButtonsRef = useRef<HTMLDivElement>(null);
-    const navMeasureRef = useRef<HTMLDivElement>(null);
     const [openWindows, setOpenWindows] = useState<string[]>([]);
     const [isMobile, setIsMobile] = useState(false);
-    const [useCompactNav, setUseCompactNav] = useState(false);
-    const [menuOpen, setMenuOpen] = useState(false);
     const focusCounter = useRef(0);
     const [windowZMap, setWindowZMap] = useState<Record<string, number>>({});
     const isMobileRef = useRef(false);
-    const useCompactNavRef = useRef(false);
     const [peeking, setPeeking] = useState(false);
     const windowsOpenRef = useRef(false);
-    const logoClickCount = useRef(0);
-    const logoClickTimer = useRef<ReturnType<typeof setTimeout>>(null);
-    const introRef = useRef<HTMLDivElement>(null);
-    const introMobileRef = useRef<HTMLDivElement>(null);
-    const philosophyRef = useRef<HTMLDivElement>(null);
-    const [showSizeWarning, setShowSizeWarning] = useState(false);
 
-    // Detect mobile viewport and compact nav state (debounced)
+    // Detect mobile viewport
     useEffect(() => {
-        let timeoutId: ReturnType<typeof setTimeout>;
         const check = () => {
             const mobile = window.innerWidth <= 768;
             setIsMobile(mobile);
             isMobileRef.current = mobile;
-
-            if (mobile) {
-                setUseCompactNav(true);
-                useCompactNavRef.current = true;
-                return;
-            }
-
-            const logoRect = logoRef.current?.getBoundingClientRect();
-            const navRect = (navButtonsRef.current ?? navMeasureRef.current)?.getBoundingClientRect();
-            if (!logoRect || !navRect) {
-                setUseCompactNav(false);
-                useCompactNavRef.current = false;
-                return;
-            }
-
-            const minGap = 32;
-            const shouldCompact = navRect.left <= logoRect.right + minGap;
-            setUseCompactNav(shouldCompact);
-            useCompactNavRef.current = shouldCompact;
         };
-        const scheduleCheck = () => {
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => {
-                requestAnimationFrame(check);
-            }, 100);
-        };
-
         check();
-        const handleResize = () => {
-            scheduleCheck();
-        };
-        window.addEventListener("resize", handleResize);
-        scheduleCheck();
-        return () => {
-            clearTimeout(timeoutId);
-            window.removeEventListener("resize", handleResize);
-        };
+        window.addEventListener("resize", check);
+        return () => window.removeEventListener("resize", check);
     }, []);
-
-    useEffect(() => {
-        if (!useCompactNav) setMenuOpen(false);
-    }, [useCompactNav]);
-
-    // Detect overlap between intro (top-right) and philosophy (bottom-left)
-    useEffect(() => {
-        let resizeTimeout: ReturnType<typeof setTimeout>;
-        let initialTimeout: ReturnType<typeof setTimeout>;
-
-        const checkOverlap = () => {
-            const introEl = introRef.current ?? introMobileRef.current;
-            const philEl = philosophyRef.current;
-            if (!introEl || !philEl) {
-                setShowSizeWarning(false);
-                return;
-            }
-            const ir = introEl.getBoundingClientRect();
-            const pr = philEl.getBoundingClientRect();
-            // Check if rects overlap with a small margin (16px buffer)
-            const margin = -16;
-            const overlap =
-                ir.left < pr.right + margin &&
-                ir.right > pr.left - margin &&
-                ir.top < pr.bottom + margin &&
-                ir.bottom > pr.top - margin;
-            setShowSizeWarning(overlap);
-        };
-
-        const scheduleCheck = () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => requestAnimationFrame(checkOverlap), 100);
-        };
-
-        // Wait for entrance animations to finish before first check
-        initialTimeout = setTimeout(checkOverlap, 1800);
-
-        window.addEventListener("resize", scheduleCheck);
-        return () => {
-            clearTimeout(resizeTimeout);
-            clearTimeout(initialTimeout);
-            window.removeEventListener("resize", scheduleCheck);
-        };
-    }, [isMobile, useCompactNav]);
-
-    useEffect(() => {
-        useCompactNavRef.current = useCompactNav;
-    }, [useCompactNav]);
-
-    useEffect(() => {
-        if (!useCompactNav) return;
-        setOpenWindows((prev) => (prev.length > 1 ? [prev[prev.length - 1]] : prev));
-    }, [useCompactNav]);
 
     useEffect(() => {
         windowsOpenRef.current = openWindows.length > 0;
@@ -218,7 +69,6 @@ export default function Hero() {
 
     // Buka/tutup window + sound — memoized to prevent child re-renders
     const toggleWindow = useCallback((name: string) => {
-        const mobileLike = isMobileRef.current || useCompactNavRef.current;
         setPeeking(false);
         setOpenWindows((prev) => {
             if (prev.includes(name)) {
@@ -230,31 +80,12 @@ export default function Hero() {
                 });
                 return prev.filter((w) => w !== name);
             }
-            // Mobile: only 1 window at a time
-            if (mobileLike && prev.length > 0) {
-                playCloseSound();
-                focusCounter.current = 1;
-                setWindowZMap({ [name]: 1 });
-                return [name];
-            }
             // Desktop: allow multiple windows
             focusCounter.current += 1;
             setWindowZMap((z) => ({ ...z, [name]: focusCounter.current }));
             return [...prev, name];
         });
-        if (mobileLike) setMenuOpen(false);
     }, []);
-
-    const handleLogoClick = useCallback(() => {
-        logoClickCount.current += 1;
-        if (logoClickTimer.current) clearTimeout(logoClickTimer.current);
-        if (logoClickCount.current >= 3) {
-            logoClickCount.current = 0;
-            toggleWindow("Admin");
-        } else {
-            logoClickTimer.current = setTimeout(() => { logoClickCount.current = 0; }, 500);
-        }
-    }, [toggleWindow]);
 
     // Bawa window ke paling depan — only update z-index, never reorder array
     const bringToFront = useCallback((name: string) => {
@@ -277,7 +108,7 @@ export default function Hero() {
     // Compute dynamic grid layout for open windows (desktop only)
     // Work & Blog = big, About & Connect = small (same size), Gallery = wide/long
     const gridLayout = (() => {
-        if (isMobile || useCompactNav || openWindows.length === 0) return {} as Record<string, { x: number; y: number; w: number; h: number }>;
+        if (isMobile || openWindows.length === 0) return {} as Record<string, { x: number; y: number; w: number; h: number }>;
         const vw = typeof window !== "undefined" ? window.innerWidth : 1440;
         const vh = typeof window !== "undefined" ? window.innerHeight : 900;
         const pad = 48;
@@ -764,531 +595,40 @@ export default function Hero() {
                 </div>
             </div>
 
-            {/* Navbar — logo kiri, buttons kanan atas */}
-            <div className="absolute top-0 left-0 right-0 flex items-start justify-between p-6 md:p-12" style={{ pointerEvents: "none" }}>
-                {/* Logo */}
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.3 }}
-                    style={{ pointerEvents: "auto", position: "relative", zIndex: 55 }}
-                    ref={logoRef}
-                >
-                    <div
-                        className="logo"
-                        onClick={handleLogoClick}
-                        style={{
-                            filter: openWindows.length > 0 && !peeking ? "blur(8px)" : "none",
-                            opacity: openWindows.length > 0 && !peeking ? 0.5 : 1,
-                            transition: "filter 0.4s ease, opacity 0.4s ease",
-                            cursor: "default",
-                            userSelect: "none"
-                        }}
-                    >
-                        <span className="flip-text">
-                            <span data-char="L" style={{ "--i": 1 } as React.CSSProperties}>L</span>
-                            <span data-char="a" style={{ "--i": 2 } as React.CSSProperties}>a</span>
-                            <span data-char="m" style={{ "--i": 3 } as React.CSSProperties}>m</span>
-                            <span data-char="." style={{ "--i": 4 } as React.CSSProperties}>.</span>
-                        </span>
-                    </div>
-                </motion.div>
-
-                {/* Nav Buttons — desktop only */}
-                {!useCompactNav && (
-                    <div
-                        className="flex flex-col items-end gap-5"
-                        style={{ pointerEvents: "none", position: "relative", zIndex: 60 }}
-                    >
-                        <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.5 }}
-                            className="flex gap-4 flex-wrap justify-end"
-                            style={{ pointerEvents: "auto" }}
-                            ref={navButtonsRef}
-                        >
-                            {buttons.map((btn, i) => (
-                                <motion.button
-                                    key={btn}
-                                    onClick={() => toggleWindow(btn)}
-                                    initial={{ opacity: 0, y: -10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{
-                                        delay: 0.5 + i * 0.08,
-                                        scale: { type: "spring", stiffness: 400, damping: 20 },
-                                        y: { type: "spring", stiffness: 400, damping: 20 },
-                                    }}
-                                    whileHover={{ scale: 1.15, y: -2 }}
-                                    whileTap={{ scale: 0.96 }}
-                                    className="relative flex items-center gap-2 px-6 py-3 text-sm tracking-widest uppercase cursor-pointer overflow-hidden"
-                                    style={{
-                                        borderRadius: "999px",
-                                        color: openWindows.includes(btn) ? "#fff" : "#E0E0E0",
-                                        background: openWindows.includes(btn)
-                                            ? "rgba(255,255,255,0.2)"
-                                            : "rgba(26, 26, 26, 0.35)",
-                                        backdropFilter: "blur(12px) saturate(140%)",
-                                        WebkitBackdropFilter: "blur(12px) saturate(140%)",
-                                        border: "1px solid rgba(255,255,255,0.2)",
-                                        boxShadow: "0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.2)",
-                                        textShadow: "none",
-                                        fontFamily: "var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif",
-                                        fontWeight: 600,
-                                        transition: "background 0.2s, color 0.2s, border 0.2s",
-                                        transformOrigin: "center center",
-                                    }}
-                                >
-                                    <span style={{ opacity: 0.75, display: "flex", alignItems: "center" }}>{buttonIcons[btn]}</span>
-                                    {btn}
-                                </motion.button>
-                            ))}
-                        </motion.div>
-                    </div>
-                )}
-            </div>
-
-            <div
-                aria-hidden="true"
-                className="absolute top-0 right-0 p-6 md:p-12"
-                style={{ visibility: "hidden", pointerEvents: "none", zIndex: -1 }}
-            >
-                <div
-                    ref={navMeasureRef}
-                    className="flex gap-4 flex-wrap justify-end"
-                >
-                    {buttons.map((btn) => (
-                        <div
-                            key={`measure-${btn}`}
-                            className="relative flex items-center gap-2 px-6 py-3 text-sm tracking-widest uppercase overflow-hidden"
-                            style={{
-                                borderRadius: "999px",
-                                fontFamily: "var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif",
-                                fontWeight: 600,
-                            }}
-                        >
-                            <span style={{ opacity: 0.75, display: "flex", alignItems: "center" }}>{buttonIcons[btn]}</span>
-                            {btn}
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            <div
-                className="absolute top-0 left-0 right-0 z-10 flex justify-end p-6 md:p-12"
-                style={{
-                    pointerEvents: "none",
-                    paddingTop: "7.5rem",
-                    visibility: isMobile ? "hidden" : "visible",
-                }}
-            >
-                <motion.div
-                    ref={introRef}
-                    initial={{ opacity: 0, y: 18 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.75, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                    className="hero-intro"
-                    style={{
-                        filter: openWindows.length > 0 && !peeking ? "blur(6px)" : "none",
-                        opacity: openWindows.length > 0 && !peeking ? 0.45 : 1,
-                        transition: "filter 0.4s ease, opacity 0.4s ease",
-                    }}
-                >
-                    <motion.span
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.8, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                        className="hero-label"
-                    >
-                        {introCopy.label}
-                    </motion.span>
-                    <div className="hero-line">
-                        <motion.span
-                            initial={{ y: "100%", opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ duration: 1.2, delay: 1, ease: [0.16, 1, 0.3, 1] }}
-                            className="hero-intro-eyebrow"
-                            style={{ display: "inline-block" }}
-                        >
-                            {introCopy.eyebrow}
-                        </motion.span>
-                    </div>
-                    <div className="hero-line">
-                        <motion.span
-                            initial={{ y: "100%", opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ duration: 1.2, delay: 1.1, ease: [0.16, 1, 0.3, 1] }}
-                            className="hero-intro-body"
-                            style={{ display: "inline-block" }}
-                        >
-                            <span className="hero-intro-body-line">{introCopy.bodyLead}</span>
-                            <span className="hero-intro-body-line">{introCopy.bodyTail}</span>
-                        </motion.span>
-                    </div>
-                </motion.div>
-            </div>
-
-            {/* Mobile Hamburger Button — only visible when no window is open */}
-            {useCompactNav && (!isMobile || openWindows.length === 0) && !menuOpen && (
-                <>
-                    <motion.button
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, delay: 0.4 }}
-                        onClick={() => setMenuOpen((prev) => !prev)}
-                        className="absolute top-0 right-0 z-[70] p-6 md:p-12"
-                        style={{ pointerEvents: "auto", background: "none", border: "none", cursor: "pointer" }}
-                        aria-label={menuOpen ? "Close menu" : "Open menu"}
-                    >
-                        {/* iOS 26 Liquid Glass pill */}
-                        <div
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                width: "48px",
-                                height: "48px",
-                                borderRadius: "18px",
-                                /* Liquid glass layers */
-                                background: "linear-gradient(145deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.20) 50%, rgba(255,255,255,0.38) 100%)",
-                                backdropFilter: "blur(12px) saturate(140%)",
-                                WebkitBackdropFilter: "blur(12px) saturate(140%)",
-                                border: "1px solid rgba(255,255,255,0.70)",
-                                boxShadow: [
-                                    "0 2px 12px rgba(0,0,0,0.10)",
-                                    "0 1px 0 rgba(255,255,255,0.90) inset",
-                                    "0 -1px 0 rgba(0,0,0,0.06) inset",
-                                    "inset 1px 0 0 rgba(255,255,255,0.60)",
-                                ].join(", "),
-                                transition: "box-shadow 0.25s, background 0.25s",
-                            }}
-                        >
-                            <div style={{ width: "22px", height: "16px", position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                                <span
-                                    style={{
-                                        display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#E0E0E0",
-                                    }}
-                                />
-                                <span
-                                    style={{
-                                        display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#E0E0E0",
-                                    }}
-                                />
-                                <span
-                                    style={{
-                                        display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#E0E0E0",
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    </motion.button>
-
-                    {isMobile && (
-                        <motion.div
-                            ref={introMobileRef}
-                            initial={{ opacity: 0, y: 18 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.75, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                            className="hero-intro hero-intro-mobile"
-                            style={{ pointerEvents: "none" }}
-                        >
-                            <motion.span
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                                className="hero-label"
-                            >
-                                {introCopy.label}
-                            </motion.span>
-                            <div className="hero-line">
-                                <motion.span
-                                    initial={{ y: "100%", opacity: 0 }}
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ duration: 1.2, delay: 0.58, ease: [0.16, 1, 0.3, 1] }}
-                                    className="hero-intro-eyebrow"
-                                    style={{ display: "inline-block" }}
-                                >
-                                    {introCopy.eyebrow}
-                                </motion.span>
-                            </div>
-                            <div className="hero-line">
-                                <motion.span
-                                    initial={{ y: "100%", opacity: 0 }}
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ duration: 1.2, delay: 0.68, ease: [0.16, 1, 0.3, 1] }}
-                                    className="hero-intro-body"
-                                    style={{ display: "inline-block" }}
-                                >
-                                    <span className="hero-intro-body-line">{introCopy.bodyLead}</span>
-                                    <span className="hero-intro-body-line">{introCopy.bodyTail}</span>
-                                </motion.span>
-                            </div>
-                        </motion.div>
-                    )}
-                </>
-            )}
-
-            {/* Mobile Slide-Down Menu */}
+            {/* BlurOverlay — click to peek/unpeek (show desktop) — desktop only */}
             <AnimatePresence>
-                {useCompactNav && menuOpen && (
-                    <motion.div
-                        initial={{ x: "100%" }}
-                        animate={{ x: 0 }}
-                        exit={{ x: "100%" }}
-                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                        style={{
-                            position: "fixed",
-                            inset: 0,
-                            zIndex: 110,
-                            background: "#0a0a0a",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            gap: "12px",
-                            padding: "80px 32px 32px",
-                        }}
-                    >
-                        {/* Close (X) button — top right */}
-                        <motion.button
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.8 }}
-                            transition={{ duration: 0.25, delay: 0.1 }}
-                            onClick={() => {
-                                setMenuOpen(false);
-                                if (openWindows.length > 0) {
-                                    playCloseSound();
-                                    setOpenWindows([]);
-                                    setWindowZMap({});
-                                    focusCounter.current = 0;
-                                }
-                            }}
-                            aria-label="Close menu"
-                            style={{
-                                position: "absolute",
-                                top: "40px",
-                                right: "40px",
-                                width: "48px",
-                                height: "48px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                background: "none",
-                                border: "none",
-                                cursor: "pointer",
-                                zIndex: 70,
-                            }}
-                        >
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" strokeWidth="2.2" strokeLinecap="round">
-                                <line x1="18" y1="6" x2="6" y2="18" />
-                                <line x1="6" y1="6" x2="18" y2="18" />
-                            </svg>
-                        </motion.button>
-
-                        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%", maxWidth: "160px", gap: "12px" }}>
-                            {buttons.map((btn, i) => (
-                                <motion.button
-                                    key={btn}
-                                    onClick={() => toggleWindow(btn)}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
-                                    transition={{ delay: i * 0.06, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                                    whileTap={{ scale: 0.96 }}
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "flex-start",
-                                        gap: "16px",
-                                        width: "100%",
-                                        padding: "16px 0",
-                                        fontSize: "18px",
-                                        letterSpacing: "0.15em",
-                                        textTransform: "uppercase" as const,
-                                        cursor: "pointer",
-                                        color: openWindows.includes(btn) ? "#fff" : "#A0A0A0",
-                                        background: "transparent",
-                                        border: "none",
-                                        fontFamily: "var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif",
-                                        fontWeight: 600,
-                                        transition: "color 0.2s",
-                                    }}
-                                >
-                                    <span style={{ opacity: 0.7, display: "flex", alignItems: "center" }}>{buttonIcons[btn]}</span>
-                                    {btn}
-                                </motion.button>
-                            ))}
-                        </div>
-                    </motion.div>
+                {!isMobile && openWindows.length > 0 && (
+                    <BlurOverlay onClose={() => setPeeking(p => !p)} peeking={peeking} />
                 )}
             </AnimatePresence>
 
-            {/* Content — kiri bawah */}
-            <div
-                className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-12"
-                style={{ pointerEvents: "none" }}
-            >
-                {/* Typography — kiri */}
-                <div className="flex flex-col items-start gap-8">
-                    <div className="hero-philosophy">
-                        <motion.div
-                            ref={philosophyRef}
-                            initial={{ opacity: 0, y: 18 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.75, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                            className="hero-quote-block"
-                            style={{
-                                pointerEvents: "none",
-                                filter: openWindows.length > 0 && !peeking ? "blur(6px)" : "none",
-                                opacity: openWindows.length > 0 && !peeking ? 0.45 : 1,
-                                transition: "filter 0.4s ease, opacity 0.4s ease",
-                            }}
-                        >
-                            <motion.span
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.7, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                                className="hero-label hero-label-accent"
-                            >
-                                {philosophyCopy.label}
-                            </motion.span>
-                            <div className="hero-line">
-                                <motion.span
-                                    initial={{ y: "100%", opacity: 0 }}
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ duration: 1.1, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
-                                    className="hero-text hero-quote-line"
-                                    style={{ display: "inline-block" }}
-                                >
-                                    {philosophyCopy.lineOne}
-                                </motion.span>
-                            </div>
-                            <div className="hero-line">
-                                <motion.span
-                                    initial={{ y: "100%", opacity: 0 }}
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ duration: 1.1, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
-                                    className="hero-text hero-quote-line"
-                                    style={{ display: "inline-block" }}
-                                >
-                                    <span className="hero-hover unhover">
-                                        ultimate
-                                        <span className="hero-img">
-                                            <img
-                                                src="https://i.pinimg.com/avif/736x/fe/00/a6/fe00a6d3a8978b2c055e6d86674be866.avf"
-                                                alt="aesthetic"
-                                            />
-                                        </span>
-                                    </span>
-                                    {" "}{philosophyCopy.lineTwo}
-                                </motion.span>
-                            </div>
-                        </motion.div>
-                    </div>
-
-
-                    {/* BlurOverlay — click to peek/unpeek (show desktop) — desktop only */}
-                    <AnimatePresence>
-                        {!isMobile && !useCompactNav && openWindows.length > 0 && (
-                            <BlurOverlay onClose={() => setPeeking(p => !p)} peeking={peeking} />
-                        )}
-                    </AnimatePresence>
-
-                    {/* Desktop: windowed mode with blur, drag, resize */}
-                    <AnimatePresence>
-                        {!isMobile && !useCompactNav && openWindows.map((name, index) => (
-                            <Window
-                                key={name}
-                                title={name}
-                                zIndex={BASE_Z + (windowZMap[name] ?? index)}
-                                onFocus={() => bringToFront(name)}
-                                onClose={() => closeWindow(name)}
-                                initialWidth={gridLayout[name]?.w ?? (["Gallery", "Blog", "Work"].includes(name) ? 820 : 560)}
-                                initialHeight={gridLayout[name]?.h ?? (["Gallery", "Blog", "Work"].includes(name) ? 620 : 480)}
-                                gridPosition={gridLayout[name]}
-                                peeking={peeking}
-                            >
-                                {name === "About" && <AboutWindow />}
-                                {name === "Work" && <WorkWindow />}
-                                {name === "Blog" && <BlogWindow />}
-                                {name === "Gallery" && <GalleryWindow />}
-                                {name === "Connect" && <ConnectionWindow />}
-                                {name === "Admin" && <AdminWindow />}
-                            </Window>
-                        ))}
-                    </AnimatePresence>
-                </div>
-            </div>
-
-            {/* Size warning overlay */}
+            {/* Desktop: windowed mode with blur, drag, resize */}
             <AnimatePresence>
-                {showSizeWarning && openWindows.length === 0 && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.4 }}
-                        style={{
-                            position: "fixed",
-                            inset: 0,
-                            zIndex: 200,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            background: "rgba(0, 0, 0, 0.85)",
-                            backdropFilter: "blur(8px)",
-                            WebkitBackdropFilter: "blur(8px)",
-                            padding: "32px",
-                        }}
+                {!isMobile && openWindows.map((name, index) => (
+                    <Window
+                        key={name}
+                        title={name}
+                        zIndex={BASE_Z + (windowZMap[name] ?? index)}
+                        onFocus={() => bringToFront(name)}
+                        onClose={() => closeWindow(name)}
+                        initialWidth={gridLayout[name]?.w ?? (["Gallery", "Blog", "Work"].includes(name) ? 820 : 560)}
+                        initialHeight={gridLayout[name]?.h ?? (["Gallery", "Blog", "Work"].includes(name) ? 620 : 480)}
+                        gridPosition={gridLayout[name]}
+                        peeking={peeking}
                     >
-                        <motion.div
-                            initial={{ opacity: 0, y: 16, scale: 0.96 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 16, scale: 0.96 }}
-                            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                            style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "center",
-                                gap: "16px",
-                                textAlign: "center",
-                                maxWidth: "380px",
-                            }}
-                        >
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="15 3 21 3 21 9" />
-                                <polyline points="9 21 3 21 3 15" />
-                                <line x1="21" y1="3" x2="14" y2="10" />
-                                <line x1="3" y1="21" x2="10" y2="14" />
-                            </svg>
-                            <span style={{
-                                fontFamily: "var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif",
-                                fontSize: "18px",
-                                fontWeight: 600,
-                                color: "#fff",
-                                letterSpacing: "0.02em",
-                                lineHeight: 1.4,
-                            }}>
-                                Please resize your window
-                            </span>
-                            <span style={{
-                                fontFamily: "var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif",
-                                fontSize: "14px",
-                                fontWeight: 400,
-                                color: "rgba(255,255,255,0.5)",
-                                lineHeight: 1.6,
-                            }}>
-                                This site is best experienced in a larger window. Try maximizing your browser or using a wider screen.
-                            </span>
-                        </motion.div>
-                    </motion.div>
-                )}
+                        {name === "About" && <AboutWindow />}
+                        {name === "Work" && <WorkWindow />}
+                        {name === "Blog" && <BlogWindow />}
+                        {name === "Gallery" && <GalleryWindow />}
+                        {name === "Connect" && <ConnectionWindow />}
+                        {name === "Admin" && <AdminWindow />}
+                    </Window>
+                ))}
             </AnimatePresence>
 
-            {/* Mobile: full-screen solid view — no window, no blur, rendered at root level */}
+            {/* Mobile: full-screen solid view */}
             <AnimatePresence>
-                {(isMobile || useCompactNav) && openWindows.length > 0 && (() => {
+                {isMobile && openWindows.length > 0 && (() => {
                     const name = openWindows[openWindows.length - 1];
                     return (
                         <motion.div
@@ -1299,22 +639,9 @@ export default function Hero() {
                             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                             className="mobile-fullview"
                         >
-                            {/* Mobile header */}
                             <div className="mobile-fullview-header">
                                 <span className="mobile-fullview-title">{name}</span>
-                                <button
-                                    onClick={() => setMenuOpen(prev => !prev)}
-                                    aria-label="Menu"
-                                    className="mobile-fullview-menu-btn"
-                                >
-                                    <div style={{ width: "20px", height: "14px", position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                                        <span style={{ display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#E0E0E0", transformOrigin: "center", transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)", transform: menuOpen ? "rotate(45deg) translateY(6px)" : "none" }} />
-                                        <span style={{ display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#E0E0E0", transition: "opacity 0.2s, transform 0.2s", opacity: menuOpen ? 0 : 1, transform: menuOpen ? "scaleX(0)" : "scaleX(1)" }} />
-                                        <span style={{ display: "block", width: "100%", height: "2px", borderRadius: "2px", background: "#E0E0E0", transformOrigin: "center", transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)", transform: menuOpen ? "rotate(-45deg) translateY(-6px)" : "none" }} />
-                                    </div>
-                                </button>
                             </div>
-                            {/* Mobile content */}
                             <div className="mobile-fullview-content">
                                 {name === "About" && <AboutWindow />}
                                 {name === "Work" && <WorkWindow />}
