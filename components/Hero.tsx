@@ -595,6 +595,54 @@ export default function Hero() {
                 </div>
             </div>
 
+            {/* Logo — pojok kiri atas */}
+            <div className="absolute top-0 left-0 p-6 md:p-12" style={{ pointerEvents: "none", zIndex: 55 }}>
+                <div className="logo">
+                    <span className="flip-text">
+                        <span data-char="L" style={{ "--i": 1 } as React.CSSProperties}>L</span>
+                        <span data-char="a" style={{ "--i": 2 } as React.CSSProperties}>a</span>
+                        <span data-char="m" style={{ "--i": 3 } as React.CSSProperties}>m</span>
+                        <span data-char="." style={{ "--i": 4 } as React.CSSProperties}>.</span>
+                    </span>
+                </div>
+            </div>
+
+            {/* Nav — kiri tengah */}
+            <div
+                className="absolute left-0 top-0 bottom-0 flex flex-col justify-center p-6 md:p-12"
+                style={{ pointerEvents: "none", zIndex: 55 }}
+            >
+                <div className="flex flex-col gap-3">
+                    {["About", "Blog", "Gallery", "Work", "Connect"].map((btn, i) => (
+                        <motion.button
+                            key={btn}
+                            onClick={() => toggleWindow(btn)}
+                            initial={{ opacity: 0, x: -12 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5, delay: 0.3 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
+                            whileHover={{ x: 4 }}
+                            style={{
+                                pointerEvents: "auto",
+                                background: "none",
+                                border: "none",
+                                cursor: "pointer",
+                                textAlign: "left",
+                                padding: 0,
+                                fontFamily: "var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif",
+                                fontSize: "13px",
+                                fontWeight: 500,
+                                letterSpacing: "0.12em",
+                                textTransform: "uppercase",
+                                color: openWindows.includes(btn) ? "#fff" : "rgba(224,224,224,0.55)",
+                                transition: "color 0.2s",
+                            }}
+                        >
+                            {btn}
+                        </motion.button>
+                    ))}
+                </div>
+            </div>
+
             {/* BlurOverlay — click to peek/unpeek (show desktop) — desktop only */}
             <AnimatePresence>
                 {!isMobile && openWindows.length > 0 && (
