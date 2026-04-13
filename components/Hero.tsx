@@ -8,7 +8,6 @@ import BlurOverlay from "@/components/BlurOverlay";
 import { playCloseSound } from "@/lib/audio";
 
 const AboutWindow = dynamic(() => import("@/components/windows/aboutwindow"), { ssr: false });
-const WorkWindow = dynamic(() => import("@/components/windows/workwindow"), { ssr: false });
 const BlogWindow = dynamic(() => import("@/components/windows/blogwindow"), { ssr: false });
 const GalleryWindow = dynamic(() => import("@/components/windows/gallerywindow"), { ssr: false });
 const ConnectionWindow = dynamic(() => import("@/components/windows/connectionwindow"), { ssr: false });
@@ -42,6 +41,11 @@ const CONFIG = {
 export default function Hero() {
     const HERO_FRAME_GAP = "16px";
     const HERO_FRAME_RADIUS = "2rem";
+    const LAM_BADGE_RADIUS = "1.5rem";
+    const LAM_BADGE_PADDING = "16px";
+    const LAM_BADGE_TOP_PADDING = "1.1rem";
+    const LAM_BADGE_RIGHT_PADDING = "1.5rem";
+    const LAM_FONT_SIZE = "clamp(6rem, 22vw, 24rem)";
 
     const viewportRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -111,7 +115,7 @@ export default function Hero() {
     const BASE_Z = 50; // z-index dasar window
 
     // Compute dynamic grid layout for open windows (desktop only)
-    // Work & Blog = big, About & Connect = small (same size), Gallery = wide/long
+    // Blog & Gallery = big, About & Connect = small (same size)
     const gridLayout = (() => {
         if (isMobile || openWindows.length === 0) return {} as Record<string, { x: number; y: number; w: number; h: number }>;
         const vw = windowSize.w || 1440;
@@ -125,7 +129,7 @@ export default function Hero() {
         const wins = openWindows;
         const count = wins.length;
 
-        const big = ["Work", "Blog", "Gallery"];
+        const big = ["Blog", "Gallery"];
         const small = ["About", "Connect"];
 
         if (count === 1) {
@@ -220,7 +224,7 @@ export default function Hero() {
             });
         } else {
             // 5 windows:
-            // Left 2 cols: Work & Blog (top, big) + About & Connect (bottom, small same size)
+            // Left 2 cols: big windows (top) + About & Connect (bottom, small same size)
             // Right col: Gallery (full height, tall)
             const galleryW = areaW * 0.35;
             const leftW = areaW - galleryW - gap;
@@ -229,11 +233,11 @@ export default function Hero() {
             const leftCellW = (leftW - gap) / 2;
 
             // Categorize
-            const topCandidates: string[] = wins.filter(n => n === "Work" || n === "Blog");
+            const topCandidates: string[] = wins.filter(n => n === "Blog");
             const botSmall: string[] = wins.filter(n => small.includes(n));
             const remaining = wins.filter(n => !topCandidates.includes(n) && n !== "Gallery" && !botSmall.includes(n));
 
-            // Left top row: Work & Blog (or fill with remaining)
+            // Left top row: blog first, then fill with remaining
             const leftTop = [...topCandidates, ...remaining].slice(0, 2);
             // Left bottom row: About & Connect
             const leftBot = botSmall.slice(0, 2);
@@ -603,18 +607,37 @@ export default function Hero() {
 
             {/* Nav — pojok kiri atas */}
             <nav
-                className="absolute top-0 left-0 right-0 px-6 pt-6 md:px-10 md:pt-10"
-                style={{ zIndex: 55 }}
+                className="absolute top-0 left-0 right-0"
+                style={{
+                    zIndex: 55,
+                    paddingInline: "clamp(1rem, 2.6vw, 2.5rem)",
+                    paddingTop: "clamp(1rem, 2.6vw, 2.5rem)",
+                }}
             >
-                <div className="flex w-full items-center justify-between gap-6">
-                {["About", "Work", "Blog", "Gallery", "Connect"].map((name) => (
+                <div className="flex w-full items-center justify-between" style={{ gap: "clamp(0.75rem, 2vw, 1.5rem)" }}>
+                {["About", "Blog", "Gallery", "Connect"].map((name) => (
                     <button
                         key={name}
                         onClick={() => toggleWindow(name)}
-                        className="text-left text-sm md:text-xl font-bold tracking-wide text-white hover:text-white transition-colors duration-150"
-                        style={{ background: "none", border: "none", cursor: "pointer", padding: 0, filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.6))" }}
+                        className="nav-flip font-bold tracking-wide text-white transition-colors duration-150"
+                        style={{
+                            fontSize: "clamp(0.92rem, 1.55vw, 1.25rem)",
+                            letterSpacing: "clamp(0.02em, 0.08vw, 0.08em)",
+                        }}
                     >
-                        {name.toLowerCase()}
+                        <span className="nav-flip-text" aria-hidden="true">
+                            {name.toLowerCase().split("").map((char, index) => (
+                                <span
+                                    key={`${name}-${index}`}
+                                    className="nav-flip-char"
+                                    data-char={char}
+                                    style={{ "--ci": index } as React.CSSProperties}
+                                >
+                                    {char}
+                                </span>
+                            ))}
+                        </span>
+                        <span className="sr-only">{name.toLowerCase()}</span>
                     </button>
                 ))}
                 </div>
@@ -637,13 +660,12 @@ export default function Hero() {
                         zIndex={BASE_Z + (windowZMap[name] ?? index)}
                         onFocus={() => bringToFront(name)}
                         onClose={() => closeWindow(name)}
-                        initialWidth={gridLayout[name]?.w ?? (["Gallery", "Blog", "Work"].includes(name) ? 820 : 560)}
-                        initialHeight={gridLayout[name]?.h ?? (["Gallery", "Blog", "Work"].includes(name) ? 620 : 480)}
+                        initialWidth={gridLayout[name]?.w ?? (["Gallery", "Blog"].includes(name) ? 820 : 560)}
+                        initialHeight={gridLayout[name]?.h ?? (["Gallery", "Blog"].includes(name) ? 620 : 480)}
                         gridPosition={gridLayout[name]}
                         peeking={peeking}
                     >
                         {name === "About" && <AboutWindow />}
-                        {name === "Work" && <WorkWindow />}
                         {name === "Blog" && <BlogWindow />}
                         {name === "Gallery" && <GalleryWindow />}
                         {name === "Connect" && <ConnectionWindow />}
@@ -670,7 +692,6 @@ export default function Hero() {
                             </div>
                             <div className="mobile-fullview-content">
                                 {name === "About" && <AboutWindow />}
-                                {name === "Work" && <WorkWindow />}
                                 {name === "Blog" && <BlogWindow />}
                                 {name === "Gallery" && <GalleryWindow />}
                                 {name === "Connect" && <ConnectionWindow />}
@@ -685,16 +706,26 @@ export default function Hero() {
 
             {/* LAM — di luar hero (fixed), biar concave corners nyambung ke frame tanpa kena overflow:hidden */}
             <div
-                style={{ position: "fixed", bottom: 0, left: 0, pointerEvents: "none", zIndex: 55, lineHeight: 0.7, background: "#111", borderTopRightRadius: HERO_FRAME_RADIUS, padding: `1.5rem 2rem ${HERO_FRAME_GAP} ${HERO_FRAME_GAP}` }}
+                style={{
+                    position: "fixed",
+                    bottom: 0,
+                    left: 0,
+                    pointerEvents: "none",
+                    zIndex: 55,
+                    lineHeight: 0.7,
+                    background: "#111",
+                    borderTopRightRadius: LAM_BADGE_RADIUS,
+                    padding: `${LAM_BADGE_TOP_PADDING} ${LAM_BADGE_RIGHT_PADDING} ${LAM_BADGE_PADDING} ${LAM_BADGE_PADDING}`,
+                }}
             >
                 {/* Concave corner kiri atas */}
                 <div
                     style={{
                         position: "absolute",
                         bottom: "100%",
-                        left: HERO_FRAME_GAP,
-                        width: HERO_FRAME_RADIUS,
-                        height: HERO_FRAME_RADIUS,
+                        left: LAM_BADGE_PADDING,
+                        width: LAM_BADGE_RADIUS,
+                        height: LAM_BADGE_RADIUS,
                         background: "radial-gradient(circle at 100% 100%, transparent calc(100% - 1px), #111 100%)",
                     }}
                 />
@@ -702,16 +733,16 @@ export default function Hero() {
                 <div
                     style={{
                         position: "absolute",
-                        bottom: HERO_FRAME_GAP,
+                        bottom: LAM_BADGE_PADDING,
                         left: "100%",
-                        width: HERO_FRAME_RADIUS,
-                        height: HERO_FRAME_RADIUS,
+                        width: LAM_BADGE_RADIUS,
+                        height: LAM_BADGE_RADIUS,
                         background: "radial-gradient(circle at 0 0, transparent calc(100% - 1px), #111 100%)",
                     }}
                 />
                 <span
                     className="font-black text-white select-none"
-                    style={{ fontSize: "clamp(8rem, 28vw, 32rem)", display: "block", letterSpacing: "-0.04em", fontFamily: "Helvetica, Arial, sans-serif" }}
+                    style={{ fontSize: LAM_FONT_SIZE, display: "block", letterSpacing: "-0.04em", fontFamily: "Helvetica, Arial, sans-serif" }}
                 >
                     LAM.
                 </span>
