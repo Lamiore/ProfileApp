@@ -40,6 +40,9 @@ const CONFIG = {
 
 
 export default function Hero() {
+    const HERO_FRAME_GAP = "16px";
+    const HERO_FRAME_RADIUS = "2rem";
+
     const viewportRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const gridRef = useRef<HTMLDivElement>(null);
@@ -50,13 +53,15 @@ export default function Hero() {
     const isMobileRef = useRef(false);
     const [peeking, setPeeking] = useState(false);
     const windowsOpenRef = useRef(false);
+    const [windowSize, setWindowSize] = useState({ w: 0, h: 0 });
 
-    // Detect mobile viewport
+    // Detect mobile viewport + track window size
     useEffect(() => {
         const check = () => {
             const mobile = window.innerWidth <= 768;
             setIsMobile(mobile);
             isMobileRef.current = mobile;
+            setWindowSize({ w: window.innerWidth, h: window.innerHeight });
         };
         check();
         window.addEventListener("resize", check);
@@ -109,8 +114,8 @@ export default function Hero() {
     // Work & Blog = big, About & Connect = small (same size), Gallery = wide/long
     const gridLayout = (() => {
         if (isMobile || openWindows.length === 0) return {} as Record<string, { x: number; y: number; w: number; h: number }>;
-        const vw = typeof window !== "undefined" ? window.innerWidth : 1440;
-        const vh = typeof window !== "undefined" ? window.innerHeight : 900;
+        const vw = windowSize.w || 1440;
+        const vh = windowSize.h || 900;
         const pad = 48;
         const topPad = 100;
         const gap = 16;
@@ -576,7 +581,8 @@ export default function Hero() {
     }, []);
 
     return (
-        <div className="relative w-screen overflow-hidden" style={{ height: "100dvh" }}>
+        <>
+        <div className="relative overflow-hidden" style={{ width: "calc(100vw - 32px)", height: "calc(100dvh - 32px)", borderRadius: HERO_FRAME_RADIUS }}>
 
             {/* Infinite Grid Background */}
             <div ref={viewportRef} className="absolute inset-0" style={{ cursor: "grab" }}>
@@ -595,88 +601,20 @@ export default function Hero() {
                 </div>
             </div>
 
-            {/* Logo — pojok kiri atas */}
-            <div className="absolute top-0 left-0 p-6 md:p-12" style={{ pointerEvents: "none", zIndex: 55 }}>
-                <div className="logo">
-                    <span className="flip-text">
-                        <span data-char="L" style={{ "--i": 1 } as React.CSSProperties}>L</span>
-                        <span data-char="a" style={{ "--i": 2 } as React.CSSProperties}>a</span>
-                        <span data-char="m" style={{ "--i": 3 } as React.CSSProperties}>m</span>
-                        <span data-char="." style={{ "--i": 4 } as React.CSSProperties}>.</span>
-                    </span>
-                </div>
-            </div>
+            {/* Nav — pojok kiri atas */}
+            <nav className="absolute top-0 left-0 p-6 md:p-10 flex flex-row gap-24" style={{ zIndex: 55 }}>
+                {["About", "Work", "Blog", "Gallery", "Connect"].map((name) => (
+                    <button
+                        key={name}
+                        onClick={() => toggleWindow(name)}
+                        className="text-left text-xl font-bold tracking-wide text-white hover:text-white transition-colors duration-150"
+                        style={{ background: "none", border: "none", cursor: "pointer", padding: 0, filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.6))" }}
+                    >
+                        {name.toLowerCase()}
+                    </button>
+                ))}
+            </nav>
 
-            {/* Nav — kiri tengah */}
-            <style>{`
-                .nav-btn {
-                    background: none;
-                    border: none;
-                    cursor: pointer;
-                    padding: 0;
-                    text-align: left;
-                    font-family: var(--font-satoshi), 'Helvetica Neue', Helvetica, Arial, sans-serif;
-                    font-size: clamp(10px, min(4vw, 5.5vh), 80px);
-                    font-weight: 800;
-                    letter-spacing: 0.1em;
-                    text-transform: uppercase;
-                    line-height: 1;
-                    display: flex;
-                    overflow: hidden;
-                    transition: color 0.2s;
-                    color: #fff;
-                    filter: drop-shadow(0 2px 12px rgba(0,0,0,0.6));
-                }
-                .nav-char {
-                    display: inline-block;
-                    position: relative;
-                    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-                    transition-delay: calc(var(--ci) * 40ms);
-                }
-                .nav-char::after {
-                    content: attr(data-char);
-                    position: absolute;
-                    left: 0;
-                    top: 100%;
-                    width: 100%;
-                    text-align: center;
-                }
-                .nav-btn:hover .nav-char {
-                    transform: translateY(-100%);
-                }
-            `}</style>
-            <div
-                className="absolute left-0 top-0 bottom-0 flex flex-col justify-center p-6 md:p-12"
-                style={{ pointerEvents: "none", zIndex: 55 }}
-            >
-                <div className="flex flex-col gap-5">
-                    {["About", "Blog", "Gallery", "Work", "Connect"].map((btn, i) => (
-                        <motion.button
-                            key={btn}
-                            onClick={() => toggleWindow(btn)}
-                            initial={{ opacity: 0, x: -12 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.5, delay: 0.3 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
-                            className="nav-btn"
-                            style={{
-                                pointerEvents: "auto",
-                                color: "#fff",
-                            }}
-                        >
-                            {btn.split("").map((char, ci) => (
-                                <span
-                                    key={ci}
-                                    className="nav-char"
-                                    data-char={char}
-                                    style={{ "--ci": ci } as React.CSSProperties}
-                                >
-                                    {char}
-                                </span>
-                            ))}
-                        </motion.button>
-                    ))}
-                </div>
-            </div>
 
             {/* BlurOverlay — click to peek/unpeek (show desktop) — desktop only */}
             <AnimatePresence>
@@ -739,5 +677,40 @@ export default function Hero() {
             </AnimatePresence>
 
         </div>
+
+            {/* LAM — di luar hero (fixed), biar concave corners nyambung ke frame tanpa kena overflow:hidden */}
+            <div
+                style={{ position: "fixed", bottom: 0, left: 0, pointerEvents: "none", zIndex: 55, lineHeight: 0.7, background: "#111", borderTopRightRadius: HERO_FRAME_RADIUS, padding: `1.5rem 2rem ${HERO_FRAME_GAP} ${HERO_FRAME_GAP}` }}
+            >
+                {/* Concave corner kiri atas */}
+                <div
+                    style={{
+                        position: "absolute",
+                        bottom: "100%",
+                        left: HERO_FRAME_GAP,
+                        width: HERO_FRAME_RADIUS,
+                        height: HERO_FRAME_RADIUS,
+                        background: "radial-gradient(circle at 100% 100%, transparent calc(100% - 1px), #111 100%)",
+                    }}
+                />
+                {/* Concave corner kanan bawah */}
+                <div
+                    style={{
+                        position: "absolute",
+                        bottom: HERO_FRAME_GAP,
+                        left: "100%",
+                        width: HERO_FRAME_RADIUS,
+                        height: HERO_FRAME_RADIUS,
+                        background: "radial-gradient(circle at 0 0, transparent calc(100% - 1px), #111 100%)",
+                    }}
+                />
+                <span
+                    className="font-black text-white select-none"
+                    style={{ fontSize: "clamp(8rem, 28vw, 32rem)", display: "block", letterSpacing: "-0.04em", fontFamily: "Helvetica, Arial, sans-serif" }}
+                >
+                    LAM.
+                </span>
+            </div>
+        </>
     );
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Sacramento } from "next/font/google";
 import "./globals.css";
 
 const satoshi = localFont({
@@ -28,6 +28,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const sacramento = Sacramento({
+  variable: "--font-sacramento",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 export const metadata: Metadata = {
   title: "Lam",
   description: "created by ilham",
@@ -43,7 +49,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${satoshi.variable} ${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${satoshi.variable} ${geistSans.variable} ${geistMono.variable} ${sacramento.variable} antialiased`}
+        style={{ background: "#111", padding: "16px", height: "100dvh", overflow: "hidden", boxSizing: "border-box" }}
       >
         <PageTransitionProvider>
           {children}
