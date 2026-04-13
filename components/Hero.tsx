@@ -602,7 +602,11 @@ export default function Hero() {
             </div>
 
             {/* Nav — pojok kiri atas */}
-            <nav className="absolute top-0 left-0 p-6 md:p-10 flex flex-row gap-24" style={{ zIndex: 55 }}>
+            <nav
+                className="absolute top-0 left-0 right-0 px-6 pt-6 md:px-10 md:pt-10"
+                style={{ zIndex: 55 }}
+            >
+                <div className="flex w-full items-center justify-between gap-6">
                 {["About", "Work", "Blog", "Gallery", "Connect"].map((name) => (
                     <button
                         key={name}
@@ -613,6 +617,7 @@ export default function Hero() {
                         {name.toLowerCase()}
                     </button>
                 ))}
+                </div>
             </nav>
 
 
