@@ -611,7 +611,7 @@ export default function Hero() {
                     <button
                         key={name}
                         onClick={() => toggleWindow(name)}
-                        className="text-left text-xl font-bold tracking-wide text-white hover:text-white transition-colors duration-150"
+                        className="text-left text-sm md:text-xl font-bold tracking-wide text-white hover:text-white transition-colors duration-150"
                         style={{ background: "none", border: "none", cursor: "pointer", padding: 0, filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.6))" }}
                     >
                         {name.toLowerCase()}
