@@ -27,6 +27,7 @@ const CONFIG = {
     mobileTileOverscan: 0,
 };
 
+const HERO_FRAME_RADIUS = "2rem";
 const LAM_BADGE_RADIUS = "1.5rem";
 const LAM_BADGE_PADDING = "16px";
 const LAM_BADGE_TOP_PADDING = "1.1rem";
