@@ -23,7 +23,7 @@ export default function PagesLayout({ children }: { children: React.ReactNode })
             <div 
                 style={{ 
                     position: "fixed", 
-                    inset: "16px", 
+                    inset: "24px", 
                     pointerEvents: "none", 
                     zIndex: 9999, 
                     borderRadius: "2rem",
