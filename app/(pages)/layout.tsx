@@ -18,8 +18,8 @@ export default function PagesLayout({ children }: { children: React.ReactNode })
     }, []);
 
     return (
-        <div className="relative flex flex-col w-full h-full">
-            <div className="absolute top-0 left-0 right-0" style={{ zIndex: 55 }}>
+        <div className="relative flex flex-col w-full h-full" style={{ padding: "16px" }}>
+            <div className="absolute top-16 left-16 right-16" style={{ zIndex: 55 }}>
                 <Nav />
             </div>
             <main

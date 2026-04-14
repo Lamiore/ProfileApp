@@ -51,27 +51,30 @@ export default function RootLayout({
         className={`${satoshi.variable} ${geistSans.variable} ${geistMono.variable} ${sacramento.variable} antialiased`}
         style={{ 
           background: "#111", 
-          padding: "16px", 
           height: "100dvh", 
           overflow: "hidden", 
           boxSizing: "border-box",
-          position: "relative"
+          position: "relative",
+          margin: 0
         }}
       >
         <PageTransitionProvider>
-          {/* Global Frame */}
-          <div 
-            style={{ 
-              width: "100%", 
-              height: "100%", 
-              borderRadius: "2rem", 
-              overflow: "hidden", 
-              position: "relative",
-              background: "#0A0A0A"
-            }}
-          >
+          {/* Main Content Container */}
+          <div style={{ width: "100%", height: "100%", position: "relative", zIndex: 1 }}>
             {children}
           </div>
+
+          {/* Sticky Frame Overlay */}
+          <div 
+            style={{ 
+              position: "fixed", 
+              inset: "16px", 
+              pointerEvents: "none", 
+              zIndex: 9999, 
+              borderRadius: "2rem",
+              boxShadow: "0 0 0 100vmax #111", // Large spread creates the bezel
+            }} 
+          />
         </PageTransitionProvider>
       </body>
     </html>
