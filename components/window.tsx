@@ -16,6 +16,8 @@ interface WindowProps {
     initialHeight?: number;
     gridPosition?: { x: number; y: number; w: number; h: number };
     peeking?: boolean;
+    centered?: boolean;
+    hideMaximize?: boolean;
     children: React.ReactNode;
 }
 
@@ -39,7 +41,7 @@ const trafficButtonStyle = (color: string): React.CSSProperties => ({
     transition: "filter 0.15s ease",
 });
 
-export default memo(function Window({ title, onClose, onFocus, onMenuToggle, menuOpen = false, zIndex = 50, initialWidth, initialHeight, gridPosition, peeking = false, children }: WindowProps) {
+export default memo(function Window({ title, onClose, onFocus, onMenuToggle, menuOpen = false, zIndex = 50, initialWidth, initialHeight, gridPosition, peeking = false, centered = false, hideMaximize = false, children }: WindowProps) {
     const windowRef = useRef<HTMLDivElement>(null);
     const dragRef = useRef({ isDragging: false, startX: 0, startY: 0, offsetX: 0, offsetY: 0 });
     const resizeRef = useRef({ isResizing: false, startX: 0, startY: 0, startW: 0, startH: 0 });
@@ -111,6 +113,22 @@ export default memo(function Window({ title, onClose, onFocus, onMenuToggle, men
         }
     }, [gridPosition?.x, gridPosition?.y, gridPosition?.w, gridPosition?.h, isMobile, initialized]);
 
+    // Keep centered on viewport resize when centered=true
+    useEffect(() => {
+        if (!centered) return;
+        const recenter = () => {
+            const el = windowRef.current;
+            if (!el) return;
+            const x = (window.innerWidth - sizeRef.current.w) / 2;
+            const y = (window.innerHeight - sizeRef.current.h) / 2;
+            positionRef.current = { x, y };
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+        };
+        window.addEventListener("resize", recenter);
+        return () => window.removeEventListener("resize", recenter);
+    }, [centered]);
+
     // Play open sound on mount
     useEffect(() => {
         playOpenSound();
@@ -121,9 +139,9 @@ export default memo(function Window({ title, onClose, onFocus, onMenuToggle, men
         return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
     }, []);
 
-    // Title bar drag (disabled when maximized or minimized)
+    // Title bar drag (disabled when maximized, minimized, or centered)
     const onTitleMouseDown = useCallback((e: React.MouseEvent) => {
-        if (isMaximized || isMinimized) return;
+        if (isMaximized || isMinimized || centered) return;
         const el = windowRef.current;
         if (!el) return;
 
@@ -381,6 +399,7 @@ export default memo(function Window({ title, onClose, onFocus, onMenuToggle, men
                         </button>
 
                         {/* Maximize */}
+                        {!hideMaximize && (
                         <button
                             onClick={handleMaximize}
                             onMouseDown={(e) => e.stopPropagation()}
@@ -393,6 +412,7 @@ export default memo(function Window({ title, onClose, onFocus, onMenuToggle, men
                                 </span>
                             )}
                         </button>
+                        )}
                     </div>
                 )}
 

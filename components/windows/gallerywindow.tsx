@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Window from "@/components/window";
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import Masonry, { type MasonryItem } from "@/components/ui/masonry";
 
 function useIsMobile() {
     const [mobile, setMobile] = useState(false);
@@ -17,12 +18,6 @@ function useIsMobile() {
     }, []);
     return mobile;
 }
-
-const MIN_COL_WIDTH = 160; // px per column minimum
-
-const getCols = (width: number) => {
-    return Math.max(2, Math.floor(width / MIN_COL_WIDTH));
-};
 
 // ---------- YouTube helpers ----------
 function getYouTubeId(url: string): string | null {
@@ -120,8 +115,6 @@ export default function GalleryWindow() {
     const [items, setItems] = useState<GalleryItem[]>(() => loadCache());
     const [previewIndex, setPreviewIndex] = useState<number | null>(null);
     const [previewSize, setPreviewSize] = useState({ w: 560, h: 480 });
-    const [cols, setCols] = useState(4);
-    const containerRef = useRef<HTMLDivElement>(null);
     const isMobile = useIsMobile();
 
     useEffect(() => {
@@ -140,23 +133,21 @@ export default function GalleryWindow() {
         return () => { unsubscribe(); fallbackUnsub?.(); };
     }, []);
 
-    useEffect(() => {
-        const el = containerRef.current;
-        if (!el) return;
-        let rafId: number;
-        const ro = new ResizeObserver(([entry]) => {
-            cancelAnimationFrame(rafId);
-            rafId = requestAnimationFrame(() => {
-                setCols(getCols(entry.contentRect.width));
-            });
-        });
-        ro.observe(el);
-        setCols(getCols(el.offsetWidth));
-        return () => { ro.disconnect(); cancelAnimationFrame(rafId); };
-    }, []);
-
-    const gap = cols <= 2 ? 16 : 24;
     const previewItem = previewIndex !== null ? items[previewIndex] ?? null : null;
+    const latestNavRef = useRef<number>(-1);
+
+    // Convert GalleryItems to MasonryItems — memoized so reference only changes when items change
+    const masonryItems: MasonryItem[] = useMemo(() => items.map((item) => ({
+        id: item.url,
+        img:
+            item.type === "youtube" && item.videoId
+                ? getYouTubeThumbnail(item.videoId)
+                : item.type === "gdrive" && item.videoId
+                ? `https://drive.google.com/thumbnail?id=${item.videoId}&sz=w800`
+                : item.url,
+        url: item.url,
+        height: 400,
+    })), [items]);
 
     // Compute preview window size for a given item
     const computeSize = useCallback((item: GalleryItem, onDone: (w: number, h: number) => void) => {
@@ -185,7 +176,9 @@ export default function GalleryWindow() {
 
     const openPreview = useCallback((item: GalleryItem) => {
         const idx = items.indexOf(item);
+        latestNavRef.current = idx;
         computeSize(item, (w, h) => {
+            if (latestNavRef.current !== idx) return;
             setPreviewSize({ w, h });
             setPreviewIndex(idx);
         });
@@ -193,8 +186,10 @@ export default function GalleryWindow() {
 
     const goTo = useCallback((idx: number) => {
         if (idx < 0 || idx >= items.length) return;
+        latestNavRef.current = idx;
         const item = items[idx];
         computeSize(item, (w, h) => {
+            if (latestNavRef.current !== idx) return;
             setPreviewSize({ w, h });
             setPreviewIndex(idx);
         });
@@ -218,89 +213,21 @@ export default function GalleryWindow() {
     return (
         <>
             {/* Masonry grid */}
-            <div
-                ref={containerRef}
-                style={{
-                    columnCount: cols,
-                    columnGap: `${gap}px`,
-                    width: "100%",
+            <Masonry
+                items={masonryItems}
+                ease="power3.out"
+                duration={0.6}
+                stagger={0.05}
+                animateFrom="bottom"
+                scaleOnHover
+                hoverScale={0.95}
+                blurToFocus
+                colorShiftOnHover={false}
+                onItemClick={(masonryItem) => {
+                    const item = items.find((g) => g.url === masonryItem.url);
+                    if (item) openPreview(item);
                 }}
-            >
-                {items.map((item, i) => (
-                    <motion.div
-                        key={item.url}
-                        initial={{ opacity: 0, y: 12 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, amount: 0.1 }}
-                        transition={{ delay: Math.min(i * 0.04, 0.4), duration: 0.35 }}
-                        onClick={() => openPreview(item)}
-                        style={{
-                            breakInside: "avoid",
-                            marginBottom: `${gap}px`,
-                            borderRadius: "8px",
-                            overflow: "hidden",
-                            cursor: "pointer",
-                            position: "relative",
-                        }}
-                        whileHover={isMobile ? undefined : { scale: 1.02 }}
-                    >
-                        <img
-                            src={
-                                item.type === "youtube" && item.videoId
-                                    ? getYouTubeThumbnail(item.videoId)
-                                    : item.type === "gdrive" && item.videoId
-                                        ? `https://drive.google.com/thumbnail?id=${item.videoId}&sz=w800`
-                                        : item.url
-                            }
-                            alt={
-                                item.type === "youtube" || item.type === "gdrive"
-                                    ? `Video ${i + 1}`
-                                    : `Gallery ${i + 1}`
-                            }
-                            onError={(e) => {
-                                (e.currentTarget as HTMLImageElement).style.display = "none";
-                            }}
-                            style={{
-                                display: "block",
-                                width: "100%",
-                                height: "auto",
-                                pointerEvents: "none",
-                            }}
-                            loading="lazy"
-                        />
-
-                        {/* Video play button overlay */}
-                        {(item.type === "youtube" || item.type === "gdrive") && (
-                            <div
-                                style={{
-                                    position: "absolute",
-                                    inset: 0,
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    background:
-                                        "linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 60%)",
-                                    pointerEvents: "none",
-                                }}
-                            >
-                                {/* Play icon */}
-                                <svg
-                                    width="48"
-                                    height="48"
-                                    viewBox="0 0 68 48"
-                                    style={{ filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.5))" }}
-                                >
-                                    <path
-                                        d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55C3.97 2.33 2.27 4.81 1.48 7.74.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z"
-                                        fill={item.type === "youtube" ? "#FF0000" : "#4285F4"}
-                                    />
-                                    <path d="M45 24L27 14v20" fill="#fff" />
-                                </svg>
-                            </div>
-                        )}
-                    </motion.div>
-                ))}
-            </div>
+            />
 
             {/* Preview — mobile: fullscreen overlay, desktop: popup Window */}
             {typeof document !== "undefined" &&
@@ -318,7 +245,7 @@ export default function GalleryWindow() {
                                     position: "fixed",
                                     inset: 0,
                                     zIndex: 200,
-                                    background: "#0a0a0a",
+                                    background: "#0d0d0d",
                                     display: "flex",
                                     flexDirection: "column",
                                 }}
@@ -414,6 +341,7 @@ export default function GalleryWindow() {
                                 style={{ position: "fixed", inset: 0, zIndex: 99 }}
                             />
                             <Window
+                                key={previewIndex}
                                 title={
                                     previewItem.type === "youtube" || previewItem.type === "gdrive"
                                         ? "Video Player"
@@ -423,10 +351,13 @@ export default function GalleryWindow() {
                                 zIndex={100}
                                 initialWidth={previewSize.w}
                                 initialHeight={previewSize.h}
+                                centered
+                                hideMaximize
                             >
                                 <div style={{ position: "relative", width: "100%", height: "100%" }}>
                                     {previewItem.type === "youtube" && previewItem.videoId ? (
                                         <iframe
+                                            key={previewItem.url}
                                             src={`https://www.youtube.com/embed/${previewItem.videoId}?autoplay=1&rel=0`}
                                             title="YouTube Video"
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -435,6 +366,7 @@ export default function GalleryWindow() {
                                         />
                                     ) : previewItem.type === "gdrive" && previewItem.videoId ? (
                                         <iframe
+                                            key={previewItem.url}
                                             src={`https://drive.google.com/file/d/${previewItem.videoId}/preview`}
                                             title="Google Drive Video"
                                             allow="autoplay"
@@ -442,7 +374,7 @@ export default function GalleryWindow() {
                                             style={{ width: "100%", height: "100%", border: "none", borderRadius: "6px" }}
                                         />
                                     ) : (
-                                        <img src={previewItem.url} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "contain", display: "block", borderRadius: "6px" }} />
+                                        <img key={previewItem.url} src={previewItem.url} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "contain", display: "block", borderRadius: "6px" }} />
                                     )}
 
                                     {previewIndex !== null && previewIndex > 0 && (

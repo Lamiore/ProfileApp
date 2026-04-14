@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Nav from "@/components/Nav";
+import { SparklesText } from "@/components/ui/sparkles-text";
 
 const IMAGES = [
     "https://i.pinimg.com/avif/736x/b9/88/1d/b9881d73712f3e4aa410348dcabcb8b3.avf",
@@ -28,9 +29,10 @@ const CONFIG = {
 };
 
 const HERO_FRAME_RADIUS = "2rem";
-const LAM_BADGE_RADIUS = "1.5rem";
-const LAM_BADGE_PADDING = "24px";
-const LAM_BADGE_TOP_PADDING = "2.2rem";
+const LAM_BADGE_RADIUS = "0.75rem";
+const LAM_BADGE_TOP_RADIUS = "1.5rem";
+const LAM_BADGE_PADDING = "16px";
+const LAM_BADGE_TOP_PADDING = "2rem";
 const LAM_BADGE_RIGHT_PADDING = "1.5rem";
 const LAM_FONT_SIZE = "clamp(6rem, 22vw, 24rem)";
 
@@ -334,7 +336,7 @@ export default function Hero() {
         <>
             <div
                 className="relative overflow-hidden"
-                style={{ width: "100%", height: "100%", borderRadius: HERO_FRAME_RADIUS }}
+                style={{ width: "100%", height: "100%", borderRadius: HERO_FRAME_RADIUS, backgroundColor: "#0d0d0d" }}
             >
                 {/* Infinite Grid Background — filling parent frame */}
                 <div ref={viewportRef} className="absolute inset-0" style={{ cursor: "grab" }}>
@@ -374,8 +376,8 @@ export default function Hero() {
                 <div
                     style={{
                         lineHeight: 0.7,
-                        background: "#111",
-                        borderTopRightRadius: LAM_BADGE_RADIUS,
+                        background: "#1b1b1b",
+                        borderTopRightRadius: LAM_BADGE_TOP_RADIUS,
                         padding: `${LAM_BADGE_TOP_PADDING} ${LAM_BADGE_RIGHT_PADDING} ${LAM_BADGE_PADDING} ${LAM_BADGE_PADDING}`,
                         position: "relative",
                     }}
@@ -386,8 +388,8 @@ export default function Hero() {
                             position: "absolute",
                             bottom: "100%",
                             left: LAM_BADGE_PADDING,
-                            width: LAM_BADGE_RADIUS,
-                            height: LAM_BADGE_RADIUS,
+                            width: LAM_BADGE_TOP_RADIUS,
+                            height: LAM_BADGE_TOP_RADIUS,
                             background: "radial-gradient(circle at 100% 100%, transparent calc(100% - 1px), #111 100%)",
                         }}
                     />
@@ -396,8 +398,8 @@ export default function Hero() {
                             position: "absolute",
                             bottom: LAM_BADGE_PADDING,
                             left: "100%",
-                            width: LAM_BADGE_RADIUS,
-                            height: LAM_BADGE_RADIUS,
+                            width: LAM_BADGE_TOP_RADIUS,
+                            height: LAM_BADGE_TOP_RADIUS,
                             background: "radial-gradient(circle at 0 0, transparent calc(100% - 1px), #111 100%)",
                         }}
                     />
@@ -431,7 +433,13 @@ export default function Hero() {
                         className="font-black text-white select-none flex items-baseline"
                         style={{ fontSize: LAM_FONT_SIZE, letterSpacing: "-0.04em", fontFamily: "Helvetica, Arial, sans-serif" }}
                     >
-                        <span>LAM</span>
+                        <SparklesText
+                            text="LAM"
+                            className="font-black"
+                            style={{ fontSize: LAM_FONT_SIZE, letterSpacing: "-0.04em", fontFamily: "Helvetica, Arial, sans-serif", lineHeight: 0.7 }}
+                            sparklesCount={12}
+                            colors={{ first: "#ffffff", second: "#aaaaaa" }}
+                        />
                         <svg 
                             width="0.25em" 
                             height="0.25em" 

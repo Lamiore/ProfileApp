@@ -2,9 +2,10 @@
 
 import { usePathname } from "next/navigation";
 import { usePageTransition } from "@/components/PageTransition";
+import { DrawUnderline } from "@/components/ui/draw-underline";
 
 const NAV_ITEMS = [
-    { name: "About", color: "#ff8c00" },
+    { name: "About", color: "#ffd700" },
     { name: "Blog", color: "#d0ff2c" },
     { name: "Gallery", color: "#c50022" }
 ] as const;
@@ -47,32 +48,21 @@ export default function Nav() {
                                 if (!isActive) e.currentTarget.style.color = "white";
                             }}
                         >
-                            <span className="nav-flip-text" aria-hidden="true">
-                                {name.toLowerCase().split("").map((char, index) => (
-                                    <span
-                                        key={index}
-                                        className="nav-flip-char"
-                                        data-char={char}
-                                        style={{ "--ci": index } as React.CSSProperties}
-                                    >
-                                        {char}
-                                    </span>
-                                ))}
-                            </span>
-                            <span className="sr-only">{name.toLowerCase()}</span>
-                            <span
-                                aria-hidden="true"
-                                style={{
-                                    display: "block",
-                                    height: "2px",
-                                    width: "100%",
-                                    background: "currentColor",
-                                    transformOrigin: "left",
-                                    transform: isActive ? "scaleX(1)" : "scaleX(0)",
-                                    transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease",
-                                    willChange: "transform",
-                                }}
-                            />
+                            <DrawUnderline isActive={isActive} color={item.color}>
+                                <span className="nav-flip-text" aria-hidden="true">
+                                    {name.toLowerCase().split("").map((char, index) => (
+                                        <span
+                                            key={index}
+                                            className="nav-flip-char"
+                                            data-char={char}
+                                            style={{ "--ci": index } as React.CSSProperties}
+                                        >
+                                            {char}
+                                        </span>
+                                    ))}
+                                </span>
+                                <span className="sr-only">{name.toLowerCase()}</span>
+                            </DrawUnderline>
                         </button>
                     );
                 })}

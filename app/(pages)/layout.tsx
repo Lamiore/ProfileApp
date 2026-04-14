@@ -9,34 +9,28 @@ export default function PagesLayout({ children }: { children: React.ReactNode })
     useEffect(() => {
         const prevOverflow = document.body.style.overflow;
         const prevHeight = document.body.style.height;
+        const prevPadding = document.body.style.padding;
+        const prevBackground = document.body.style.background;
         document.body.style.overflow = "auto";
         document.body.style.height = "auto";
+        document.body.style.padding = "0";
+        document.body.style.background = "#0d0d0d";
         return () => {
             document.body.style.overflow = prevOverflow;
             document.body.style.height = prevHeight;
+            document.body.style.padding = prevPadding;
+            document.body.style.background = prevBackground;
         };
     }, []);
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", minHeight: "100%", backgroundColor: "#111" }}>
-            {/* Sticky Frame Overlay - fixed to viewport, creates the rounded corners look */}
-            <div 
-                style={{ 
-                    position: "fixed", 
-                    inset: "24px", 
-                    pointerEvents: "none", 
-                    zIndex: 9999, 
-                    borderRadius: "2rem",
-                    boxShadow: "0 0 0 100vmax #111", 
-                }} 
-            />
-
-            <header 
+        <div style={{ display: "flex", flexDirection: "column", minHeight: "100%", backgroundColor: "#0d0d0d" }}>
+<header 
                 style={{ 
                     position: "sticky", 
                     top: 0, 
                     zIndex: 100, 
-                    backgroundColor: "rgba(17, 17, 17, 0.6)", 
+                    backgroundColor: "rgba(13, 13, 13, 0.6)", 
                     backdropFilter: "blur(12px)",
                     WebkitBackdropFilter: "blur(12px)",
                 }}
