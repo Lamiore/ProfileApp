@@ -27,7 +27,7 @@ export default function PagesLayout({ children }: { children: React.ReactNode })
                     pointerEvents: "none", 
                     zIndex: 9999, 
                     borderRadius: "2rem",
-                    boxShadow: "0 0 0 100vmax #111", 
+                    boxShadow: "0 0 0 100vmax #000", 
                 }} 
             />
 

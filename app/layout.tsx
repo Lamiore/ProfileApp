@@ -49,7 +49,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body
         className={`${satoshi.variable} ${geistSans.variable} ${geistMono.variable} ${sacramento.variable} antialiased`}
-        style={{ background: "#111", padding: "16px", height: "100dvh", overflow: "hidden", boxSizing: "border-box" }}
+        style={{ background: "#000", padding: "16px", height: "100dvh", overflow: "hidden", boxSizing: "border-box" }}
       >
         <PageTransitionProvider>
           {children}
