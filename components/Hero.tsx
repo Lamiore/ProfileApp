@@ -27,6 +27,12 @@ const CONFIG = {
     mobileTileOverscan: 0,
 };
 
+const LAM_BADGE_RADIUS = "1.5rem";
+const LAM_BADGE_PADDING = "16px";
+const LAM_BADGE_TOP_PADDING = "1.1rem";
+const LAM_BADGE_RIGHT_PADDING = "1.5rem";
+const LAM_FONT_SIZE = "clamp(6rem, 22vw, 24rem)";
+
 export default function Hero() {
     const viewportRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -345,6 +351,48 @@ export default function Hero() {
             {/* Nav — absolute over grid */}
             <div className="absolute top-0 left-0 right-0" style={{ zIndex: 55 }}>
                 <Nav />
+            </div>
+
+            {/* LAM badge — outside the hero grid container, fixed to window corner */}
+            <div
+                style={{
+                    position: "fixed",
+                    bottom: 0,
+                    left: 0,
+                    pointerEvents: "none",
+                    zIndex: 10000,
+                    lineHeight: 0.7,
+                    background: "#111",
+                    borderTopRightRadius: LAM_BADGE_RADIUS,
+                    padding: `${LAM_BADGE_TOP_PADDING} ${LAM_BADGE_RIGHT_PADDING} ${LAM_BADGE_PADDING} ${LAM_BADGE_PADDING}`,
+                }}
+            >
+                <div
+                    style={{
+                        position: "absolute",
+                        bottom: "100%",
+                        left: LAM_BADGE_PADDING,
+                        width: LAM_BADGE_RADIUS,
+                        height: LAM_BADGE_RADIUS,
+                        background: "radial-gradient(circle at 100% 100%, transparent calc(100% - 1px), #111 100%)",
+                    }}
+                />
+                <div
+                    style={{
+                        position: "absolute",
+                        bottom: LAM_BADGE_PADDING,
+                        left: "100%",
+                        width: LAM_BADGE_RADIUS,
+                        height: LAM_BADGE_RADIUS,
+                        background: "radial-gradient(circle at 0 0, transparent calc(100% - 1px), #111 100%)",
+                    }}
+                />
+                <span
+                    className="font-black text-white select-none"
+                    style={{ fontSize: LAM_FONT_SIZE, display: "block", letterSpacing: "-0.04em", fontFamily: "Helvetica, Arial, sans-serif" }}
+                >
+                    LAM.
+                </span>
             </div>
         </>
     );
