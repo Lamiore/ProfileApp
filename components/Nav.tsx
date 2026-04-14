@@ -27,24 +27,16 @@ export default function Nav() {
                         <button
                             key={name}
                             onClick={() => navigateTo(path)}
-                            className="nav-flip font-bold tracking-wide text-white transition-colors duration-150"
+                            className="nav-flip font-bold tracking-wide text-white"
                             style={{
                                 fontSize: "clamp(0.92rem, 1.55vw, 1.25rem)",
                                 letterSpacing: "clamp(0.02em, 0.08vw, 0.08em)",
-                                background: "none",
-                                border: "none",
-                                cursor: "pointer",
-                                padding: 0,
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "flex-start",
-                                gap: "4px",
                             }}
                         >
                             <span className="nav-flip-text" aria-hidden="true">
                                 {name.toLowerCase().split("").map((char, index) => (
                                     <span
-                                        key={`${name}-${index}`}
+                                        key={index}
                                         className="nav-flip-char"
                                         data-char={char}
                                         style={{ "--ci": index } as React.CSSProperties}
@@ -64,6 +56,7 @@ export default function Nav() {
                                     transformOrigin: "left",
                                     transform: isActive ? "scaleX(1)" : "scaleX(0)",
                                     transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+                                    willChange: "transform",
                                 }}
                             />
                         </button>
