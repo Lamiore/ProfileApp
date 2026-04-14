@@ -50,24 +50,6 @@ export default function Hero() {
     }, []);
 
     useEffect(() => {
-        const hoverElements = document.querySelectorAll(".hero-hover");
-        const handlers: { el: Element; over: () => void; leave: () => void }[] = [];
-        hoverElements.forEach((el) => {
-            const over = () => el.classList.remove("unhover");
-            const leave = () => el.classList.add("unhover");
-            el.addEventListener("mouseover", over);
-            el.addEventListener("mouseleave", leave);
-            handlers.push({ el, over, leave });
-        });
-        return () => {
-            handlers.forEach(({ el, over, leave }) => {
-                el.removeEventListener("mouseover", over);
-                el.removeEventListener("mouseleave", leave);
-            });
-        };
-    }, []);
-
-    useEffect(() => {
         const viewport = viewportRef.current;
         const container = containerRef.current;
         const grid = gridRef.current;
@@ -233,7 +215,7 @@ export default function Hero() {
             state.targetRotationY = 0;
         };
 
-        let resizeTimeout: ReturnType<typeof setTimeout>;
+        let resizeTimeout: ReturnType<typeof setTimeout> | undefined;
         const onResize = () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
