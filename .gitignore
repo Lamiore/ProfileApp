@@ -47,5 +47,6 @@ next-env.d.ts
 
 # superpowers
 .superpowers
-docs/superpowers
+docs/superpowers/
+.claude/
 skills-lock.json
