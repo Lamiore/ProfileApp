@@ -368,7 +368,7 @@ export default function Hero() {
                     pointerEvents: "none",
                     zIndex: 55,
                     lineHeight: 0.7,
-                    background: "#000",
+                    background: "#171717",
                     borderTopRightRadius: LAM_BADGE_RADIUS,
                     padding: `${LAM_BADGE_TOP_PADDING} ${LAM_BADGE_RIGHT_PADDING} ${LAM_BADGE_PADDING} ${LAM_BADGE_PADDING}`,
                 }}
@@ -380,7 +380,7 @@ export default function Hero() {
                         left: LAM_BADGE_PADDING,
                         width: LAM_BADGE_RADIUS,
                         height: LAM_BADGE_RADIUS,
-                        background: "radial-gradient(circle at 100% 100%, transparent calc(100% - 1px), #000 100%)",
+                        background: "radial-gradient(circle at 100% 100%, transparent calc(100% - 1px), #171717 100%)",
                     }}
                 />
                 <div
@@ -390,7 +390,7 @@ export default function Hero() {
                         left: "100%",
                         width: LAM_BADGE_RADIUS,
                         height: LAM_BADGE_RADIUS,
-                        background: "radial-gradient(circle at 0 0, transparent calc(100% - 1px), #000 100%)",
+                        background: "radial-gradient(circle at 0 0, transparent calc(100% - 1px), #171717 100%)",
                     }}
                 />
                 <span
