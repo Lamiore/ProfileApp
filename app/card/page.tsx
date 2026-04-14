@@ -108,9 +108,8 @@ export default function CardPage() {
         <div
             onMouseLeave={handleMouseLeave}
             style={{
-                width: "100vw",
-                height: "100vh",
-                background: "#0a0a0a",
+                width: "100%",
+                height: "100%",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",

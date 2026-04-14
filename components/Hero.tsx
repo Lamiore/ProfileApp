@@ -27,13 +27,6 @@ const CONFIG = {
     mobileTileOverscan: 0,
 };
 
-const HERO_FRAME_RADIUS = "2rem";
-const LAM_BADGE_RADIUS = "1.5rem";
-const LAM_BADGE_PADDING = "16px";
-const LAM_BADGE_TOP_PADDING = "1.1rem";
-const LAM_BADGE_RIGHT_PADDING = "1.5rem";
-const LAM_FONT_SIZE = "clamp(6rem, 22vw, 24rem)";
-
 export default function Hero() {
     const viewportRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -332,73 +325,26 @@ export default function Hero() {
 
     return (
         <>
-            <div
-                className="relative overflow-hidden"
-                style={{ width: "calc(100vw - 32px)", height: "calc(100dvh - 32px)", borderRadius: HERO_FRAME_RADIUS }}
-            >
-                {/* Infinite Grid Background */}
-                <div ref={viewportRef} className="absolute inset-0" style={{ cursor: "grab" }}>
-                    <div
-                        ref={containerRef}
-                        style={{
-                            position: "absolute",
-                            inset: "-10vmin",
-                            width: "100%",
-                            height: "100%",
-                            transformOrigin: "center center",
-                            willChange: "transform",
-                        }}
-                    >
-                        <div ref={gridRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
-                    </div>
-                </div>
-
-                {/* Nav — absolute over grid */}
-                <div className="absolute top-0 left-0 right-0" style={{ zIndex: 55 }}>
-                    <Nav />
+            {/* Infinite Grid Background — filling parent frame */}
+            <div ref={viewportRef} className="absolute inset-0" style={{ cursor: "grab" }}>
+                <div
+                    ref={containerRef}
+                    style={{
+                        position: "absolute",
+                        inset: "-10vmin",
+                        width: "100%",
+                        height: "100%",
+                        transformOrigin: "center center",
+                        willChange: "transform",
+                    }}
+                >
+                    <div ref={gridRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
                 </div>
             </div>
 
-            {/* LAM badge — outside hero so concave corners connect to frame */}
-            <div
-                style={{
-                    position: "fixed",
-                    bottom: 0,
-                    left: 0,
-                    pointerEvents: "none",
-                    zIndex: 55,
-                    lineHeight: 0.7,
-                    background: "#111",
-                    borderTopRightRadius: LAM_BADGE_RADIUS,
-                    padding: `${LAM_BADGE_TOP_PADDING} ${LAM_BADGE_RIGHT_PADDING} ${LAM_BADGE_PADDING} ${LAM_BADGE_PADDING}`,
-                }}
-            >
-                <div
-                    style={{
-                        position: "absolute",
-                        bottom: "100%",
-                        left: LAM_BADGE_PADDING,
-                        width: LAM_BADGE_RADIUS,
-                        height: LAM_BADGE_RADIUS,
-                        background: "radial-gradient(circle at 100% 100%, transparent calc(100% - 1px), #111 100%)",
-                    }}
-                />
-                <div
-                    style={{
-                        position: "absolute",
-                        bottom: LAM_BADGE_PADDING,
-                        left: "100%",
-                        width: LAM_BADGE_RADIUS,
-                        height: LAM_BADGE_RADIUS,
-                        background: "radial-gradient(circle at 0 0, transparent calc(100% - 1px), #111 100%)",
-                    }}
-                />
-                <span
-                    className="font-black text-white select-none"
-                    style={{ fontSize: LAM_FONT_SIZE, display: "block", letterSpacing: "-0.04em", fontFamily: "Helvetica, Arial, sans-serif" }}
-                >
-                    LAM.
-                </span>
+            {/* Nav — absolute over grid */}
+            <div className="absolute top-0 left-0 right-0" style={{ zIndex: 55 }}>
+                <Nav />
             </div>
         </>
     );

@@ -18,7 +18,7 @@ export default function Nav() {
         >
             <div
                 className="flex w-full items-center justify-between"
-                style={{ gap: "clamp(0.75rem, 2vw, 1.5rem)" }}
+                style={{ gap: "clamp(1rem, 3vw, 2.5rem)" }}
             >
                 {NAV_ITEMS.map((name) => {
                     const path = `/${name.toLowerCase()}`;
@@ -30,8 +30,8 @@ export default function Nav() {
                             onClick={() => navigateTo(targetPath)}
                             className="nav-flip font-bold tracking-wide text-white"
                             style={{
-                                fontSize: "clamp(0.92rem, 1.55vw, 1.25rem)",
-                                letterSpacing: "clamp(0.02em, 0.08vw, 0.08em)",
+                                fontSize: "clamp(1.1rem, 2vw, 1.6rem)",
+                                letterSpacing: "clamp(0.04em, 0.1vw, 0.1em)",
                             }}
                         >
                             <span className="nav-flip-text" aria-hidden="true">
