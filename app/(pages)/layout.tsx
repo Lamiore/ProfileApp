@@ -19,6 +19,18 @@ export default function PagesLayout({ children }: { children: React.ReactNode })
 
     return (
         <div style={{ display: "flex", flexDirection: "column", minHeight: "100%" }}>
+            {/* Sticky Frame Overlay - fixed to viewport, creates the rounded corners look */}
+            <div 
+                style={{ 
+                    position: "fixed", 
+                    inset: "16px", 
+                    pointerEvents: "none", 
+                    zIndex: 9999, 
+                    borderRadius: "2rem",
+                    boxShadow: "0 0 0 100vmax #111", 
+                }} 
+            />
+
             <header 
                 style={{ 
                     position: "sticky", 
