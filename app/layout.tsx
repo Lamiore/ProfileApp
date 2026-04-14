@@ -72,53 +72,6 @@ export default function RootLayout({
           >
             {children}
           </div>
-
-          {/* Global LAM badge — outside the radius-clipped area for concave effect */}
-          <div
-            style={{
-              position: "fixed",
-              bottom: 0,
-              left: 0,
-              pointerEvents: "none",
-              zIndex: 100,
-              lineHeight: 0.7,
-              background: "#111",
-              borderTopRightRadius: "1.5rem",
-              padding: `1.1rem 1.5rem 16px 16px`,
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                bottom: "100%",
-                left: "16px",
-                width: "1.5rem",
-                height: "1.5rem",
-                background: "radial-gradient(circle at 100% 100%, transparent calc(100% - 1px), #111 100%)",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                bottom: "16px",
-                left: "100%",
-                width: "1.5rem",
-                height: "1.5rem",
-                background: "radial-gradient(circle at 0 0, transparent calc(100% - 1px), #111 100%)",
-              }}
-            />
-            <span
-              className="font-black text-white select-none"
-              style={{ 
-                fontSize: "clamp(6rem, 22vw, 24rem)", 
-                display: "block", 
-                letterSpacing: "-0.04em", 
-                fontFamily: "Helvetica, Arial, sans-serif" 
-              }}
-            >
-              LAM.
-            </span>
-          </div>
         </PageTransitionProvider>
       </body>
     </html>
