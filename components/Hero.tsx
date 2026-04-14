@@ -1,17 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import dynamic from "next/dynamic";
-import Window from "@/components/window";
-import BlurOverlay from "@/components/BlurOverlay";
-import { playCloseSound } from "@/lib/audio";
-
-const AboutWindow = dynamic(() => import("@/components/windows/aboutwindow"), { ssr: false });
-const BlogWindow = dynamic(() => import("@/components/windows/blogwindow"), { ssr: false });
-const GalleryWindow = dynamic(() => import("@/components/windows/gallerywindow"), { ssr: false });
-const ConnectionWindow = dynamic(() => import("@/components/windows/connectionwindow"), { ssr: false });
-const AdminWindow = dynamic(() => import("@/components/windows/adminwindow"), { ssr: false });
+import { useEffect, useRef } from "react";
+import Nav from "@/components/Nav";
 
 const IMAGES = [
     "https://i.pinimg.com/avif/736x/b9/88/1d/b9881d73712f3e4aa410348dcabcb8b3.avf",
@@ -37,35 +27,22 @@ const CONFIG = {
     mobileTileOverscan: 0,
 };
 
+const HERO_FRAME_RADIUS = "2rem";
+const LAM_BADGE_RADIUS = "1.5rem";
+const LAM_BADGE_PADDING = "16px";
+const LAM_BADGE_TOP_PADDING = "1.1rem";
+const LAM_BADGE_RIGHT_PADDING = "1.5rem";
+const LAM_FONT_SIZE = "clamp(6rem, 22vw, 24rem)";
 
 export default function Hero() {
-    const HERO_FRAME_GAP = "16px";
-    const HERO_FRAME_RADIUS = "2rem";
-    const LAM_BADGE_RADIUS = "1.5rem";
-    const LAM_BADGE_PADDING = "16px";
-    const LAM_BADGE_TOP_PADDING = "1.1rem";
-    const LAM_BADGE_RIGHT_PADDING = "1.5rem";
-    const LAM_FONT_SIZE = "clamp(6rem, 22vw, 24rem)";
-
     const viewportRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const gridRef = useRef<HTMLDivElement>(null);
-    const [openWindows, setOpenWindows] = useState<string[]>([]);
-    const [isMobile, setIsMobile] = useState(false);
-    const focusCounter = useRef(0);
-    const [windowZMap, setWindowZMap] = useState<Record<string, number>>({});
     const isMobileRef = useRef(false);
-    const [peeking, setPeeking] = useState(false);
-    const windowsOpenRef = useRef(false);
-    const [windowSize, setWindowSize] = useState({ w: 0, h: 0 });
 
-    // Detect mobile viewport + track window size
     useEffect(() => {
         const check = () => {
-            const mobile = window.innerWidth <= 768;
-            setIsMobile(mobile);
-            isMobileRef.current = mobile;
-            setWindowSize({ w: window.innerWidth, h: window.innerHeight });
+            isMobileRef.current = window.innerWidth <= 768;
         };
         check();
         window.addEventListener("resize", check);
@@ -73,215 +50,19 @@ export default function Hero() {
     }, []);
 
     useEffect(() => {
-        windowsOpenRef.current = openWindows.length > 0;
-    }, [openWindows]);
-
-    // Buka/tutup window + sound — memoized to prevent child re-renders
-    const toggleWindow = useCallback((name: string) => {
-        setPeeking(false);
-        setOpenWindows((prev) => {
-            if (prev.includes(name)) {
-                playCloseSound();
-                setWindowZMap((z) => {
-                    const next = { ...z };
-                    delete next[name];
-                    return next;
-                });
-                return prev.filter((w) => w !== name);
-            }
-            // Desktop: allow multiple windows
-            focusCounter.current += 1;
-            setWindowZMap((z) => ({ ...z, [name]: focusCounter.current }));
-            return [...prev, name];
-        });
-    }, []);
-
-    // Bawa window ke paling depan — only update z-index, never reorder array
-    const bringToFront = useCallback((name: string) => {
-        focusCounter.current += 1;
-        setWindowZMap((z) => ({ ...z, [name]: focusCounter.current }));
-    }, []);
-
-    const closeWindow = useCallback((name: string) => {
-        playCloseSound();
-        setOpenWindows((prev) => prev.filter((w) => w !== name));
-        setWindowZMap((z) => {
-            const next = { ...z };
-            delete next[name];
-            return next;
-        });
-    }, []);
-
-    const BASE_Z = 50; // z-index dasar window
-
-    // Compute dynamic grid layout for open windows (desktop only)
-    // Blog & Gallery = big, About & Connect = small (same size)
-    const gridLayout = (() => {
-        if (isMobile || openWindows.length === 0) return {} as Record<string, { x: number; y: number; w: number; h: number }>;
-        const vw = windowSize.w || 1440;
-        const vh = windowSize.h || 900;
-        const pad = 48;
-        const topPad = 100;
-        const gap = 16;
-        const areaW = vw - pad * 2;
-        const areaH = vh - topPad - pad;
-        const layout: Record<string, { x: number; y: number; w: number; h: number }> = {};
-        const wins = openWindows;
-        const count = wins.length;
-
-        const big = ["Blog", "Gallery"];
-        const small = ["About", "Connect"];
-
-        if (count === 1) {
-            // Single window centered at comfortable size
-            const w = Math.min(areaW, 820);
-            const h = Math.min(areaH, 620);
-            layout[wins[0]] = { x: pad + (areaW - w) / 2, y: topPad + (areaH - h) / 2, w, h };
-        } else if (count === 2) {
-            const bothSmall = wins.every(n => small.includes(n));
-            const bothBig = wins.every(n => big.includes(n));
-            if (bothSmall) {
-                // Two small windows side by side, capped size
-                const cellW = (areaW - gap) / 2;
-                const h = Math.min(areaH, 480);
-                const yOff = (areaH - h) / 2;
-                wins.forEach((name, i) => {
-                    layout[name] = { x: pad + i * (cellW + gap), y: topPad + yOff, w: cellW, h };
-                });
-            } else if (bothBig) {
-                // Two big windows side by side, full height
-                const cellW = (areaW - gap) / 2;
-                wins.forEach((name, i) => {
-                    layout[name] = { x: pad + i * (cellW + gap), y: topPad, w: cellW, h: areaH };
-                });
-            } else {
-                // Mixed: big gets 60%, small gets 40%
-                const bigW = areaW * 0.6 - gap / 2;
-                const smallW = areaW * 0.4 - gap / 2;
-                wins.forEach((name, i) => {
-                    const isBig = big.includes(name);
-                    const w = isBig ? bigW : smallW;
-                    // Place big first, small second (or vice versa based on order)
-                    const prevW = i === 0 ? 0 : (big.includes(wins[0]) ? bigW + gap : smallW + gap);
-                    layout[name] = { x: pad + prevW, y: topPad, w, h: areaH };
-                });
-            }
-        } else if (count === 3) {
-            // Sort: big windows top row, small bottom — or adapt
-            const bigWins = wins.filter(n => big.includes(n));
-            const smallWins = wins.filter(n => small.includes(n));
-
-            if (bigWins.length >= 2) {
-                // Top row: 2 big windows (65% height), bottom: remaining (35% height)
-                const topH = areaH * 0.65 - gap / 2;
-                const botH = areaH * 0.35 - gap / 2;
-                const cellW = (areaW - gap) / 2;
-                bigWins.slice(0, 2).forEach((name, i) => {
-                    layout[name] = { x: pad + i * (cellW + gap), y: topPad, w: cellW, h: topH };
-                });
-                const rest = wins.filter(n => !layout[n]);
-                rest.forEach((name) => {
-                    layout[name] = { x: pad, y: topPad + topH + gap, w: areaW, h: botH };
-                });
-            } else {
-                // 2 columns, top big full row, bottom 2 small
-                const topH = areaH * 0.6 - gap / 2;
-                const botH = areaH * 0.4 - gap / 2;
-                if (bigWins.length === 1) {
-                    layout[bigWins[0]] = { x: pad, y: topPad, w: areaW, h: topH };
-                    smallWins.forEach((name, i) => {
-                        const cellW = (areaW - gap) / 2;
-                        layout[name] = { x: pad + i * (cellW + gap), y: topPad + topH + gap, w: cellW, h: botH };
-                    });
-                } else {
-                    // All small — uniform grid
-                    const cellW = (areaW - gap) / 2;
-                    wins.forEach((name, i) => {
-                        if (i < 2) {
-                            layout[name] = { x: pad + i * (cellW + gap), y: topPad, w: cellW, h: topH };
-                        } else {
-                            layout[name] = { x: pad, y: topPad + topH + gap, w: areaW, h: botH };
-                        }
-                    });
-                }
-            }
-        } else if (count === 4) {
-            // Sort: big on top, small on bottom
-            const bigWins = wins.filter(n => big.includes(n));
-            const smallWins = wins.filter(n => small.includes(n));
-            const topRow = bigWins.length >= 2 ? bigWins.slice(0, 2) : [...bigWins, ...smallWins].slice(0, 2);
-            const botRow = wins.filter(n => !topRow.includes(n));
-
-            const topH = areaH * 0.6 - gap / 2;
-            const botH = areaH * 0.4 - gap / 2;
-            const cellW = (areaW - gap) / 2;
-
-            topRow.forEach((name, i) => {
-                layout[name] = { x: pad + i * (cellW + gap), y: topPad, w: cellW, h: topH };
-            });
-            botRow.forEach((name, i) => {
-                layout[name] = { x: pad + i * (cellW + gap), y: topPad + topH + gap, w: cellW, h: botH };
-            });
-        } else {
-            // 5 windows:
-            // Left 2 cols: big windows (top) + About & Connect (bottom, small same size)
-            // Right col: Gallery (full height, tall)
-            const galleryW = areaW * 0.35;
-            const leftW = areaW - galleryW - gap;
-            const topH = areaH * 0.6 - gap / 2;
-            const botH = areaH * 0.4 - gap / 2;
-            const leftCellW = (leftW - gap) / 2;
-
-            // Categorize
-            const topCandidates: string[] = wins.filter(n => n === "Blog");
-            const botSmall: string[] = wins.filter(n => small.includes(n));
-            const remaining = wins.filter(n => !topCandidates.includes(n) && n !== "Gallery" && !botSmall.includes(n));
-
-            // Left top row: blog first, then fill with remaining
-            const leftTop = [...topCandidates, ...remaining].slice(0, 2);
-            // Left bottom row: About & Connect
-            const leftBot = botSmall.slice(0, 2);
-            // Fill any unplaced into leftBot
-            const placed = new Set([...leftTop, ...leftBot, "Gallery"]);
-            const unplaced = wins.filter(n => !placed.has(n));
-            leftBot.push(...unplaced);
-
-            // Left top
-            leftTop.forEach((name, i) => {
-                layout[name] = { x: pad + i * (leftCellW + gap), y: topPad, w: leftCellW, h: topH };
-            });
-
-            // Left bottom
-            const botCellW = leftBot.length > 1 ? (leftW - gap) / 2 : leftW;
-            leftBot.forEach((name, i) => {
-                layout[name] = { x: pad + i * (botCellW + gap), y: topPad + topH + gap, w: botCellW, h: botH };
-            });
-
-            // Gallery: right column, full height
-            if (wins.includes("Gallery")) {
-                layout["Gallery"] = { x: pad + leftW + gap, y: topPad, w: galleryW, h: areaH };
-            }
-        }
-        return layout;
-    })();
-
-    // Hero hover image interaction
-    useEffect(() => {
-        const hoverElements = document.querySelectorAll('.hero-hover');
+        const hoverElements = document.querySelectorAll(".hero-hover");
         const handlers: { el: Element; over: () => void; leave: () => void }[] = [];
-
         hoverElements.forEach((el) => {
-            const over = () => el.classList.remove('unhover');
-            const leave = () => el.classList.add('unhover');
-            el.addEventListener('mouseover', over);
-            el.addEventListener('mouseleave', leave);
+            const over = () => el.classList.remove("unhover");
+            const leave = () => el.classList.add("unhover");
+            el.addEventListener("mouseover", over);
+            el.addEventListener("mouseleave", leave);
             handlers.push({ el, over, leave });
         });
-
         return () => {
             handlers.forEach(({ el, over, leave }) => {
-                el.removeEventListener('mouseover', over);
-                el.removeEventListener('mouseleave', leave);
+                el.removeEventListener("mouseover", over);
+                el.removeEventListener("mouseleave", leave);
             });
         };
     }, []);
@@ -292,9 +73,8 @@ export default function Hero() {
         const grid = gridRef.current;
         if (!viewport || !container || !grid) return;
 
-        const imageFor = (baseX: number, baseY: number) => {
-            return IMAGES[(baseX + baseY * CONFIG.COLS) % IMAGES.length];
-        };
+        const imageFor = (baseX: number, baseY: number) =>
+            IMAGES[(baseX + baseY * CONFIG.COLS) % IMAGES.length];
 
         const state = {
             gridItems: [] as { element: HTMLDivElement; baseX: number; baseY: number; tileX: number; tileY: number; yOffset: number }[],
@@ -310,17 +90,16 @@ export default function Hero() {
             containerScale: 1,
             targetScale: 1,
             scrollSpeed: 0,
-            // Idle drift
             lastInteractionTime: performance.now(),
             driftTime: 0,
             driftActive: false,
-            driftBlendFactor: 0,  // 0 = no drift, 1 = full drift
+            driftBlendFactor: 0,
         };
 
-        const IDLE_DELAY_MS = 1500;  // waktu tunggu sedang
-        const DRIFT_SPEED = 0.6;     // kecepatan sedang
-        const DRIFT_RADIUS_X = 180;  // jangkauan horizontal sedang
-        const DRIFT_RADIUS_Y = 120;  // jangkauan vertikal sedang
+        const IDLE_DELAY_MS = 1500;
+        const DRIFT_SPEED = 0.6;
+        const DRIFT_RADIUS_X = 180;
+        const DRIFT_RADIUS_Y = 120;
 
         let cellWidth = 0;
         let cellHeight = 0;
@@ -354,16 +133,16 @@ export default function Hero() {
                         for (let x = 0; x < CONFIG.COLS; x++) {
                             const element = document.createElement("div");
                             element.style.cssText = `
-                position: absolute;
-                width: ${cellWidth}px;
-                height: ${cellHeight}px;
-                padding: 25px;
-                box-sizing: border-box;
-                overflow: hidden;
-                will-change: transform;
-                user-select: none;
-                backface-visibility: hidden;
-              `;
+                                position: absolute;
+                                width: ${cellWidth}px;
+                                height: ${cellHeight}px;
+                                padding: 25px;
+                                box-sizing: border-box;
+                                overflow: hidden;
+                                will-change: transform;
+                                user-select: none;
+                                backface-visibility: hidden;
+                            `;
                             const yOffset = x * cellHeight * 0.15;
                             const src = imageFor(x, y);
                             element.innerHTML = `<img src="${src}" style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;border-radius:8px;" loading="lazy" decoding="async" />`;
@@ -465,45 +244,31 @@ export default function Hero() {
         };
 
         let isPaused = false;
-        let frameCount = 0;
 
         const animate = () => {
             if (document.hidden) {
                 isPaused = true;
-                return; // stop loop — resumed via visibilitychange
+                return;
             }
             rafId = requestAnimationFrame(animate);
-
-            // Throttle to every 3rd frame when windows are open (save CPU)
-            if (windowsOpenRef.current) {
-                frameCount++;
-                if (frameCount % 3 !== 0) return;
-            }
 
             const now = performance.now();
             const idleMs = now - state.lastInteractionTime;
 
-            // Masuk idle mode setelah IDLE_DELAY_MS
             if (!state.isDragging && idleMs > IDLE_DELAY_MS) {
                 state.driftActive = true;
             }
 
             if (state.driftActive) {
-                // Blend factor naik perlahan (fade-in drift)
                 state.driftBlendFactor = Math.min(1, state.driftBlendFactor + 0.012);
-                state.driftTime += DRIFT_SPEED * 0.016; // ~60fps equiv
-
-                // Organic figure-8 / Lissajous path
+                state.driftTime += DRIFT_SPEED * 0.016;
                 const driftX = Math.sin(state.driftTime * 0.4) * DRIFT_RADIUS_X
                     + Math.sin(state.driftTime * 0.13) * DRIFT_RADIUS_X * 0.3;
                 const driftY = Math.cos(state.driftTime * 0.25) * DRIFT_RADIUS_Y
                     + Math.cos(state.driftTime * 0.17) * DRIFT_RADIUS_Y * 0.4;
-
-                // Blend dari posisi user ke posisi drift
                 state.targetOffset.x += (driftX - state.targetOffset.x) * 0.012 * state.driftBlendFactor;
                 state.targetOffset.y += (driftY - state.targetOffset.y) * 0.012 * state.driftBlendFactor;
             } else {
-                // Fade-out drift blend
                 state.driftBlendFactor = Math.max(0, state.driftBlendFactor - 0.05);
             }
 
@@ -514,6 +279,7 @@ export default function Hero() {
                 state.cameraOffset.y += dy * CONFIG.easingFactor;
                 updateItemPositions();
             }
+
             if (state.scrollSpeed > 0.1) {
                 const speedFactor = Math.min(state.scrollSpeed * 0.01, 1);
                 state.targetScale = 1 - speedFactor * CONFIG.maxScaleEffect;
@@ -522,6 +288,7 @@ export default function Hero() {
                 state.scrollSpeed = 0;
                 state.targetScale = 1;
             }
+
             const prevScale = state.containerScale;
             const prevRotX = state.containerRotationX;
             const prevRotY = state.containerRotationY;
@@ -556,21 +323,18 @@ export default function Hero() {
         viewport.addEventListener("touchend", onTouchEnd);
         window.addEventListener("resize", onResize);
 
-        // Listen to visibilitychange inside the effect explicitly if needed,
-        // though document.hidden check inside animate loop already handles the RAF pause.
-
         const onVisibilityChange = () => {
             if (!document.hidden && isPaused) {
                 isPaused = false;
                 rafId = requestAnimationFrame(animate);
             }
         };
-        document.addEventListener('visibilitychange', onVisibilityChange);
+        document.addEventListener("visibilitychange", onVisibilityChange);
         animate();
 
         return () => {
             cancelAnimationFrame(rafId);
-            document.removeEventListener('visibilitychange', onVisibilityChange);
+            document.removeEventListener("visibilitychange", onVisibilityChange);
             viewport.removeEventListener("mousedown", onMouseDown);
             viewport.removeEventListener("mousemove", onMouseMove);
             viewport.removeEventListener("mouseup", onMouseUp);
@@ -586,125 +350,34 @@ export default function Hero() {
 
     return (
         <>
-        <div className="relative overflow-hidden" style={{ width: "calc(100vw - 32px)", height: "calc(100dvh - 32px)", borderRadius: HERO_FRAME_RADIUS }}>
+            <div
+                className="relative overflow-hidden"
+                style={{ width: "calc(100vw - 32px)", height: "calc(100dvh - 32px)", borderRadius: HERO_FRAME_RADIUS }}
+            >
+                {/* Infinite Grid Background */}
+                <div ref={viewportRef} className="absolute inset-0" style={{ cursor: "grab" }}>
+                    <div
+                        ref={containerRef}
+                        style={{
+                            position: "absolute",
+                            inset: "-10vmin",
+                            width: "100%",
+                            height: "100%",
+                            transformOrigin: "center center",
+                            willChange: "transform",
+                        }}
+                    >
+                        <div ref={gridRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
+                    </div>
+                </div>
 
-            {/* Infinite Grid Background */}
-            <div ref={viewportRef} className="absolute inset-0" style={{ cursor: "grab" }}>
-                <div
-                    ref={containerRef}
-                    style={{
-                        position: "absolute",
-                        inset: "-10vmin",
-                        width: "100%",
-                        height: "100%",
-                        transformOrigin: "center center",
-                        willChange: "transform",
-                    }}
-                >
-                    <div ref={gridRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
+                {/* Nav — absolute over grid */}
+                <div className="absolute top-0 left-0 right-0" style={{ zIndex: 55 }}>
+                    <Nav />
                 </div>
             </div>
 
-            {/* Nav — pojok kiri atas */}
-            <nav
-                className="absolute top-0 left-0 right-0"
-                style={{
-                    zIndex: 55,
-                    paddingInline: "clamp(1rem, 2.6vw, 2.5rem)",
-                    paddingTop: "clamp(1rem, 2.6vw, 2.5rem)",
-                }}
-            >
-                <div className="flex w-full items-center justify-between" style={{ gap: "clamp(0.75rem, 2vw, 1.5rem)" }}>
-                {["About", "Blog", "Gallery", "Connect"].map((name) => (
-                    <button
-                        key={name}
-                        onClick={() => toggleWindow(name)}
-                        className="nav-flip font-bold tracking-wide text-white transition-colors duration-150"
-                        style={{
-                            fontSize: "clamp(0.92rem, 1.55vw, 1.25rem)",
-                            letterSpacing: "clamp(0.02em, 0.08vw, 0.08em)",
-                        }}
-                    >
-                        <span className="nav-flip-text" aria-hidden="true">
-                            {name.toLowerCase().split("").map((char, index) => (
-                                <span
-                                    key={`${name}-${index}`}
-                                    className="nav-flip-char"
-                                    data-char={char}
-                                    style={{ "--ci": index } as React.CSSProperties}
-                                >
-                                    {char}
-                                </span>
-                            ))}
-                        </span>
-                        <span className="sr-only">{name.toLowerCase()}</span>
-                    </button>
-                ))}
-                </div>
-            </nav>
-
-
-            {/* BlurOverlay — click to peek/unpeek (show desktop) — desktop only */}
-            <AnimatePresence>
-                {!isMobile && openWindows.length > 0 && (
-                    <BlurOverlay onClose={() => setPeeking(p => !p)} peeking={peeking} />
-                )}
-            </AnimatePresence>
-
-            {/* Desktop: windowed mode with blur, drag, resize */}
-            <AnimatePresence>
-                {!isMobile && openWindows.map((name, index) => (
-                    <Window
-                        key={name}
-                        title={name}
-                        zIndex={BASE_Z + (windowZMap[name] ?? index)}
-                        onFocus={() => bringToFront(name)}
-                        onClose={() => closeWindow(name)}
-                        initialWidth={gridLayout[name]?.w ?? (["Gallery", "Blog"].includes(name) ? 820 : 560)}
-                        initialHeight={gridLayout[name]?.h ?? (["Gallery", "Blog"].includes(name) ? 620 : 480)}
-                        gridPosition={gridLayout[name]}
-                        peeking={peeking}
-                    >
-                        {name === "About" && <AboutWindow />}
-                        {name === "Blog" && <BlogWindow />}
-                        {name === "Gallery" && <GalleryWindow />}
-                        {name === "Connect" && <ConnectionWindow />}
-                        {name === "Admin" && <AdminWindow />}
-                    </Window>
-                ))}
-            </AnimatePresence>
-
-            {/* Mobile: full-screen solid view */}
-            <AnimatePresence>
-                {isMobile && openWindows.length > 0 && (() => {
-                    const name = openWindows[openWindows.length - 1];
-                    return (
-                        <motion.div
-                            key={`mobile-${name}`}
-                            initial={{ opacity: 0, y: 40 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 40 }}
-                            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                            className="mobile-fullview"
-                        >
-                            <div className="mobile-fullview-header">
-                                <span className="mobile-fullview-title">{name}</span>
-                            </div>
-                            <div className="mobile-fullview-content">
-                                {name === "About" && <AboutWindow />}
-                                {name === "Blog" && <BlogWindow />}
-                                {name === "Gallery" && <GalleryWindow />}
-                                {name === "Connect" && <ConnectionWindow />}
-                                {name === "Admin" && <AdminWindow />}
-                            </div>
-                        </motion.div>
-                    );
-                })()}
-            </AnimatePresence>
-
-        </div>
-
-            {/* LAM — di luar hero (fixed), biar concave corners nyambung ke frame tanpa kena overflow:hidden */}
+            {/* LAM badge — outside hero so concave corners connect to frame */}
             <div
                 style={{
                     position: "fixed",
@@ -718,7 +391,6 @@ export default function Hero() {
                     padding: `${LAM_BADGE_TOP_PADDING} ${LAM_BADGE_RIGHT_PADDING} ${LAM_BADGE_PADDING} ${LAM_BADGE_PADDING}`,
                 }}
             >
-                {/* Concave corner kiri atas */}
                 <div
                     style={{
                         position: "absolute",
@@ -729,7 +401,6 @@ export default function Hero() {
                         background: "radial-gradient(circle at 100% 100%, transparent calc(100% - 1px), #111 100%)",
                     }}
                 />
-                {/* Concave corner kanan bawah */}
                 <div
                     style={{
                         position: "absolute",
