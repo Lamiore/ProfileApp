@@ -7,7 +7,7 @@ import { db, auth, provider } from "@/lib/firebase";
 import {
     Trash2, CheckCircle, AlertCircle,
     LogIn, LogOut, Image as ImageIcon,
-    Copy, FileText, Type, Image,
+    FileText, Type, Image,
     ChevronUp, ChevronDown, Link2, Settings, Plus, Pencil,
 } from "lucide-react";
 

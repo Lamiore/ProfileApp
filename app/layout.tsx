@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Geist, Geist_Mono, Sacramento } from "next/font/google";
 import "./globals.css";
+import PageTransitionProvider from "@/components/PageTransition";
 
 const satoshi = localFont({
   src: [
@@ -38,8 +39,6 @@ export const metadata: Metadata = {
   title: "Lam",
   description: "created by ilham",
 };
-
-import PageTransitionProvider from "@/components/PageTransition";
 
 export default function RootLayout({
   children,

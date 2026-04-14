@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { usePageTransition } from "@/components/PageTransition";
 
-const NAV_ITEMS = ["About", "Blog", "Gallery", "Connect"] as const;
+const NAV_ITEMS = ["About", "Blog", "Gallery"] as const;
 
 export default function Nav() {
     const pathname = usePathname();
@@ -23,10 +23,11 @@ export default function Nav() {
                 {NAV_ITEMS.map((name) => {
                     const path = `/${name.toLowerCase()}`;
                     const isActive = pathname === path;
+                    const targetPath = isActive ? "/" : path;
                     return (
                         <button
                             key={name}
-                            onClick={() => navigateTo(path)}
+                            onClick={() => navigateTo(targetPath)}
                             className="nav-flip font-bold tracking-wide text-white"
                             style={{
                                 fontSize: "clamp(0.92rem, 1.55vw, 1.25rem)",

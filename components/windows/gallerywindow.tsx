@@ -59,9 +59,6 @@ function getYouTubeId(url: string): string | null {
     return null;
 }
 
-function isYouTubeUrl(url: string): boolean {
-    return getYouTubeId(url) !== null;
-}
 
 function getYouTubeThumbnail(videoId: string): string {
     return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
