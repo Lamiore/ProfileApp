@@ -227,15 +227,15 @@
 .nav-flip-text {
   overflow: hidden;
   display: inline-flex;
-  line-height: 1;
+  line-height: 1.2;
 }
 
 .nav-flip-char {
   position: relative;
-  display: inline-grid;
-  place-content: center;
+  display: inline-block;
   transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   transition-delay: calc(var(--ci) * 40ms);
+  vertical-align: middle;
 }
 
 .nav-flip-char::after {
@@ -244,8 +244,10 @@
   left: 0;
   top: 100%;
   width: 100%;
+  height: 100%;
   text-align: center;
   color: inherit;
+  display: block;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -347,6 +349,16 @@
 }
 
 /* ── Hero Typography ── */
+:root {
+  --hero-arrow-margin: 0.2rem;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --hero-arrow-margin: 0.2rem;
+  }
+}
+
 .hero-text {
   font-size: clamp(2rem, 7vw, 6.5rem);
   font-weight: 400;
@@ -523,7 +535,7 @@
   transform: translateY(-50%);
   transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
     right 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  border-radius: 6px;
+  border-radius: 16px;
 }
 
 .hero-img img {

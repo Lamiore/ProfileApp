@@ -39,7 +39,6 @@ export default function PagesLayout({ children }: { children: React.ReactNode })
                     backgroundColor: "rgba(17, 17, 17, 0.6)", 
                     backdropFilter: "blur(12px)",
                     WebkitBackdropFilter: "blur(12px)",
-                    borderBottom: "1px solid rgba(255, 255, 255, 0.05)"
                 }}
             >
                 <Nav />

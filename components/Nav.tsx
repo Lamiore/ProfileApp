@@ -3,7 +3,11 @@
 import { usePathname } from "next/navigation";
 import { usePageTransition } from "@/components/PageTransition";
 
-const NAV_ITEMS = ["About", "Blog", "Gallery"] as const;
+const NAV_ITEMS = [
+    { name: "About", color: "#ff8c00" },
+    { name: "Blog", color: "#d0ff2c" },
+    { name: "Gallery", color: "#c50022" }
+] as const;
 
 export default function Nav() {
     const pathname = usePathname();
@@ -20,7 +24,8 @@ export default function Nav() {
                 className="flex w-full items-center justify-between"
                 style={{ gap: "clamp(1rem, 3vw, 2.5rem)" }}
             >
-                {NAV_ITEMS.map((name) => {
+                {NAV_ITEMS.map((item) => {
+                    const name = item.name;
                     const path = `/${name.toLowerCase()}`;
                     const isActive = pathname === path;
                     const targetPath = isActive ? "/" : path;
@@ -28,10 +33,18 @@ export default function Nav() {
                         <button
                             key={name}
                             onClick={() => navigateTo(targetPath)}
-                            className="nav-flip font-bold tracking-wide text-white"
+                            className="nav-flip font-bold tracking-wide transition-colors duration-300"
                             style={{
                                 fontSize: "clamp(1.1rem, 2vw, 1.6rem)",
                                 letterSpacing: "clamp(0.04em, 0.1vw, 0.1em)",
+                                color: isActive ? item.color : "white",
+                                ["--hover-color" as any]: item.color,
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.color = item.color;
+                            }}
+                            onMouseLeave={(e) => {
+                                if (!isActive) e.currentTarget.style.color = "white";
                             }}
                         >
                             <span className="nav-flip-text" aria-hidden="true">
@@ -53,10 +66,10 @@ export default function Nav() {
                                     display: "block",
                                     height: "2px",
                                     width: "100%",
-                                    background: "white",
+                                    background: "currentColor",
                                     transformOrigin: "left",
                                     transform: isActive ? "scaleX(1)" : "scaleX(0)",
-                                    transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+                                    transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease",
                                     willChange: "transform",
                                 }}
                             />
