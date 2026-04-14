@@ -331,36 +331,41 @@ export default function Hero() {
 
     return (
         <>
-            {/* Infinite Grid Background — filling parent frame */}
-            <div ref={viewportRef} className="absolute inset-0" style={{ cursor: "grab" }}>
-                <div
-                    ref={containerRef}
-                    style={{
-                        position: "absolute",
-                        inset: "-10vmin",
-                        width: "100%",
-                        height: "100%",
-                        transformOrigin: "center center",
-                        willChange: "transform",
-                    }}
-                >
-                    <div ref={gridRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
+            <div
+                className="relative overflow-hidden"
+                style={{ width: "100%", height: "100%", borderRadius: HERO_FRAME_RADIUS }}
+            >
+                {/* Infinite Grid Background — filling parent frame */}
+                <div ref={viewportRef} className="absolute inset-0" style={{ cursor: "grab" }}>
+                    <div
+                        ref={containerRef}
+                        style={{
+                            position: "absolute",
+                            inset: "-10vmin",
+                            width: "100%",
+                            height: "100%",
+                            transformOrigin: "center center",
+                            willChange: "transform",
+                        }}
+                    >
+                        <div ref={gridRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
+                    </div>
+                </div>
+
+                {/* Nav — absolute over grid */}
+                <div className="absolute top-0 left-0 right-0" style={{ zIndex: 55 }}>
+                    <Nav />
                 </div>
             </div>
 
-            {/* Nav — absolute over grid */}
-            <div className="absolute top-0 left-0 right-0" style={{ zIndex: 55 }}>
-                <Nav />
-            </div>
-
-            {/* LAM badge — outside the hero grid container, fixed to window corner */}
+            {/* LAM badge — outside hero so concave corners connect to frame */}
             <div
                 style={{
-                    position: "fixed",
+                    position: "absolute",
                     bottom: 0,
                     left: 0,
                     pointerEvents: "none",
-                    zIndex: 10000,
+                    zIndex: 55,
                     lineHeight: 0.7,
                     background: "#111",
                     borderTopRightRadius: LAM_BADGE_RADIUS,

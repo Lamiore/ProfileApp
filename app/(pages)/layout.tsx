@@ -18,20 +18,9 @@ export default function PagesLayout({ children }: { children: React.ReactNode })
     }, []);
 
     return (
-        <div className="relative flex flex-col w-full h-full" style={{ padding: "16px" }}>
-            <div className="absolute top-16 left-16 right-16" style={{ zIndex: 55 }}>
-                <Nav />
-            </div>
-            <main
-                style={{
-                    flex: 1,
-                    overflowY: "auto",
-                    paddingTop: "clamp(4rem, 8vw, 6rem)", // Offset for fixed nav
-                    scrollbarWidth: "none",
-                    msOverflowStyle: "none",
-                }}
-                className="blog-detail-scroll-hidden"
-            >
+        <div style={{ display: "flex", flexDirection: "column", minHeight: "100%" }}>
+            <Nav />
+            <main style={{ flex: 1 }}>
                 {children}
             </main>
         </div>
