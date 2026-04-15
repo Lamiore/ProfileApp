@@ -5,9 +5,9 @@ import { usePageTransition } from "@/components/PageTransition";
 import { DrawUnderline } from "@/components/ui/draw-underline";
 
 const NAV_ITEMS = [
-    { name: "About", color: "#ffd700" },
-    { name: "Blog", color: "#d0ff2c" },
-    { name: "Gallery", color: "#c50022" }
+    { name: "About", color: "#ffd700", variant: 0 as const },
+    { name: "Blog", color: "#d0ff2c", variant: 1 as const },
+    { name: "Gallery", color: "#c50022", variant: 3 as const },
 ] as const;
 
 export default function Nav() {
@@ -48,7 +48,7 @@ export default function Nav() {
                                 if (!isActive) e.currentTarget.style.color = "white";
                             }}
                         >
-                            <DrawUnderline isActive={isActive} color={item.color}>
+                            <DrawUnderline isActive={isActive} color={item.color} variant={item.variant}>
                                 <span className="nav-flip-text" aria-hidden="true">
                                     {name.toLowerCase().split("").map((char, index) => (
                                         <span
