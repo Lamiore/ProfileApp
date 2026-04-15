@@ -6,8 +6,8 @@ import { DrawUnderline } from "@/components/ui/draw-underline";
 
 const NAV_ITEMS = [
     { name: "About", color: "#ffd700", variant: 0 as const },
-    { name: "Blog", color: "#d0ff2c", variant: 1 as const },
-    { name: "Gallery", color: "#c50022", variant: 3 as const },
+    { name: "Blog", color: "#d0ff2c", variant: 2 as const },
+    { name: "Gallery", color: "#c50022", variant: 1 as const },
 ] as const;
 
 export default function Nav() {
