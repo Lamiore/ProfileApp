@@ -331,34 +331,29 @@ export default function Hero() {
     }, []);
 
     return (
-        <>
-            <div
-                className="relative overflow-hidden"
-                style={{ width: "100%", height: "100vh", backgroundColor: "#0d0d0d" }}
-            >
-                {/* Infinite Grid Background — filling parent frame */}
-                <div ref={viewportRef} className="absolute inset-0" style={{ cursor: "grab" }}>
-                    <PixelTrail
-                        gridSize={50}
-                        trailSize={0.1}
-                        maxAge={250}
-                        interpolate={5}
-                        color="#0e1013"
-                        gooeyFilter={{ id: "custom-goo-filter", strength: 2 }}
-                    />
-                    <div
-                        ref={containerRef}
-                        style={{
-                            position: "absolute",
-                            inset: "-10vmin",
-                            width: "100%",
-                            height: "100%",
-                            transformOrigin: "center center",
-                            willChange: "transform",
-                        }}
-                    >
-                        <div ref={gridRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
-                    </div>
+        <div className="relative w-full h-full overflow-hidden bg-[#0d0d0d]">
+            {/* Infinite Grid Background — filling parent frame */}
+            <div ref={viewportRef} className="absolute inset-0" style={{ cursor: "grab" }}>
+                <PixelTrail
+                    gridSize={50}
+                    trailSize={0.1}
+                    maxAge={250}
+                    interpolate={5}
+                    color="#0e1013"
+                    gooeyFilter={{ id: "custom-goo-filter", strength: 2 }}
+                />
+                <div
+                    ref={containerRef}
+                    style={{
+                        position: "absolute",
+                        inset: "-10vmin",
+                        width: "100%",
+                        height: "100%",
+                        transformOrigin: "center center",
+                        willChange: "transform",
+                    }}
+                >
+                    <div ref={gridRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
                 </div>
             </div>
 
@@ -437,6 +432,6 @@ export default function Hero() {
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 }
