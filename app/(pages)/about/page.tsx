@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import AboutText from "@/components/ui/about-text";
+import { Typewriter } from "@/components/ui/typewriter";
 import { LogoLoop } from "@/components/ui/logo-loop";
 import {
   Figma,
@@ -123,7 +124,7 @@ export default function AboutPage() {
               letterSpacing: "-0.05em",
             }}
           >
-            HI, I'M ILHAM
+            Hi, I&apos;m <Typewriter text={["Ilham", "Lam"]} speed={150} deleteSpeed={100} waitTime={4000} showCursor cursorChar="|" className="" />
           </h1>
 
           {/* Subtitle */}

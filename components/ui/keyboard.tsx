@@ -1,8 +1,8 @@
 /* eslint-disable react/no-unknown-property */
 'use client';
 
-import { Suspense, useRef, useMemo, useEffect, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Suspense, useRef, useMemo, useEffect, useState, useCallback } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, Environment, ContactShadows, OrbitControls, Center } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -39,6 +39,49 @@ function KeyboardModel() {
     );
 }
 
+const DEFAULT_POSITION = new THREE.Vector3(4, 2, 8);
+const DEFAULT_TARGET = new THREE.Vector3(0, 0, 0);
+
+function AutoResetOrbitControls() {
+    const controlsRef = useRef<any>(null);
+    const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const isResetting = useRef(false);
+    const { camera } = useThree();
+
+    const scheduleReset = useCallback(() => {
+        if (idleTimer.current) clearTimeout(idleTimer.current);
+        isResetting.current = false;
+        idleTimer.current = setTimeout(() => {
+            isResetting.current = true;
+        }, 1500);
+    }, []);
+
+    useFrame(() => {
+        if (!controlsRef.current || !isResetting.current) return;
+
+        camera.position.lerp(DEFAULT_POSITION, 0.03);
+        controlsRef.current.target.lerp(DEFAULT_TARGET, 0.03);
+        controlsRef.current.update();
+
+        if (camera.position.distanceTo(DEFAULT_POSITION) < 0.01) {
+            camera.position.copy(DEFAULT_POSITION);
+            controlsRef.current.target.copy(DEFAULT_TARGET);
+            controlsRef.current.update();
+            isResetting.current = false;
+        }
+    });
+
+    return (
+        <OrbitControls
+            ref={controlsRef}
+            enableZoom={false}
+            autoRotate={false}
+            onStart={scheduleReset}
+            onEnd={scheduleReset}
+        />
+    );
+}
+
 export default function Keyboard() {
     return (
         <Canvas
@@ -62,7 +105,7 @@ export default function Keyboard() {
                 />
                 <Environment preset="city" />
             </Suspense>
-            <OrbitControls enableZoom={false} autoRotate={false} />
+            <AutoResetOrbitControls />
         </Canvas>
     );
 }

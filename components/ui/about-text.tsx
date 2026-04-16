@@ -79,29 +79,21 @@ export default function AboutText() {
         },
       });
 
-      tl.to(subtitleRef.current, {
-        opacity: 0.7,
-        ease: "none",
-        duration: 0.4,
-      })
-        .to(
-          textRef.current,
-          {
-            opacity: 1,
-            ease: "none",
-            duration: 0,
-          },
-          "<"
+      tl.fromTo(
+          subtitleRef.current,
+          { opacity: 0, y: "40px" },
+          { opacity: 0.7, y: 0, ease: "power3.out", duration: 1 },
         )
         .fromTo(
           textRef.current,
-          { y: "20px" },
+          { opacity: 0, y: "60px" },
           {
+            opacity: 1,
             y: 0,
-            ease: "sine.out",
+            ease: "power3.out",
             duration: 1.2,
           },
-          "<0.4"
+          "<0.15"
         );
     }, containerRef);
 
@@ -130,7 +122,7 @@ export default function AboutText() {
           textAlign: "left",
           marginTop: "clamp(1rem, 2vw, 1.8rem)",
           letterSpacing: "-0.038em",
-          color: "#7d7d7d",
+          color: "#fff",
           lineHeight: 1.15,
           fontWeight: 400,
           fontFamily: "Inter, system-ui, sans-serif",
