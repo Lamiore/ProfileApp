@@ -1,6 +1,36 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import Admin from "@/components/sections/admin";
 
 export default function AdminPage() {
+    const router = useRouter();
+    const [user, setUser] = useState<User | null>(null);
+    const [checking, setChecking] = useState(true);
+
+    useEffect(() => {
+        const unsub = onAuthStateChanged(auth, (u) => {
+            if (!u) {
+                router.replace("/admin/login");
+            } else {
+                setUser(u);
+                setChecking(false);
+            }
+        });
+        return () => unsub();
+    }, [router]);
+
+    if (checking || !user) {
+        return (
+            <div style={{ minHeight: "100vh", backgroundColor: "#0d0d0d", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "14px" }}>Loading...</span>
+            </div>
+        );
+    }
+
     return (
         <div style={{ minHeight: "100vh", backgroundColor: "#0d0d0d", display: "flex", justifyContent: "center", padding: "clamp(1rem, 2.6vw, 2.5rem)" }}>
             <div style={{ width: "100%", maxWidth: "600px" }}>
