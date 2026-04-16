@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { usePageTransition } from "@/components/PageTransition";
-import { FileText } from "lucide-react";
+import { FileText, Search } from "lucide-react";
 
 interface BlogBlock {
     id: number;
@@ -94,6 +94,7 @@ function SkeletonCard() {
 export default function BlogWindow() {
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState("");
     const { navigateTo } = usePageTransition();
 
     useEffect(() => {
@@ -105,8 +106,47 @@ export default function BlogWindow() {
         return () => unsub();
     }, []);
 
+    const filteredBlogs = useMemo(() => {
+        if (!searchQuery.trim()) return blogs;
+        const q = searchQuery.toLowerCase();
+        return blogs.filter((blog) => 
+            blog.title.toLowerCase().includes(q) || 
+            blog.blocks?.some(b => b.type === "text" && b.content.toLowerCase().includes(q))
+        );
+    }, [blogs, searchQuery]);
+
     return (
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            <div style={{ position: "relative", width: "100%", maxWidth: "400px" }}>
+                <Search 
+                    size={16} 
+                    style={{ 
+                        position: "absolute", 
+                        left: "12px", 
+                        top: "50%", 
+                        transform: "translateY(-50%)", 
+                        color: "rgba(255,255,255,0.4)" 
+                    }} 
+                />
+                <input
+                    type="text"
+                    placeholder="Cari artikel..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    style={{
+                        width: "100%",
+                        padding: "10px 12px 10px 38px",
+                        background: "rgba(255,255,255,0.05)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        borderRadius: "8px",
+                        color: "#fff",
+                        fontSize: "13px",
+                        outline: "none",
+                        transition: "all 0.2s ease"
+                    }}
+                    className="wnd-blog-search"
+                />
+            </div>
             {loading ? (
                 <div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
@@ -114,19 +154,21 @@ export default function BlogWindow() {
                         <div style={{ width: "55px", height: "12px", borderRadius: "4px", background: "rgba(255,255,255,0.06)", animation: "skeleton-pulse 1.8s ease-in-out 0.1s infinite" }} />
                     </div>
                     <div className="wnd-blog-grid">
-                        {Array.from({ length: 4 }).map((_, i) => (
+                        {Array.from({ length: 6 }).map((_, i) => (
                             <SkeletonCard key={i} />
                         ))}
                     </div>
                 </div>
-            ) : blogs.length > 0 ? (
+            ) : filteredBlogs.length > 0 ? (
                 <div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                        <span style={{ fontSize: "13px", fontWeight: 600, color: "#E0E0E0" }}>Semua Blog</span>
-                        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>{blogs.length} artikel</span>
+                        <span style={{ fontSize: "13px", fontWeight: 600, color: "#E0E0E0" }}>
+                            {searchQuery ? `Hasil pencarian: ${filteredBlogs.length}` : "Semua Blog"}
+                        </span>
+                        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>{filteredBlogs.length} artikel</span>
                     </div>
                     <div className="wnd-blog-grid">
-                        {blogs.map((blog) => {
+                        {filteredBlogs.map((blog) => {
                             const excerpt = getExcerpt(blog.blocks);
 
                             return (
@@ -165,8 +207,10 @@ export default function BlogWindow() {
                     </div>
                 </div>
             ) : (
-                <div style={{ textAlign: "center", padding: "2rem 1rem", color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>
-                    Belum ada tulisan yang dipublikasikan.
+                <div style={{ textAlign: "center", padding: "4rem 1rem", color: "rgba(255,255,255,0.4)", fontSize: "14px" }}>
+                    {searchQuery 
+                        ? `Tidak ada hasil untuk "${searchQuery}"`
+                        : "Belum ada tulisan yang dipublikasikan."}
                 </div>
             )}
         </div>

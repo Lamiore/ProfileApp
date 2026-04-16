@@ -884,8 +884,20 @@
 /* ── Blog Window ── */
 .wnd-blog-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 14px;
+}
+
+@media (max-width: 1024px) {
+  .wnd-blog-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.wnd-blog-search:focus {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.02);
 }
 
 .wnd-blog-card {

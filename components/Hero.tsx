@@ -336,16 +336,16 @@ export default function Hero() {
                 className="relative overflow-hidden"
                 style={{ width: "100%", height: "100vh", backgroundColor: "#0d0d0d" }}
             >
-                <PixelTrail
-                    gridSize={50}
-                    trailSize={0.1}
-                    maxAge={250}
-                    interpolate={5}
-                    color="#0e1013"
-                    gooeyFilter={{ id: "custom-goo-filter", strength: 2 }}
-                />
                 {/* Infinite Grid Background — filling parent frame */}
                 <div ref={viewportRef} className="absolute inset-0" style={{ cursor: "grab" }}>
+                    <PixelTrail
+                        gridSize={50}
+                        trailSize={0.1}
+                        maxAge={250}
+                        interpolate={5}
+                        color="#0e1013"
+                        gooeyFilter={{ id: "custom-goo-filter", strength: 2 }}
+                    />
                     <div
                         ref={containerRef}
                         style={{
@@ -375,28 +375,6 @@ export default function Hero() {
                     zIndex: 55,
                 }}
             >
-                {/* Arrow */}
-                <div 
-                    style={{ 
-                        marginBottom: "var(--hero-arrow-margin, 0.5rem)",
-                        zIndex: 60 
-                    }}
-                >
-                    <svg 
-                        width="clamp(3.5rem, 11vw, 13rem)" 
-                        height="clamp(3.5rem, 11vw, 13rem)"
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="white" 
-                        strokeWidth="4.5" 
-                        strokeLinecap="butt" 
-                        strokeLinejoin="miter"
-                    >
-                        <line x1="7" y1="17" x2="17" y2="7" />
-                        <polyline points="7 7 17 7 17 17" />
-                    </svg>
-                </div>
-
                 <div
                     className="font-black text-white select-none flex items-baseline"
                     style={{ 
@@ -413,20 +391,50 @@ export default function Hero() {
                         sparklesCount={12}
                         colors={{ first: "#ffffff", second: "#aaaaaa" }}
                     />
-                    <svg 
-                        width="0.25em" 
-                        height="0.25em" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="5" 
-                        strokeLinecap="butt"
-                        style={{ marginLeft: "0.08em", transform: "translateY(-0.05em)" }}
-                    >
-                        <line x1="12" y1="2" x2="12" y2="22" />
-                        <line x1="3.34" y1="7" x2="20.66" y2="17" />
-                        <line x1="20.66" y1="7" x2="3.34" y2="17" />
-                    </svg>
+                    
+                    {/* Asterisk and Arrow Container */}
+                    <div className="relative flex items-baseline">
+                        {/* Arrow — now relative to the asterisk */}
+                        <div 
+                            style={{ 
+                                position: "absolute",
+                                bottom: "100%",
+                                left: "50%",
+                                transform: "translateX(-40%)",
+                                marginBottom: "var(--hero-arrow-margin, 0.5rem)",
+                                zIndex: 60 
+                            }}
+                        >
+                            <svg 
+                                width="clamp(2.8rem, 9vw, 10rem)" 
+                                height="clamp(2.8rem, 9vw, 10rem)"
+                                viewBox="0 0 24 24" 
+                                fill="none" 
+                                stroke="white" 
+                                strokeWidth="4.5" 
+                                strokeLinecap="butt" 
+                                strokeLinejoin="miter"
+                            >
+                                <line x1="7" y1="17" x2="17" y2="7" />
+                                <polyline points="7 7 17 7 17 17" />
+                            </svg>
+                        </div>
+
+                        <svg 
+                            width="0.32em" 
+                            height="0.32em" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            strokeWidth="4.5" 
+                            strokeLinecap="butt"
+                            style={{ marginLeft: "0.1em", transform: "translateY(-0.04em)" }}
+                        >
+                            <line x1="12" y1="2" x2="12" y2="22" />
+                            <line x1="3.34" y1="7" x2="20.66" y2="17" />
+                            <line x1="20.66" y1="7" x2="3.34" y2="17" />
+                        </svg>
+                    </div>
                 </div>
             </div>
         </>
