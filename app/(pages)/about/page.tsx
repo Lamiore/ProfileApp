@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import AboutText from "@/components/ui/about-text";
 import { LogoLoop } from "@/components/ui/logo-loop";
 import {
   Figma,
@@ -109,7 +110,7 @@ export default function AboutPage() {
           <Keyboard />
         </div>
 
-        <div style={{ position: "relative", zIndex: 1, maxWidth: "550px" }}>
+        <div style={{ position: "relative", zIndex: 1 }}>
           {/* Title */}
           <h1
             style={{
@@ -140,23 +141,9 @@ export default function AboutPage() {
           </p>
 
           {/* Description */}
-          <p
-            style={{
-              marginTop: "clamp(2rem, 5vh, 4rem)",
-              fontSize: "clamp(22px, 4vw, 48px)",
-              fontWeight: 600,
-              lineHeight: 1.15,
-              letterSpacing: "-0.01em",
-              color: "white",
-              fontFamily: "'Syne', system-ui, sans-serif",
-            }}
-          >
-            Saya seorang designer dan developer yang passionate dalam
-            membangun pengalaman digital yang bermakna. Setiap pixel punya
-            tujuan, setiap animasi punya cerita. Saya percaya desain yang baik
-            bukan hanya soal tampilan, tapi bagaimana ia terasa — smooth,
-            intentional, dan hidup.
-          </p>
+          <div style={{ marginTop: "clamp(2rem, 5vh, 4rem)" }}>
+            <AboutText />
+          </div>
         </div>
       </section>
 
