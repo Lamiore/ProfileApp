@@ -29,7 +29,7 @@ function KeyboardModel() {
 export default function Keyboard() {
     return (
         <Canvas
-            camera={{ position: [0, 2, 8], fov: 45 }}
+            camera={{ position: [4, 2, 8], fov: 45 }}
             dpr={[1, 2]}
             gl={{ alpha: true, antialias: true }}
             style={{ width: '100%', height: '100%', background: 'transparent' }}

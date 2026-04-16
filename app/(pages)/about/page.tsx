@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import FillText from "@/components/ui/fill-text";
 import { LogoLoop } from "@/components/ui/logo-loop";
 import {
   Figma,
@@ -110,7 +109,7 @@ export default function AboutPage() {
           <Keyboard />
         </div>
 
-        <div style={{ position: "relative", zIndex: 1, maxWidth: "980px" }}>
+        <div style={{ position: "relative", zIndex: 1, maxWidth: "550px" }}>
           {/* Title */}
           <h1
             style={{
@@ -140,45 +139,24 @@ export default function AboutPage() {
             Designer & Developer — Based in Indonesia
           </p>
 
-          {/* Fill Text */}
-          <div style={{ marginTop: "clamp(2rem, 5vh, 4rem)" }}>
-            <FillText>
-              Saya seorang designer dan developer yang passionate dalam
-              membangun pengalaman digital yang bermakna. Setiap pixel punya
-              tujuan, setiap animasi punya cerita. Saya percaya desain yang baik
-              bukan hanya soal tampilan, tapi bagaimana ia terasa — smooth,
-              intentional, dan hidup.
-            </FillText>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: "40px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: 1,
-            opacity: 0.4,
-          }}
-        >
-          <svg
-            width="42px"
-            height="42px"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
+          {/* Description */}
+          <p
+            style={{
+              marginTop: "clamp(2rem, 5vh, 4rem)",
+              fontSize: "clamp(22px, 4vw, 48px)",
+              fontWeight: 600,
+              lineHeight: 1.15,
+              letterSpacing: "-0.01em",
+              color: "white",
+              fontFamily: "'Syne', system-ui, sans-serif",
+            }}
           >
-            <path
-              d="M12 3L12 21M12 21L20.5 12.5M12 21L3.5 12.5"
-              stroke="#fff"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+            Saya seorang designer dan developer yang passionate dalam
+            membangun pengalaman digital yang bermakna. Setiap pixel punya
+            tujuan, setiap animasi punya cerita. Saya percaya desain yang baik
+            bukan hanya soal tampilan, tapi bagaimana ia terasa — smooth,
+            intentional, dan hidup.
+          </p>
         </div>
       </section>
 
