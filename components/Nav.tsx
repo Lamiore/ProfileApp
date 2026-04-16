@@ -1,10 +1,12 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { usePageTransition } from "@/components/PageTransition";
 import StaggeredMenu from "./StaggeredMenu";
 
 export default function Nav() {
     const { navigateTo } = usePageTransition();
+    const pathname = usePathname();
 
     const menuItems = [
         { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
@@ -30,10 +32,11 @@ export default function Nav() {
             menuButtonColor="#ffffff"
             openMenuButtonColor="#000000"
             changeMenuColorOnOpen={true}
-            colors={['#1b1b1b', '#333333', '#ffd700']}
-            accentColor="#ffd700"
+            colors={['#1b1b1b', '#333333', '#e9204f']}
+            accentColor="#e9204f"
             onItemClick={(link) => navigateTo(link)}
             logoUrl=""
+            showDropShadow={pathname === "/"}
         />
     );
 }

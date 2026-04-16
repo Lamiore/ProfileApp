@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Nav from "@/components/Nav";
 import { SparklesText } from "@/components/ui/sparkles-text";
+import PixelTrail from "@/components/ui/PixelTrail";
 
 const IMAGES = [
     "https://i.pinimg.com/avif/736x/b9/88/1d/b9881d73712f3e4aa410348dcabcb8b3.avf",
@@ -28,8 +28,6 @@ const CONFIG = {
     mobileTileOverscan: 0,
 };
 
-const HERO_FRAME_RADIUS = "2rem";
-const LAM_BADGE_RADIUS = "0.75rem";
 const LAM_BADGE_TOP_RADIUS = "1.5rem";
 const LAM_BADGE_PADDING = "28px";
 const LAM_BADGE_TOP_PADDING = "2rem";
@@ -338,6 +336,14 @@ export default function Hero() {
                 className="relative overflow-hidden"
                 style={{ width: "100%", height: "100vh", backgroundColor: "#0d0d0d" }}
             >
+                <PixelTrail
+                    gridSize={50}
+                    trailSize={0.1}
+                    maxAge={250}
+                    interpolate={5}
+                    color="#0e1013"
+                    gooeyFilter={{ id: "custom-goo-filter", strength: 2 }}
+                />
                 {/* Infinite Grid Background — filling parent frame */}
                 <div ref={viewportRef} className="absolute inset-0" style={{ cursor: "grab" }}>
                     <div
@@ -356,100 +362,71 @@ export default function Hero() {
                 </div>
             </div>
 
-            {/* LAM badge — outside hero so concave corners connect to frame */}
+            {/* LAM Text — Clean version without badge background */}
             <div
                 style={{
                     position: "absolute",
-                    bottom: 0,
-                    left: 0,
+                    bottom: "1.5rem",
+                    left: "2rem",
                     display: "flex",
-                    alignItems: "flex-end",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
                     pointerEvents: "none",
                     zIndex: 55,
                 }}
             >
-                <div
-                    style={{
-                        lineHeight: 0.7,
-                        background: "#1b1b1b",
-                        borderTopRightRadius: LAM_BADGE_TOP_RADIUS,
-                        padding: `${LAM_BADGE_TOP_PADDING} ${LAM_BADGE_RIGHT_PADDING} ${LAM_BADGE_PADDING} ${LAM_BADGE_PADDING}`,
-                        position: "relative",
+                {/* Arrow */}
+                <div 
+                    style={{ 
+                        marginBottom: "var(--hero-arrow-margin, 0.5rem)",
+                        zIndex: 60 
                     }}
                 >
-                    {/* Concave corners */}
-                    <div
-                        style={{
-                            position: "absolute",
-                            bottom: "100%",
-                            left: LAM_BADGE_PADDING,
-                            width: LAM_BADGE_TOP_RADIUS,
-                            height: LAM_BADGE_TOP_RADIUS,
-                            background: "radial-gradient(circle at 100% 100%, transparent calc(100% - 1px), #111 100%)",
-                        }}
-                    />
-                    <div
-                        style={{
-                            position: "absolute",
-                            bottom: LAM_BADGE_PADDING,
-                            left: "100%",
-                            width: LAM_BADGE_TOP_RADIUS,
-                            height: LAM_BADGE_TOP_RADIUS,
-                            background: "radial-gradient(circle at 0 0, transparent calc(100% - 1px), #111 100%)",
-                        }}
-                    />
-
-                    {/* Arrow — Positioned above the top border of the badge */}
-                    <div 
-                        style={{ 
-                            position: "absolute", 
-                            bottom: "100%", 
-                            left: "1.5rem", 
-                            marginBottom: "var(--hero-arrow-margin, -1rem)",
-                            zIndex: 60 
-                        }}
+                    <svg 
+                        width="clamp(3.5rem, 11vw, 13rem)" 
+                        height="clamp(3.5rem, 11vw, 13rem)"
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="white" 
+                        strokeWidth="4.5" 
+                        strokeLinecap="butt" 
+                        strokeLinejoin="miter"
                     >
-                        <svg 
-                            width="clamp(3.5rem, 11vw, 13rem)" 
-                            height="clamp(3.5rem, 11vw, 13rem)"
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="white" 
-                            strokeWidth="4.5" 
-                            strokeLinecap="butt" 
-                            strokeLinejoin="miter"
-                        >
-                            <line x1="7" y1="17" x2="17" y2="7" />
-                            <polyline points="7 7 17 7 17 17" />
-                        </svg>
-                    </div>
+                        <line x1="7" y1="17" x2="17" y2="7" />
+                        <polyline points="7 7 17 7 17 17" />
+                    </svg>
+                </div>
 
-                    <div
-                        className="font-black text-white select-none flex items-baseline"
-                        style={{ fontSize: LAM_FONT_SIZE, letterSpacing: "-0.04em", fontFamily: "Helvetica, Arial, sans-serif" }}
+                <div
+                    className="font-black text-white select-none flex items-baseline"
+                    style={{ 
+                        fontSize: LAM_FONT_SIZE, 
+                        letterSpacing: "-0.04em", 
+                        fontFamily: "Helvetica, Arial, sans-serif",
+                        lineHeight: 0.7 
+                    }}
+                >
+                    <SparklesText
+                        text="LAM"
+                        className="font-black"
+                        style={{ fontSize: LAM_FONT_SIZE, letterSpacing: "-0.04em", fontFamily: "Helvetica, Arial, sans-serif", lineHeight: 0.7 }}
+                        sparklesCount={12}
+                        colors={{ first: "#ffffff", second: "#aaaaaa" }}
+                    />
+                    <svg 
+                        width="0.25em" 
+                        height="0.25em" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="5" 
+                        strokeLinecap="butt"
+                        style={{ marginLeft: "0.08em", transform: "translateY(-0.05em)" }}
                     >
-                        <SparklesText
-                            text="LAM"
-                            className="font-black"
-                            style={{ fontSize: LAM_FONT_SIZE, letterSpacing: "-0.04em", fontFamily: "Helvetica, Arial, sans-serif", lineHeight: 0.7 }}
-                            sparklesCount={12}
-                            colors={{ first: "#ffffff", second: "#aaaaaa" }}
-                        />
-                        <svg 
-                            width="0.25em" 
-                            height="0.25em" 
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="currentColor" 
-                            strokeWidth="5" 
-                            strokeLinecap="butt"
-                            style={{ marginLeft: "0.08em", transform: "translateY(-0.05em)" }}
-                        >
-                            <line x1="12" y1="2" x2="12" y2="22" />
-                            <line x1="3.34" y1="7" x2="20.66" y2="17" />
-                            <line x1="20.66" y1="7" x2="3.34" y2="17" />
-                        </svg>
-                    </div>
+                        <line x1="12" y1="2" x2="12" y2="22" />
+                        <line x1="3.34" y1="7" x2="20.66" y2="17" />
+                        <line x1="20.66" y1="7" x2="3.34" y2="17" />
+                    </svg>
                 </div>
             </div>
         </>
