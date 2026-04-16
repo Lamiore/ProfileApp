@@ -336,7 +336,7 @@ export default function Hero() {
         <>
             <div
                 className="relative overflow-hidden"
-                style={{ width: "100%", height: "100%", borderRadius: HERO_FRAME_RADIUS, backgroundColor: "#0d0d0d" }}
+                style={{ width: "100%", height: "100vh", backgroundColor: "#0d0d0d" }}
             >
                 {/* Infinite Grid Background — filling parent frame */}
                 <div ref={viewportRef} className="absolute inset-0" style={{ cursor: "grab" }}>
@@ -353,11 +353,6 @@ export default function Hero() {
                     >
                         <div ref={gridRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
                     </div>
-                </div>
-
-                {/* Nav — absolute over grid */}
-                <div className="absolute top-0 left-0 right-0" style={{ zIndex: 55 }}>
-                    <Nav />
                 </div>
             </div>
 

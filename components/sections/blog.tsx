@@ -33,21 +33,93 @@ const getExcerpt = (blocks?: BlogBlock[]) => {
     return normalized.length > 110 ? `${normalized.slice(0, 107)}...` : normalized;
 };
 
+function SkeletonCard() {
+    return (
+        <div
+            className="wnd-blog-card"
+            style={{ cursor: "default", pointerEvents: "none" }}
+        >
+            <div
+                className="wnd-blog-card-backdrop"
+                style={{
+                    background: "linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
+                    animation: "skeleton-pulse 1.8s ease-in-out infinite",
+                }}
+            />
+            <div className="wnd-blog-card-content" style={{ zIndex: 2 }}>
+                <div style={{
+                    width: "72px",
+                    height: "10px",
+                    borderRadius: "4px",
+                    background: "rgba(255,255,255,0.08)",
+                    animation: "skeleton-pulse 1.8s ease-in-out infinite",
+                }} />
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "8px" }}>
+                    <div style={{
+                        width: "85%",
+                        height: "14px",
+                        borderRadius: "4px",
+                        background: "rgba(255,255,255,0.1)",
+                        animation: "skeleton-pulse 1.8s ease-in-out 0.1s infinite",
+                    }} />
+                    <div style={{
+                        width: "60%",
+                        height: "14px",
+                        borderRadius: "4px",
+                        background: "rgba(255,255,255,0.07)",
+                        animation: "skeleton-pulse 1.8s ease-in-out 0.2s infinite",
+                    }} />
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginTop: "10px" }}>
+                    <div style={{
+                        width: "100%",
+                        height: "8px",
+                        borderRadius: "3px",
+                        background: "rgba(255,255,255,0.05)",
+                        animation: "skeleton-pulse 1.8s ease-in-out 0.3s infinite",
+                    }} />
+                    <div style={{
+                        width: "70%",
+                        height: "8px",
+                        borderRadius: "3px",
+                        background: "rgba(255,255,255,0.04)",
+                        animation: "skeleton-pulse 1.8s ease-in-out 0.4s infinite",
+                    }} />
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function BlogWindow() {
     const [blogs, setBlogs] = useState<Blog[]>([]);
+    const [loading, setLoading] = useState(true);
     const { navigateTo } = usePageTransition();
 
     useEffect(() => {
         const q = query(collection(db, "blogs"), orderBy("createdAt", "desc"));
         const unsub = onSnapshot(q, (snap) => {
             setBlogs(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Blog)));
+            setLoading(false);
         });
         return () => unsub();
     }, []);
 
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            {blogs.length > 0 ? (
+            {loading ? (
+                <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                        <div style={{ width: "90px", height: "13px", borderRadius: "4px", background: "rgba(255,255,255,0.08)", animation: "skeleton-pulse 1.8s ease-in-out infinite" }} />
+                        <div style={{ width: "55px", height: "12px", borderRadius: "4px", background: "rgba(255,255,255,0.06)", animation: "skeleton-pulse 1.8s ease-in-out 0.1s infinite" }} />
+                    </div>
+                    <div className="wnd-blog-grid">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                            <SkeletonCard key={i} />
+                        ))}
+                    </div>
+                </div>
+            ) : blogs.length > 0 ? (
                 <div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                         <span style={{ fontSize: "13px", fontWeight: 600, color: "#E0E0E0" }}>Semua Blog</span>

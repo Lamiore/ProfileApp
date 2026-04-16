@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { Geist, Geist_Mono, Sacramento } from "next/font/google";
 import "./globals.css";
 import PageTransitionProvider from "@/components/PageTransition";
+import Nav from "@/components/Nav";
 
 const satoshi = localFont({
   src: [
@@ -49,9 +50,10 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body
         className={`${satoshi.variable} ${geistSans.variable} ${geistMono.variable} ${sacramento.variable} antialiased`}
-        style={{ background: "#1b1b1b", padding: "24px", height: "100dvh", overflow: "hidden", boxSizing: "border-box" }}
+        style={{ background: "#0d0d0d", minHeight: "100dvh", overflowX: "hidden", boxSizing: "border-box" }}
       >
         <PageTransitionProvider>
+          <Nav />
           {children}
         </PageTransitionProvider>
       </body>

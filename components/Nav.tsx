@@ -1,72 +1,39 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { usePageTransition } from "@/components/PageTransition";
-import { DrawUnderline } from "@/components/ui/draw-underline";
-
-const NAV_ITEMS = [
-    { name: "About", color: "#ffd700", variant: 0 as const },
-    { name: "Blog", color: "#d0ff2c", variant: 2 as const },
-    { name: "Gallery", color: "#c50022", variant: 1 as const },
-] as const;
+import StaggeredMenu from "./StaggeredMenu";
 
 export default function Nav() {
-    const pathname = usePathname();
     const { navigateTo } = usePageTransition();
 
+    const menuItems = [
+        { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
+        { label: 'About', ariaLabel: 'Learn about us', link: '/about' },
+        { label: 'Blog', ariaLabel: 'Read our blog', link: '/blog' },
+        { label: 'Gallery', ariaLabel: 'View our gallery', link: '/gallery' }
+    ];
+
+    const socialItems = [
+        { label: 'Twitter', link: 'https://twitter.com' },
+        { label: 'Instagram', link: 'https://instagram.com/ikanguramegarorica' },
+        { label: 'LinkedIn', link: 'https://linkedin.com/in/irham-aadiyaat-mohammad' }
+    ];
+
     return (
-        <nav
-            style={{
-                paddingInline: "clamp(1rem, 2.6vw, 2.5rem)",
-                paddingTop: "clamp(1rem, 2.6vw, 2.5rem)",
-            }}
-        >
-            <div
-                className="flex w-full items-center justify-between"
-                style={{ gap: "clamp(1rem, 3vw, 2.5rem)" }}
-            >
-                {NAV_ITEMS.map((item) => {
-                    const name = item.name;
-                    const path = `/${name.toLowerCase()}`;
-                    const isActive = pathname === path;
-                    const targetPath = isActive ? "/" : path;
-                    return (
-                        <button
-                            key={name}
-                            onClick={() => navigateTo(targetPath)}
-                            className="nav-flip font-bold tracking-wide transition-colors duration-300"
-                            style={{
-                                fontSize: "clamp(1.1rem, 2vw, 1.6rem)",
-                                letterSpacing: "clamp(0.04em, 0.1vw, 0.1em)",
-                                color: isActive ? item.color : "white",
-                                ["--hover-color" as any]: item.color,
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.color = item.color;
-                            }}
-                            onMouseLeave={(e) => {
-                                if (!isActive) e.currentTarget.style.color = "white";
-                            }}
-                        >
-                            <DrawUnderline isActive={isActive} color={item.color} variant={item.variant}>
-                                <span className="nav-flip-text" aria-hidden="true">
-                                    {name.toLowerCase().split("").map((char, index) => (
-                                        <span
-                                            key={index}
-                                            className="nav-flip-char"
-                                            data-char={char}
-                                            style={{ "--ci": index } as React.CSSProperties}
-                                        >
-                                            {char}
-                                        </span>
-                                    ))}
-                                </span>
-                                <span className="sr-only">{name.toLowerCase()}</span>
-                            </DrawUnderline>
-                        </button>
-                    );
-                })}
-            </div>
-        </nav>
+        <StaggeredMenu
+            isFixed={true}
+            position="right"
+            items={menuItems}
+            socialItems={socialItems}
+            displaySocials
+            displayItemNumbering={true}
+            menuButtonColor="#ffffff"
+            openMenuButtonColor="#000000"
+            changeMenuColorOnOpen={true}
+            colors={['#1b1b1b', '#333333', '#ffd700']}
+            accentColor="#ffd700"
+            onItemClick={(link) => navigateTo(link)}
+            logoUrl=""
+        />
     );
 }

@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import Window from "@/components/window";
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Masonry, { type MasonryItem } from "@/components/ui/masonry";
@@ -329,7 +328,7 @@ export default function GalleryWindow() {
                                 </div>
                             </motion.div>
                         ) : previewItem ? (
-                            /* ── Desktop: Window-based preview ── */
+                            /* ── Desktop: centered modal preview ── */
                             <>
                             <motion.div
                                 key="desktop-backdrop"
@@ -338,23 +337,62 @@ export default function GalleryWindow() {
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: 0.2 }}
                                 onClick={() => setPreviewIndex(null)}
-                                style={{ position: "fixed", inset: 0, zIndex: 99 }}
+                                style={{ position: "fixed", inset: 0, zIndex: 99, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
                             />
-                            <Window
+                            <motion.div
                                 key={previewIndex}
-                                title={
-                                    previewItem.type === "youtube" || previewItem.type === "gdrive"
-                                        ? "Video Player"
-                                        : `Preview — ${(previewIndex ?? 0) + 1} / ${items.length}`
-                                }
-                                onClose={() => setPreviewIndex(null)}
-                                zIndex={100}
-                                initialWidth={previewSize.w}
-                                initialHeight={previewSize.h}
-                                centered
-                                hideMaximize
+                                initial={{ opacity: 0, scale: 0.92, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.92, y: 20 }}
+                                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                                style={{
+                                    position: "fixed",
+                                    zIndex: 100,
+                                    width: `${previewSize.w}px`,
+                                    height: `${previewSize.h}px`,
+                                    left: `calc(50% - ${previewSize.w / 2}px)`,
+                                    top: `calc(50% - ${previewSize.h / 2}px)`,
+                                    borderRadius: "12px",
+                                    overflow: "hidden",
+                                    background: "rgba(26,26,26,0.75)",
+                                    backdropFilter: "blur(40px) saturate(180%)",
+                                    WebkitBackdropFilter: "blur(40px) saturate(180%)",
+                                    border: "1px solid rgba(255,255,255,0.1)",
+                                    boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                }}
                             >
-                                <div style={{ position: "relative", width: "100%", height: "100%" }}>
+                                {/* Title bar */}
+                                <div style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    padding: "14px 16px",
+                                    borderBottom: "1px solid rgba(44,44,44,0.1)",
+                                    background: "rgba(26,26,26,0.4)",
+                                    flexShrink: 0,
+                                    gap: "8px",
+                                }}>
+                                    <button
+                                        onClick={() => setPreviewIndex(null)}
+                                        style={{
+                                            width: "14px", height: "14px", borderRadius: "50%",
+                                            background: "#FF5F57", border: "none", cursor: "pointer", flexShrink: 0,
+                                        }}
+                                    />
+                                    <span style={{
+                                        flex: 1, textAlign: "center", fontSize: "13px", fontWeight: 500,
+                                        color: "rgba(255,255,255,0.6)", letterSpacing: "0.05em",
+                                    }}>
+                                        {previewItem.type === "youtube" || previewItem.type === "gdrive"
+                                            ? "Video Player"
+                                            : `Preview — ${(previewIndex ?? 0) + 1} / ${items.length}`}
+                                    </span>
+                                    <div style={{ width: "14px", flexShrink: 0 }} />
+                                </div>
+
+                                {/* Content */}
+                                <div style={{ position: "relative", flex: 1, overflow: "hidden" }}>
                                     {previewItem.type === "youtube" && previewItem.videoId ? (
                                         <iframe
                                             key={previewItem.url}
@@ -362,7 +400,7 @@ export default function GalleryWindow() {
                                             title="YouTube Video"
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                             allowFullScreen
-                                            style={{ width: "100%", height: "100%", border: "none", borderRadius: "6px" }}
+                                            style={{ width: "100%", height: "100%", border: "none" }}
                                         />
                                     ) : previewItem.type === "gdrive" && previewItem.videoId ? (
                                         <iframe
@@ -371,10 +409,11 @@ export default function GalleryWindow() {
                                             title="Google Drive Video"
                                             allow="autoplay"
                                             allowFullScreen
-                                            style={{ width: "100%", height: "100%", border: "none", borderRadius: "6px" }}
+                                            style={{ width: "100%", height: "100%", border: "none" }}
                                         />
                                     ) : (
-                                        <img key={previewItem.url} src={previewItem.url} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "contain", display: "block", borderRadius: "6px" }} />
+                                        <img key={previewItem.url} src={previewItem.url} alt="Preview"
+                                            style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }} />
                                     )}
 
                                     {previewIndex !== null && previewIndex > 0 && (
@@ -406,7 +445,7 @@ export default function GalleryWindow() {
                                         </button>
                                     )}
                                 </div>
-                            </Window>
+                            </motion.div>
                             </>
                         ) : null}
                     </AnimatePresence>,

@@ -8,6 +8,25 @@ const PageTransitionContext = createContext<{ navigateTo: (url: string) => void 
     navigateTo: () => {},
 });
 
+const TRANSITION_VARIANTS = {
+    "right-to-left": {
+        initial: { x: "100%", y: 0 },
+        exit: { x: "-100%", y: 0 }
+    },
+    "left-to-right": {
+        initial: { x: "-100%", y: 0 },
+        exit: { x: "100%", y: 0 }
+    },
+    "top-to-bottom": {
+        initial: { x: 0, y: "-100%" },
+        exit: { x: 0, y: "100%" }
+    },
+    "bottom-to-top": {
+        initial: { x: 0, y: "100%" },
+        exit: { x: 0, y: "-100%" }
+    }
+};
+
 export const usePageTransition = () => useContext(PageTransitionContext);
 
 export default function PageTransitionProvider({ children }: { children: React.ReactNode }) {
@@ -17,6 +36,7 @@ export default function PageTransitionProvider({ children }: { children: React.R
     const hadClosing = useRef(false);
     const [phase, setPhase] = useState<"idle" | "closing" | "opening">("idle");
     const [prevPathname, setPrevPathname] = useState(pathname);
+    const [variant, setVariant] = useState<keyof typeof TRANSITION_VARIANTS>("right-to-left");
 
     // Detect route change → switch to "opening" (reveal) phase
     if (pathname !== prevPathname) {
@@ -39,12 +59,18 @@ export default function PageTransitionProvider({ children }: { children: React.R
 
     // Trigger closing curtain, then navigate after animation
     const navigateTo = useCallback((url: string) => {
+        const variants = Object.keys(TRANSITION_VARIANTS) as (keyof typeof TRANSITION_VARIANTS)[];
+        const randomVariant = variants[Math.floor(Math.random() * variants.length)];
+        setVariant(randomVariant);
+        
         hadClosing.current = true;
         setPhase("closing");
         setTimeout(() => {
             router.push(url);
         }, 800);
     }, [router]);
+
+    const currentVariant = TRANSITION_VARIANTS[variant];
 
     return (
         <PageTransitionContext.Provider value={{ navigateTo }}>
@@ -53,9 +79,9 @@ export default function PageTransitionProvider({ children }: { children: React.R
                 {phase !== "idle" && (
                     <motion.div
                         key="page-transition"
-                        initial={{ y: hadClosing.current ? "-100%" : 0 }}
-                        animate={{ y: 0 }}
-                        exit={{ y: "-100%" }}
+                        initial={hadClosing.current ? currentVariant.initial : { x: 0, y: 0 }}
+                        animate={{ x: 0, y: 0 }}
+                        exit={currentVariant.exit}
                         transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
                         onAnimationComplete={() => { hadClosing.current = false; }}
                         style={{
