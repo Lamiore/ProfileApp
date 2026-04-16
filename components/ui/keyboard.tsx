@@ -18,7 +18,7 @@ function KeyboardModel() {
     });
 
     return (
-        <group ref={ref} scale={4} rotation={[0.4, Math.PI, 0]}>
+        <group ref={ref} scale={3} rotation={[0.2, 0, 0]}>
             <Center>
                 <primitive object={cloned} />
             </Center>
