@@ -4,6 +4,12 @@ import { usePathname } from "next/navigation";
 import { usePageTransition } from "@/components/PageTransition";
 import StaggeredMenu from "./StaggeredMenu";
 
+const pageLabels: Record<string, string> = {
+    "/about": "ABOUT",
+    "/blog": "BLOG",
+    "/gallery": "GALLERY",
+};
+
 export default function Nav() {
     const { navigateTo } = usePageTransition();
     const pathname = usePathname();
@@ -21,6 +27,8 @@ export default function Nav() {
         { label: 'LinkedIn', link: 'https://linkedin.com/in/irham-aadiyaat-mohammad' }
     ];
 
+    const logoText = pageLabels[pathname] || "";
+
     return (
         <StaggeredMenu
             isFixed={true}
@@ -36,6 +44,7 @@ export default function Nav() {
             accentColor="#e9204f"
             onItemClick={(link) => navigateTo(link)}
             logoUrl=""
+            logoText={logoText}
             showDropShadow={pathname === "/"}
         />
     );

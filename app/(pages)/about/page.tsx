@@ -123,7 +123,7 @@ export default function AboutPage() {
               letterSpacing: "-0.05em",
             }}
           >
-            ABOUT
+            HI, I'M ILHAM
           </h1>
 
           {/* Subtitle */}

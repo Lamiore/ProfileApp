@@ -19,6 +19,7 @@ export interface StaggeredMenuProps {
   displayItemNumbering?: boolean;
   className?: string;
   logoUrl?: string;
+  logoText?: string;
   menuButtonColor?: string;
   openMenuButtonColor?: string;
   accentColor?: string;
@@ -40,6 +41,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   displayItemNumbering = true,
   className,
   logoUrl,
+  logoText,
   menuButtonColor = '#fff',
   openMenuButtonColor = '#000',
   changeMenuColorOnOpen = true,
@@ -447,6 +449,11 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                 height={24}
               />
             )}
+            {!logoUrl && logoText && (
+              <span style={{ fontSize: "1.4rem", fontWeight: 700, color: "#fff", lineHeight: 1 }}>
+                {logoText}
+              </span>
+            )}
           </div>
 
           <button
@@ -564,7 +571,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
       <style>{`
 .sm-scope .staggered-menu-wrapper { position: relative; width: 100%; height: 100%; z-index: 40; pointer-events: none; }
-.sm-scope .staggered-menu-header { position: fixed; top: 0; left: 0; width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 24px; pointer-events: none; z-index: 20; }
+.sm-scope .staggered-menu-header { position: fixed; top: 0; left: 0; width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 24px; pointer-events: none; z-index: 20; transition: opacity 0.3s ease, transform 0.3s ease; }
+body.gallery-preview-active .sm-scope .staggered-menu-header { opacity: 0; pointer-events: none; transform: translateY(-20px); }
 .sm-scope .staggered-menu-header > * { pointer-events: auto; }
 .sm-scope .sm-logo { display: flex; align-items: center; user-select: none; }
 .sm-scope .sm-logo-img { display: block; height: 32px; width: auto; object-fit: contain; }

@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unknown-property */
 'use client';
 
-import { Suspense, useRef, useMemo } from 'react';
+import { Suspense, useRef, useMemo, useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, Environment, ContactShadows, OrbitControls, Center } from '@react-three/drei';
 import * as THREE from 'three';
@@ -10,11 +10,24 @@ function KeyboardModel() {
     const { scene } = useGLTF('/models/about/minikeyboard.gltf');
     const cloned = useMemo(() => scene.clone(true), [scene]);
     const ref = useRef<THREE.Group>(null);
+    const [scrollY, setScrollY] = useState(0);
+    const smoothScroll = useRef(0);
+
+    useEffect(() => {
+        const handleScroll = () => setScrollY(window.scrollY);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     useFrame((state) => {
         if (!ref.current) return;
-        // Subtle floating only
+        // Smooth lerp scroll value
+        smoothScroll.current += (scrollY - smoothScroll.current) * 0.05;
+        const scrollFactor = smoothScroll.current * 0.002;
+
+        // Floating + scroll-based rotation
         ref.current.position.y = Math.sin(state.clock.elapsedTime * 0.4) * 0.1;
+        ref.current.rotation.set(0.2 + scrollFactor * 0.3, scrollFactor, 0);
     });
 
     return (

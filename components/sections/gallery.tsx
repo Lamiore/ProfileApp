@@ -116,6 +116,16 @@ export default function GalleryWindow() {
     const [previewSize, setPreviewSize] = useState({ w: 560, h: 480 });
     const isMobile = useIsMobile();
 
+    // Hide navbar when mobile preview is open
+    useEffect(() => {
+        if (!isMobile || previewIndex === null) return;
+        const header = document.querySelector('.staggered-menu-header') as HTMLElement | null;
+        if (header) header.style.display = 'none';
+        return () => {
+            if (header) header.style.display = '';
+        };
+    }, [isMobile, previewIndex]);
+
     useEffect(() => {
         const q = query(collection(db, "images"), orderBy("createdAt", "desc"));
         const onFresh = (snap: { docs: { data: () => Record<string, string> }[] }) => {
@@ -337,7 +347,7 @@ export default function GalleryWindow() {
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: 0.2 }}
                                 onClick={() => setPreviewIndex(null)}
-                                style={{ position: "fixed", inset: 0, zIndex: 99, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+                                style={{ position: "fixed", inset: 0, zIndex: 10000, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
                             />
                             <motion.div
                                 key={previewIndex}
@@ -347,16 +357,16 @@ export default function GalleryWindow() {
                                 transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                                 style={{
                                     position: "fixed",
-                                    zIndex: 100,
+                                    zIndex: 10001,
                                     width: `${previewSize.w}px`,
                                     height: `${previewSize.h}px`,
                                     left: `calc(50% - ${previewSize.w / 2}px)`,
                                     top: `calc(50% - ${previewSize.h / 2}px)`,
                                     borderRadius: "12px",
                                     overflow: "hidden",
-                                    background: "rgba(26,26,26,0.75)",
-                                    backdropFilter: "blur(40px) saturate(180%)",
-                                    WebkitBackdropFilter: "blur(40px) saturate(180%)",
+                                    background: "rgba(13,13,13,0.9)",
+                                    backdropFilter: "blur(10px)",
+                                    WebkitBackdropFilter: "blur(10px)",
                                     border: "1px solid rgba(255,255,255,0.1)",
                                     boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
                                     display: "flex",
