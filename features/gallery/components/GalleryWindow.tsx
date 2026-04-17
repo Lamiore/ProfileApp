@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import Masonry, { type MasonryItem } from "@/components/ui/Masonry";
+import { useGalleryImages } from "../hooks/use-gallery-images";
+import type { GalleryItem } from "../types";
+import GalleryGrid from "./GalleryGrid";
 
 function useIsMobile() {
     const [mobile, setMobile] = useState(false);
@@ -18,100 +18,8 @@ function useIsMobile() {
     return mobile;
 }
 
-// ---------- YouTube helpers ----------
-function getYouTubeId(url: string): string | null {
-    try {
-        const u = new URL(url);
-        // youtube.com/watch?v=ID
-        if (
-            (u.hostname === "www.youtube.com" || u.hostname === "youtube.com") &&
-            u.pathname === "/watch"
-        ) {
-            return u.searchParams.get("v");
-        }
-        // youtu.be/ID
-        if (u.hostname === "youtu.be") {
-            return u.pathname.slice(1) || null;
-        }
-        // youtube.com/shorts/ID
-        if (
-            (u.hostname === "www.youtube.com" || u.hostname === "youtube.com") &&
-            u.pathname.startsWith("/shorts/")
-        ) {
-            return u.pathname.split("/shorts/")[1]?.split("?")[0] || null;
-        }
-        // youtube.com/embed/ID
-        if (
-            (u.hostname === "www.youtube.com" || u.hostname === "youtube.com") &&
-            u.pathname.startsWith("/embed/")
-        ) {
-            return u.pathname.split("/embed/")[1]?.split("?")[0] || null;
-        }
-    } catch {
-        return null;
-    }
-    return null;
-}
-
-
-function getYouTubeThumbnail(videoId: string): string {
-    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-}
-
-// ---------- Google Drive helpers ----------
-function getGDriveId(url: string): string | null {
-    try {
-        const u = new URL(url);
-        if (u.hostname === "drive.google.com" && u.pathname.includes("/file/d/")) {
-            const match = u.pathname.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-            return match ? match[1] : null;
-        }
-    } catch {
-        return null;
-    }
-    return null;
-}
-
-// ---------- Gallery item type ----------
-interface GalleryItem {
-    url: string;
-    type: "image" | "youtube" | "gdrive";
-    videoId?: string;
-}
-
-const CACHE_KEY = "gallery_items_v1";
-
-function loadCache(): GalleryItem[] {
-    try {
-        const raw = localStorage.getItem(CACHE_KEY);
-        return raw ? JSON.parse(raw) : [];
-    } catch {
-        return [];
-    }
-}
-
-function saveCache(items: GalleryItem[]) {
-    try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify(items));
-    } catch { /* storage full — ignore */ }
-}
-
-function parseItems(docs: { data: () => Record<string, string> }[]): GalleryItem[] {
-    return docs
-        .map((doc) => {
-            const url = doc.data().url;
-            if (!url) return null;
-            const ytId = getYouTubeId(url);
-            if (ytId) return { url, type: "youtube" as const, videoId: ytId };
-            const gDriveId = getGDriveId(url);
-            if (gDriveId) return { url, type: "gdrive" as const, videoId: gDriveId };
-            return { url, type: "image" as const };
-        })
-        .filter(Boolean) as GalleryItem[];
-}
-
 export default function GalleryWindow() {
-    const [items, setItems] = useState<GalleryItem[]>(() => loadCache());
+    const items = useGalleryImages();
     const [previewIndex, setPreviewIndex] = useState<number | null>(null);
     const [previewSize, setPreviewSize] = useState({ w: 560, h: 480 });
     const isMobile = useIsMobile();
@@ -126,37 +34,8 @@ export default function GalleryWindow() {
         };
     }, [isMobile, previewIndex]);
 
-    useEffect(() => {
-        const q = query(collection(db, "images"), orderBy("createdAt", "desc"));
-        const onFresh = (snap: { docs: { data: () => Record<string, string> }[] }) => {
-            const fresh = parseItems(snap.docs);
-            setItems(fresh);
-            saveCache(fresh);
-        };
-
-        let fallbackUnsub: (() => void) | null = null;
-        const unsubscribe = onSnapshot(q, onFresh, (error) => {
-            console.error("Error fetching images, falling back to unordered:", error);
-            fallbackUnsub = onSnapshot(collection(db, "images"), onFresh);
-        });
-        return () => { unsubscribe(); fallbackUnsub?.(); };
-    }, []);
-
     const previewItem = previewIndex !== null ? items[previewIndex] ?? null : null;
     const latestNavRef = useRef<number>(-1);
-
-    // Convert GalleryItems to MasonryItems — memoized so reference only changes when items change
-    const masonryItems: MasonryItem[] = useMemo(() => items.map((item) => ({
-        id: item.url,
-        img:
-            item.type === "youtube" && item.videoId
-                ? getYouTubeThumbnail(item.videoId)
-                : item.type === "gdrive" && item.videoId
-                ? `https://drive.google.com/thumbnail?id=${item.videoId}&sz=w800`
-                : item.url,
-        url: item.url,
-        height: 400,
-    })), [items]);
 
     // Compute preview window size for a given item
     const computeSize = useCallback((item: GalleryItem, onDone: (w: number, h: number) => void) => {
@@ -222,21 +101,7 @@ export default function GalleryWindow() {
     return (
         <>
             {/* Masonry grid */}
-            <Masonry
-                items={masonryItems}
-                ease="power3.out"
-                duration={0.6}
-                stagger={0.05}
-                animateFrom="bottom"
-                scaleOnHover
-                hoverScale={0.95}
-                blurToFocus
-                colorShiftOnHover={false}
-                onItemClick={(masonryItem) => {
-                    const item = items.find((g) => g.url === masonryItem.url);
-                    if (item) openPreview(item);
-                }}
-            />
+            <GalleryGrid items={items} onItemClick={openPreview} />
 
             {/* Preview — mobile: fullscreen overlay, desktop: popup Window */}
             {typeof document !== "undefined" &&

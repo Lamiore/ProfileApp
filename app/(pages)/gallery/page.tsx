@@ -1,4 +1,4 @@
-import Gallery from "@/components/sections/gallery";
+import Gallery from "@/features/gallery/components/GalleryWindow";
 
 export default function GalleryPage() {
     return (
