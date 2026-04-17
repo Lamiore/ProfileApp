@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { SparklesText } from "@/components/ui/sparkles-text";
+import { SparklesText } from "@/components/ui/SparklesText";
 import PixelTrail from "@/components/ui/PixelTrail";
 
 const IMAGES = [

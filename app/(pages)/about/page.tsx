@@ -1,9 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import AboutText from "@/components/ui/about-text";
-import { Typewriter } from "@/components/ui/typewriter";
-import { LogoLoop } from "@/components/ui/logo-loop";
+import AboutText from "@/components/ui/AboutText";
+import { Typewriter } from "@/components/ui/Typewriter";
+import { LogoLoop } from "@/components/ui/LogoLoop";
 import {
   Figma,
   Github,
@@ -17,7 +17,7 @@ import {
   PenTool,
 } from "lucide-react";
 
-const Keyboard = dynamic(() => import("@/components/ui/keyboard"), {
+const Keyboard = dynamic(() => import("@/components/ui/Keyboard"), {
   ssr: false,
   loading: () => (
     <div

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithPopup, onAuthStateChanged } from "firebase/auth";
 import { auth, provider } from "@/lib/firebase";
-import { LoginPage } from "@/components/ui/animated-characters-login-page";
+import { LoginPage } from "@/components/ui/AnimatedCharactersLogin";
 
 export default function AdminLoginPage() {
   const router = useRouter();

@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import Masonry, { type MasonryItem } from "@/components/ui/masonry";
+import Masonry, { type MasonryItem } from "@/components/ui/Masonry";
 
 function useIsMobile() {
     const [mobile, setMobile] = useState(false);
