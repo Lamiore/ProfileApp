@@ -123,6 +123,11 @@
 
   body {
     @apply bg-background text-foreground;
+    background-color: #0d0d0d;
+    height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    box-sizing: border-box;
   }
 }
 

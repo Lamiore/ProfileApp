@@ -50,7 +50,6 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body
         className={`${satoshi.variable} ${geistSans.variable} ${geistMono.variable} ${sacramento.variable} antialiased`}
-        style={{ backgroundColor: "#0d0d0d", height: "100dvh", overflowX: "hidden", overflowY: "hidden", boxSizing: "border-box" }}
       >
         <PageTransitionProvider>
           <Nav />
