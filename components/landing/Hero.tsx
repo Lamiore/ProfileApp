@@ -38,16 +38,6 @@ export default function Hero() {
     const viewportRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const gridRef = useRef<HTMLDivElement>(null);
-    const isMobileRef = useRef(false);
-
-    useEffect(() => {
-        const check = () => {
-            isMobileRef.current = window.innerWidth <= 768;
-        };
-        check();
-        window.addEventListener("resize", check);
-        return () => window.removeEventListener("resize", check);
-    }, []);
 
     useEffect(() => {
         const viewport = viewportRef.current;
@@ -62,23 +52,9 @@ export default function Hero() {
             gridItems: [] as { element: HTMLDivElement; baseX: number; baseY: number; tileX: number; tileY: number; yOffset: number }[],
             cameraOffset: { x: 0, y: 0 },
             targetOffset: { x: 0, y: 0 },
-            isDragging: false,
-            previousMousePosition: { x: 0, y: 0 },
-            touchStart: null as { x: number; y: number } | null,
-            containerRotationX: 0,
-            containerRotationY: 0,
-            targetRotationX: 0,
-            targetRotationY: 0,
-            containerScale: 1,
-            targetScale: 1,
-            scrollSpeed: 0,
-            lastInteractionTime: performance.now(),
             driftTime: 0,
-            driftActive: false,
-            driftBlendFactor: 0,
         };
 
-        const IDLE_DELAY_MS = 1500;
         const DRIFT_SPEED = 0.6;
         const DRIFT_RADIUS_X = 180;
         const DRIFT_RADIUS_Y = 120;
@@ -148,73 +124,6 @@ export default function Hero() {
             });
         };
 
-        const resetIdle = () => {
-            state.lastInteractionTime = performance.now();
-            state.driftActive = false;
-        };
-
-        const onMouseDown = (e: MouseEvent) => {
-            state.isDragging = true;
-            viewport.style.cursor = "grabbing";
-            state.previousMousePosition = { x: e.clientX, y: e.clientY };
-            resetIdle();
-        };
-
-        const onMouseMove = (e: MouseEvent) => {
-            if (!state.isDragging) return;
-            const deltaX = e.clientX - state.previousMousePosition.x;
-            const deltaY = e.clientY - state.previousMousePosition.y;
-            state.targetOffset.x -= deltaX;
-            state.targetOffset.y -= deltaY;
-            state.scrollSpeed = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            state.targetRotationY = deltaX * CONFIG.rotationStrength;
-            state.targetRotationX = -deltaY * CONFIG.rotationStrength;
-            state.previousMousePosition = { x: e.clientX, y: e.clientY };
-        };
-
-        const onMouseUp = () => {
-            state.isDragging = false;
-            viewport.style.cursor = "grab";
-            state.targetRotationX = 0;
-            state.targetRotationY = 0;
-            resetIdle();
-        };
-
-        const onWheel = (e: WheelEvent) => {
-            e.preventDefault();
-            state.targetOffset.x += e.deltaX;
-            state.targetOffset.y += e.deltaY;
-            state.scrollSpeed = Math.sqrt(e.deltaX * e.deltaX + e.deltaY * e.deltaY);
-            state.targetRotationY = e.deltaX * CONFIG.rotationStrength * 0.5;
-            state.targetRotationX = -e.deltaY * CONFIG.rotationStrength * 0.5;
-            resetIdle();
-        };
-
-        const onTouchStart = (e: TouchEvent) => {
-            if (e.touches.length === 1)
-                state.touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        };
-
-        const onTouchMove = (e: TouchEvent) => {
-            if (e.touches.length === 1 && state.touchStart) {
-                e.preventDefault();
-                const deltaX = e.touches[0].clientX - state.touchStart.x;
-                const deltaY = e.touches[0].clientY - state.touchStart.y;
-                state.targetOffset.x -= deltaX;
-                state.targetOffset.y -= deltaY;
-                state.scrollSpeed = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                state.targetRotationY = deltaX * CONFIG.rotationStrength;
-                state.targetRotationX = -deltaY * CONFIG.rotationStrength;
-                state.touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-            }
-        };
-
-        const onTouchEnd = () => {
-            state.touchStart = null;
-            state.targetRotationX = 0;
-            state.targetRotationY = 0;
-        };
-
         let resizeTimeout: ReturnType<typeof setTimeout> | undefined;
         const onResize = () => {
             clearTimeout(resizeTimeout);
@@ -234,25 +143,13 @@ export default function Hero() {
             }
             rafId = requestAnimationFrame(animate);
 
-            const now = performance.now();
-            const idleMs = now - state.lastInteractionTime;
-
-            if (!state.isDragging && idleMs > IDLE_DELAY_MS) {
-                state.driftActive = true;
-            }
-
-            if (state.driftActive) {
-                state.driftBlendFactor = Math.min(1, state.driftBlendFactor + 0.012);
-                state.driftTime += DRIFT_SPEED * 0.016;
-                const driftX = Math.sin(state.driftTime * 0.4) * DRIFT_RADIUS_X
-                    + Math.sin(state.driftTime * 0.13) * DRIFT_RADIUS_X * 0.3;
-                const driftY = Math.cos(state.driftTime * 0.25) * DRIFT_RADIUS_Y
-                    + Math.cos(state.driftTime * 0.17) * DRIFT_RADIUS_Y * 0.4;
-                state.targetOffset.x += (driftX - state.targetOffset.x) * 0.012 * state.driftBlendFactor;
-                state.targetOffset.y += (driftY - state.targetOffset.y) * 0.012 * state.driftBlendFactor;
-            } else {
-                state.driftBlendFactor = Math.max(0, state.driftBlendFactor - 0.05);
-            }
+            state.driftTime += DRIFT_SPEED * 0.016;
+            const driftX = Math.sin(state.driftTime * 0.4) * DRIFT_RADIUS_X
+                + Math.sin(state.driftTime * 0.13) * DRIFT_RADIUS_X * 0.3;
+            const driftY = Math.cos(state.driftTime * 0.25) * DRIFT_RADIUS_Y
+                + Math.cos(state.driftTime * 0.17) * DRIFT_RADIUS_Y * 0.4;
+            state.targetOffset.x += (driftX - state.targetOffset.x) * 0.012;
+            state.targetOffset.y += (driftY - state.targetOffset.y) * 0.012;
 
             const dx = state.targetOffset.x - state.cameraOffset.x;
             const dy = state.targetOffset.y - state.cameraOffset.y;
@@ -261,48 +158,12 @@ export default function Hero() {
                 state.cameraOffset.y += dy * CONFIG.easingFactor;
                 updateItemPositions();
             }
-
-            if (state.scrollSpeed > 0.1) {
-                const speedFactor = Math.min(state.scrollSpeed * 0.01, 1);
-                state.targetScale = 1 - speedFactor * CONFIG.maxScaleEffect;
-                state.scrollSpeed *= 0.85;
-            } else {
-                state.scrollSpeed = 0;
-                state.targetScale = 1;
-            }
-
-            const prevScale = state.containerScale;
-            const prevRotX = state.containerRotationX;
-            const prevRotY = state.containerRotationY;
-            state.containerScale += (state.targetScale - state.containerScale) * CONFIG.scaleEasing;
-            state.containerRotationX += (state.targetRotationX - state.containerRotationX) * CONFIG.rotationEasing;
-            state.containerRotationY += (state.targetRotationY - state.containerRotationY) * CONFIG.rotationEasing;
-            if (
-                Math.abs(state.containerScale - prevScale) > 0.0001 ||
-                Math.abs(state.containerRotationX - prevRotX) > 0.0001 ||
-                Math.abs(state.containerRotationY - prevRotY) > 0.0001
-            ) {
-                if (isMobileRef.current) {
-                    container.style.transform = `scale(${state.containerScale})`;
-                } else {
-                    container.style.transform = `scale(${state.containerScale}) skewY(${state.containerRotationX}deg) skewX(${state.containerRotationY}deg)`;
-                }
-            }
         };
 
         calculateCellSizeAndTiling();
         createGridItems();
         updateItemPositions();
-        viewport.style.perspective = "1000px";
 
-        viewport.addEventListener("mousedown", onMouseDown);
-        viewport.addEventListener("mousemove", onMouseMove);
-        viewport.addEventListener("mouseup", onMouseUp);
-        viewport.addEventListener("mouseleave", onMouseUp);
-        viewport.addEventListener("wheel", onWheel, { passive: false });
-        viewport.addEventListener("touchstart", onTouchStart);
-        viewport.addEventListener("touchmove", onTouchMove, { passive: false });
-        viewport.addEventListener("touchend", onTouchEnd);
         window.addEventListener("resize", onResize);
 
         const onVisibilityChange = () => {
@@ -317,14 +178,6 @@ export default function Hero() {
         return () => {
             cancelAnimationFrame(rafId);
             document.removeEventListener("visibilitychange", onVisibilityChange);
-            viewport.removeEventListener("mousedown", onMouseDown);
-            viewport.removeEventListener("mousemove", onMouseMove);
-            viewport.removeEventListener("mouseup", onMouseUp);
-            viewport.removeEventListener("mouseleave", onMouseUp);
-            viewport.removeEventListener("wheel", onWheel);
-            viewport.removeEventListener("touchstart", onTouchStart);
-            viewport.removeEventListener("touchmove", onTouchMove);
-            viewport.removeEventListener("touchend", onTouchEnd);
             window.removeEventListener("resize", onResize);
             clearTimeout(resizeTimeout);
         };
@@ -333,7 +186,7 @@ export default function Hero() {
     return (
         <div className="relative w-full h-full overflow-hidden bg-[#0d0d0d]">
             {/* Infinite Grid Background — filling parent frame */}
-            <div ref={viewportRef} className="absolute inset-0" style={{ cursor: "grab" }}>
+            <div ref={viewportRef} className="absolute inset-0">
                 <PixelTrail
                     gridSize={50}
                     trailSize={0.1}
@@ -349,8 +202,6 @@ export default function Hero() {
                         inset: "-10vmin",
                         width: "100%",
                         height: "100%",
-                        transformOrigin: "center center",
-                        willChange: "transform",
                     }}
                 >
                     <div ref={gridRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
