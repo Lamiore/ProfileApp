@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { doc, getDoc, collection, query, orderBy, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { usePageTransition } from "@/components/PageTransition";
+import { usePageTransition } from "@/components/layout/PageTransition";
 
 interface BlogBlock {
     type: "text" | "image";

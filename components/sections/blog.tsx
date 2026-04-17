@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { usePageTransition } from "@/components/PageTransition";
+import { usePageTransition } from "@/components/layout/PageTransition";
 import { FileText, Search } from "lucide-react";
 
 interface BlogBlock {

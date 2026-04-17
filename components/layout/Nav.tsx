@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { usePageTransition } from "@/components/PageTransition";
+import { usePageTransition } from "@/components/layout/PageTransition";
 import StaggeredMenu from "./StaggeredMenu";
 
 const pageLabels: Record<string, string> = {

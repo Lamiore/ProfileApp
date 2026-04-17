@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
-import { usePageTransition } from "@/components/PageTransition";
+import { usePageTransition } from "@/components/layout/PageTransition";
 
 export default function CardPage() {
     const { navigateTo } = usePageTransition();

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Geist, Geist_Mono, Sacramento } from "next/font/google";
 import "./globals.css";
-import PageTransitionProvider from "@/components/PageTransition";
-import Nav from "@/components/Nav";
+import PageTransitionProvider from "@/components/layout/PageTransition";
+import Nav from "@/components/layout/Nav";
 
 const satoshi = localFont({
   src: [
