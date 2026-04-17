@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import Admin from "@/components/sections/admin";
+import Admin from "@/features/admin/components/AdminWindow";
 
 export default function AdminPage() {
     const router = useRouter();
