@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import { SparklesText } from "@/components/ui/SparklesText";
-import PixelTrail from "@/components/ui/PixelTrail";
 
 const IMAGES = [
     "https://i.pinimg.com/avif/736x/b9/88/1d/b9881d73712f3e4aa410348dcabcb8b3.avf",
@@ -52,12 +51,19 @@ export default function Hero() {
             gridItems: [] as { element: HTMLDivElement; baseX: number; baseY: number; tileX: number; tileY: number; yOffset: number }[],
             cameraOffset: { x: 0, y: 0 },
             targetOffset: { x: 0, y: 0 },
+            isDragging: false,
+            previousMouse: { x: 0, y: 0 },
+            touchStart: { x: 0, y: 0 },
             driftTime: 0,
+            driftActive: false,
+            driftBlendFactor: 0,
+            lastInteraction: performance.now(),
         };
 
         const DRIFT_SPEED = 0.6;
         const DRIFT_RADIUS_X = 180;
         const DRIFT_RADIUS_Y = 120;
+        const IDLE_DELAY_MS = 1500;
 
         let cellWidth = 0;
         let cellHeight = 0;
@@ -135,21 +141,117 @@ export default function Hero() {
         };
 
         let isPaused = false;
+        let menuFullscreenOpen = false;
+        let menuCooldownUntil = 0;
+        const MENU_COOLDOWN_MS = 1500;
+
+        const onMenuOpen = (e: Event) => {
+            const detail = (e as CustomEvent<{ fullscreen?: boolean }>).detail;
+            if (detail?.fullscreen) {
+                menuFullscreenOpen = true;
+            } else {
+                menuCooldownUntil = performance.now() + MENU_COOLDOWN_MS;
+            }
+        };
+        const onMenuClose = (e: Event) => {
+            const detail = (e as CustomEvent<{ fullscreen?: boolean }>).detail;
+            if (detail?.fullscreen) {
+                menuFullscreenOpen = false;
+            }
+            if (isPaused && !document.hidden && !menuFullscreenOpen) {
+                isPaused = false;
+                rafId = requestAnimationFrame(animate);
+            }
+        };
+        window.addEventListener('menu:open', onMenuOpen);
+        window.addEventListener('menu:close', onMenuClose);
+
+        const onMouseDown = (e: MouseEvent) => {
+            state.isDragging = true;
+            viewport.style.cursor = "grabbing";
+            state.previousMouse = { x: e.clientX, y: e.clientY };
+            state.lastInteraction = performance.now();
+            state.driftActive = false;
+        };
+        const onMouseMove = (e: MouseEvent) => {
+            if (!state.isDragging) return;
+            const deltaX = e.clientX - state.previousMouse.x;
+            const deltaY = e.clientY - state.previousMouse.y;
+            state.targetOffset.x -= deltaX;
+            state.targetOffset.y -= deltaY;
+            state.previousMouse = { x: e.clientX, y: e.clientY };
+            state.lastInteraction = performance.now();
+        };
+        const onMouseUp = () => {
+            state.isDragging = false;
+            viewport.style.cursor = "grab";
+        };
+        const onWheel = (e: WheelEvent) => {
+            e.preventDefault();
+            state.targetOffset.x += e.deltaX;
+            state.targetOffset.y += e.deltaY;
+            state.lastInteraction = performance.now();
+            state.driftActive = false;
+        };
+        const onTouchStart = (e: TouchEvent) => {
+            if (e.touches.length !== 1) return;
+            state.isDragging = true;
+            state.touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            state.previousMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            state.lastInteraction = performance.now();
+            state.driftActive = false;
+        };
+        const onTouchMove = (e: TouchEvent) => {
+            if (!state.isDragging || e.touches.length !== 1) return;
+            e.preventDefault();
+            const deltaX = e.touches[0].clientX - state.previousMouse.x;
+            const deltaY = e.touches[0].clientY - state.previousMouse.y;
+            state.targetOffset.x -= deltaX;
+            state.targetOffset.y -= deltaY;
+            state.previousMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            state.lastInteraction = performance.now();
+        };
+        const onTouchEnd = () => { state.isDragging = false; };
+
+        viewport.addEventListener("mousedown", onMouseDown);
+        window.addEventListener("mousemove", onMouseMove);
+        window.addEventListener("mouseup", onMouseUp);
+        viewport.addEventListener("wheel", onWheel, { passive: false });
+        viewport.addEventListener("touchstart", onTouchStart, { passive: true });
+        viewport.addEventListener("touchmove", onTouchMove, { passive: false });
+        viewport.addEventListener("touchend", onTouchEnd);
 
         const animate = () => {
-            if (document.hidden) {
+            if (document.hidden || menuFullscreenOpen) {
                 isPaused = true;
                 return;
             }
             rafId = requestAnimationFrame(animate);
 
-            state.driftTime += DRIFT_SPEED * 0.016;
-            const driftX = Math.sin(state.driftTime * 0.4) * DRIFT_RADIUS_X
-                + Math.sin(state.driftTime * 0.13) * DRIFT_RADIUS_X * 0.3;
-            const driftY = Math.cos(state.driftTime * 0.25) * DRIFT_RADIUS_Y
-                + Math.cos(state.driftTime * 0.17) * DRIFT_RADIUS_Y * 0.4;
-            state.targetOffset.x += (driftX - state.targetOffset.x) * 0.012;
-            state.targetOffset.y += (driftY - state.targetOffset.y) * 0.012;
+            const now = performance.now();
+            if (now < menuCooldownUntil) return;
+
+            const idleTime = now - state.lastInteraction;
+            const shouldDrift = idleTime > IDLE_DELAY_MS && !state.isDragging;
+
+            if (shouldDrift && !state.driftActive) {
+                state.driftActive = true;
+                state.driftBlendFactor = 0;
+            } else if (!shouldDrift && state.driftActive) {
+                state.driftActive = false;
+            }
+
+            if (state.driftActive) {
+                state.driftBlendFactor = Math.min(1, state.driftBlendFactor + 0.01);
+                state.driftTime += DRIFT_SPEED * 0.016;
+                const driftX = Math.sin(state.driftTime * 0.4) * DRIFT_RADIUS_X
+                    + Math.sin(state.driftTime * 0.13) * DRIFT_RADIUS_X * 0.3;
+                const driftY = Math.cos(state.driftTime * 0.25) * DRIFT_RADIUS_Y
+                    + Math.cos(state.driftTime * 0.17) * DRIFT_RADIUS_Y * 0.4;
+                const blend = state.driftBlendFactor * 0.012;
+                state.targetOffset.x += (driftX - state.targetOffset.x) * blend;
+                state.targetOffset.y += (driftY - state.targetOffset.y) * blend;
+            }
 
             const dx = state.targetOffset.x - state.cameraOffset.x;
             const dy = state.targetOffset.y - state.cameraOffset.y;
@@ -167,7 +269,7 @@ export default function Hero() {
         window.addEventListener("resize", onResize);
 
         const onVisibilityChange = () => {
-            if (!document.hidden && isPaused) {
+            if (!document.hidden && isPaused && !menuFullscreenOpen) {
                 isPaused = false;
                 rafId = requestAnimationFrame(animate);
             }
@@ -178,7 +280,16 @@ export default function Hero() {
         return () => {
             cancelAnimationFrame(rafId);
             document.removeEventListener("visibilitychange", onVisibilityChange);
+            window.removeEventListener("menu:open", onMenuOpen);
+            window.removeEventListener("menu:close", onMenuClose);
             window.removeEventListener("resize", onResize);
+            viewport.removeEventListener("mousedown", onMouseDown);
+            window.removeEventListener("mousemove", onMouseMove);
+            window.removeEventListener("mouseup", onMouseUp);
+            viewport.removeEventListener("wheel", onWheel);
+            viewport.removeEventListener("touchstart", onTouchStart);
+            viewport.removeEventListener("touchmove", onTouchMove);
+            viewport.removeEventListener("touchend", onTouchEnd);
             clearTimeout(resizeTimeout);
         };
     }, []);
@@ -186,15 +297,7 @@ export default function Hero() {
     return (
         <div className="relative w-full h-full overflow-hidden bg-[#0d0d0d]">
             {/* Infinite Grid Background — filling parent frame */}
-            <div ref={viewportRef} className="absolute inset-0">
-                <PixelTrail
-                    gridSize={50}
-                    trailSize={0.1}
-                    maxAge={250}
-                    interpolate={5}
-                    color="#0e1013"
-                    gooeyFilter={{ id: "custom-goo-filter", strength: 2 }}
-                />
+            <div ref={viewportRef} className="absolute inset-0" style={{ cursor: "grab" }}>
                 <div
                     ref={containerRef}
                     style={{

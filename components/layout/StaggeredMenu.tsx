@@ -357,6 +357,9 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     const target = !openRef.current;
     openRef.current = target;
     setOpen(target);
+    window.dispatchEvent(new CustomEvent(target ? 'menu:open' : 'menu:close', {
+      detail: { fullscreen: window.innerWidth <= 1024 }
+    }));
 
     if (target) {
       onMenuOpen?.();
@@ -375,6 +378,9 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     if (openRef.current) {
       openRef.current = false;
       setOpen(false);
+      window.dispatchEvent(new CustomEvent('menu:close', {
+        detail: { fullscreen: window.innerWidth <= 1024 }
+      }));
       onMenuClose?.();
       playClose();
       animateIcon(false);
