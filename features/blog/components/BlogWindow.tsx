@@ -1,82 +1,146 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { Search, X } from "lucide-react";
 import { usePageTransition } from "@/components/layout/PageTransition";
 import { useBlogPosts } from "../hooks/use-blog-posts";
-import BlogCard, { SkeletonCard } from "./BlogCard";
+import BlogCard, { FeaturedBlogCard, FeaturedSkeleton, SkeletonCard } from "./BlogCard";
 
 export default function BlogWindow() {
     const { loading, searchQuery, setSearchQuery, filteredBlogs } = useBlogPosts();
     const { navigateTo } = usePageTransition();
+    const searchRef = useRef<HTMLInputElement>(null);
+
+    // Focus search with "/" shortcut — small designer touch
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
+            const active = document.activeElement;
+            const editing = active instanceof HTMLElement && (
+                active.tagName === "INPUT" ||
+                active.tagName === "TEXTAREA" ||
+                active.isContentEditable
+            );
+            if (editing) return;
+            e.preventDefault();
+            searchRef.current?.focus();
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, []);
+
+    const isSearching = searchQuery.trim().length > 0;
+    const [featured, ...rest] = filteredBlogs;
+    const showFeatured = !isSearching && !!featured;
+    const gridPosts = showFeatured ? rest : filteredBlogs;
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-            <div style={{ position: "relative", width: "100%", maxWidth: "400px" }}>
-                <Search
-                    size={16}
-                    style={{
-                        position: "absolute",
-                        left: "12px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        color: "rgba(255,255,255,0.4)"
-                    }}
-                />
-                <input
-                    type="text"
-                    placeholder="Cari artikel..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    style={{
-                        width: "100%",
-                        padding: "10px 12px 10px 38px",
-                        background: "rgba(255,255,255,0.05)",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        borderRadius: "8px",
-                        color: "#fff",
-                        fontSize: "13px",
-                        outline: "none",
-                        transition: "all 0.2s ease"
-                    }}
-                    className="wnd-blog-search"
-                />
+        <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+            {/* Toolbar: search + meta */}
+            <div className="wnd-blog-toolbar">
+                <div className="wnd-blog-search-field">
+                    <Search size={15} />
+                    <input
+                        ref={searchRef}
+                        type="text"
+                        placeholder="Search articles by title or content"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="wnd-blog-search"
+                        aria-label="Search articles"
+                    />
+                    {isSearching ? (
+                        <button
+                            type="button"
+                            className="wnd-blog-search-clear"
+                            aria-label="Clear search"
+                            onClick={() => {
+                                setSearchQuery("");
+                                searchRef.current?.focus();
+                            }}
+                        >
+                            <X size={13} />
+                        </button>
+                    ) : (
+                        <span className="wnd-blog-search-hint" aria-hidden="true">/</span>
+                    )}
+                </div>
+                <div className="wnd-blog-meta">
+                    {loading ? (
+                        <span>Loading</span>
+                    ) : isSearching ? (
+                        <>
+                            <span>{filteredBlogs.length} result{filteredBlogs.length === 1 ? "" : "s"}</span>
+                        </>
+                    ) : (
+                        <>
+                            <span>{filteredBlogs.length} article{filteredBlogs.length === 1 ? "" : "s"}</span>
+                            <span className="wnd-blog-meta-dot" aria-hidden="true" />
+                            <span>Latest first</span>
+                        </>
+                    )}
+                </div>
             </div>
+
+            {/* Body */}
             {loading ? (
-                <div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                        <div style={{ width: "90px", height: "13px", borderRadius: "4px", background: "rgba(255,255,255,0.08)", animation: "skeleton-pulse 1.8s ease-in-out infinite" }} />
-                        <div style={{ width: "55px", height: "12px", borderRadius: "4px", background: "rgba(255,255,255,0.06)", animation: "skeleton-pulse 1.8s ease-in-out 0.1s infinite" }} />
+                <>
+                    <FeaturedSkeleton />
+                    <div className="wnd-blog-section-head">
+                        <span className="wnd-blog-section-label">All articles</span>
+                        <span className="wnd-blog-section-rule" aria-hidden="true" />
+                        <span className="wnd-blog-section-count">—</span>
                     </div>
                     <div className="wnd-blog-grid">
                         {Array.from({ length: 6 }).map((_, i) => (
                             <SkeletonCard key={i} />
                         ))}
                     </div>
-                </div>
-            ) : filteredBlogs.length > 0 ? (
-                <div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                        <span style={{ fontSize: "13px", fontWeight: 600, color: "#E0E0E0" }}>
-                            {searchQuery ? `Hasil pencarian: ${filteredBlogs.length}` : "Semua Blog"}
-                        </span>
-                        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>{filteredBlogs.length} artikel</span>
-                    </div>
-                    <div className="wnd-blog-grid">
-                        {filteredBlogs.map((blog) => (
-                            <BlogCard
-                                key={blog.id}
-                                post={blog}
-                                onClick={() => navigateTo(`/blog/${blog.id}`)}
-                            />
-                        ))}
-                    </div>
+                </>
+            ) : filteredBlogs.length === 0 ? (
+                <div className="wnd-blog-empty">
+                    <span className="wnd-blog-empty-eyebrow">
+                        {isSearching ? "No results" : "Nothing yet"}
+                    </span>
+                    <p className="wnd-blog-empty-text">
+                        {isSearching ? (
+                            <>Nothing matched <strong>&ldquo;{searchQuery}&rdquo;</strong>. Try a different keyword.</>
+                        ) : (
+                            <>The journal is quiet for now — new writings land here soon.</>
+                        )}
+                    </p>
                 </div>
             ) : (
-                <div style={{ textAlign: "center", padding: "4rem 1rem", color: "rgba(255,255,255,0.4)", fontSize: "14px" }}>
-                    {searchQuery
-                        ? `Tidak ada hasil untuk "${searchQuery}"`
-                        : "Belum ada tulisan yang dipublikasikan."}
-                </div>
+                <>
+                    {showFeatured && (
+                        <FeaturedBlogCard
+                            post={featured}
+                            onClick={() => navigateTo(`/blog/${featured.id}`)}
+                        />
+                    )}
+                    {gridPosts.length > 0 && (
+                        <>
+                            <div className="wnd-blog-section-head">
+                                <span className="wnd-blog-section-label">
+                                    {isSearching ? "Results" : showFeatured ? "All articles" : "Articles"}
+                                </span>
+                                <span className="wnd-blog-section-rule" aria-hidden="true" />
+                                <span className="wnd-blog-section-count">
+                                    {String(gridPosts.length).padStart(2, "0")}
+                                </span>
+                            </div>
+                            <div className="wnd-blog-grid">
+                                {gridPosts.map((blog) => (
+                                    <BlogCard
+                                        key={blog.id}
+                                        post={blog}
+                                        onClick={() => navigateTo(`/blog/${blog.id}`)}
+                                    />
+                                ))}
+                            </div>
+                        </>
+                    )}
+                </>
             )}
         </div>
     );

@@ -23,6 +23,15 @@ export default function AdminPage() {
         return () => unsub();
     }, [router]);
 
+    useEffect(() => {
+        document.documentElement.classList.add("adm-scroll");
+        document.body.classList.add("adm-scroll");
+        return () => {
+            document.documentElement.classList.remove("adm-scroll");
+            document.body.classList.remove("adm-scroll");
+        };
+    }, []);
+
     if (checking || !user) {
         return (
             <div style={{ minHeight: "100vh", backgroundColor: "#0d0d0d", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -32,8 +41,8 @@ export default function AdminPage() {
     }
 
     return (
-        <div style={{ minHeight: "100vh", backgroundColor: "#0d0d0d", display: "flex", justifyContent: "center", padding: "clamp(1rem, 2.6vw, 2.5rem)" }}>
-            <div style={{ width: "100%", maxWidth: "600px" }}>
+        <div style={{ minHeight: "100vh", backgroundColor: "#0d0d0d", padding: "clamp(1rem, 2.4vw, 2rem) clamp(1rem, 2.4vw, 2rem) 3rem" }}>
+            <div style={{ width: "100%", maxWidth: "1180px", margin: "0 auto" }}>
                 <Admin />
             </div>
         </div>

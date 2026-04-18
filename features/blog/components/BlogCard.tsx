@@ -5,15 +5,22 @@ import type { BlogPost, BlogBlock } from "../types";
 
 const formatDate = (ts: { toDate: () => Date } | undefined) => {
     if (!ts || typeof ts.toDate !== "function") return "";
-    return ts.toDate().toLocaleDateString("id-ID", { year: "numeric", month: "long", day: "numeric" });
+    return ts.toDate().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 };
 
-const getExcerpt = (blocks?: BlogBlock[]) => {
+const getExcerpt = (blocks: BlogBlock[] | undefined, max = 110) => {
     const textBlock = blocks?.find((block) => block.type === "text" && block.content.trim());
-    if (!textBlock) return "Buka artikel untuk membaca selengkapnya.";
+    if (!textBlock) return "Open the article to read more.";
 
     const normalized = textBlock.content.replace(/\s+/g, " ").trim();
-    return normalized.length > 110 ? `${normalized.slice(0, 107)}...` : normalized;
+    return normalized.length > max ? `${normalized.slice(0, max - 3)}...` : normalized;
+};
+
+const getReadingMinutes = (blocks?: BlogBlock[]) => {
+    const words = (blocks ?? [])
+        .filter((b) => b.type === "text")
+        .reduce((sum, b) => sum + b.content.trim().split(/\s+/).filter(Boolean).length, 0);
+    return Math.max(1, Math.round(words / 200));
 };
 
 interface BlogCardProps {
@@ -79,8 +86,75 @@ export function SkeletonCard() {
     );
 }
 
+export function FeaturedSkeleton() {
+    return (
+        <div className="wnd-blog-featured" style={{ cursor: "default", pointerEvents: "none" }}>
+            <div
+                className="wnd-blog-card-backdrop"
+                style={{
+                    background: "linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
+                    animation: "skeleton-pulse 1.8s ease-in-out infinite",
+                }}
+            />
+            <div className="wnd-blog-featured-content">
+                <div style={{ width: "120px", height: "12px", borderRadius: "4px", background: "rgba(255,255,255,0.1)", animation: "skeleton-pulse 1.8s ease-in-out infinite" }} />
+                <div style={{ display: "grid", gap: 10 }}>
+                    <div style={{ width: "82%", height: "28px", borderRadius: "6px", background: "rgba(255,255,255,0.12)", animation: "skeleton-pulse 1.8s ease-in-out 0.1s infinite" }} />
+                    <div style={{ width: "60%", height: "28px", borderRadius: "6px", background: "rgba(255,255,255,0.09)", animation: "skeleton-pulse 1.8s ease-in-out 0.2s infinite" }} />
+                </div>
+                <div style={{ display: "grid", gap: 6 }}>
+                    <div style={{ width: "90%", height: "10px", borderRadius: "3px", background: "rgba(255,255,255,0.06)", animation: "skeleton-pulse 1.8s ease-in-out 0.3s infinite" }} />
+                    <div style={{ width: "75%", height: "10px", borderRadius: "3px", background: "rgba(255,255,255,0.05)", animation: "skeleton-pulse 1.8s ease-in-out 0.4s infinite" }} />
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export function FeaturedBlogCard({ post, onClick }: BlogCardProps) {
+    const excerpt = getExcerpt(post.blocks, 180);
+    const date = formatDate(post.createdAt);
+    const minutes = getReadingMinutes(post.blocks);
+
+    return (
+        <article className="wnd-blog-featured" onClick={onClick}>
+            {post.thumbnail ? (
+                <img
+                    src={post.thumbnail}
+                    alt={post.title}
+                    referrerPolicy="no-referrer"
+                    className="wnd-blog-card-backdrop"
+                />
+            ) : (
+                <div className="wnd-blog-card-thumb-empty wnd-blog-card-backdrop">
+                    <FileText size={34} />
+                </div>
+            )}
+            <div className="wnd-blog-featured-content">
+                <div className="wnd-blog-featured-meta">
+                    <span className="wnd-blog-featured-badge">Featured</span>
+                    {date && <span>{date}</span>}
+                    <span>·</span>
+                    <span>{minutes} min read</span>
+                </div>
+                <h2 className="wnd-blog-featured-title">{post.title}</h2>
+                <p className="wnd-blog-featured-excerpt">{excerpt}</p>
+                <span className="wnd-blog-featured-cta">
+                    Read article
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                </span>
+            </div>
+        </article>
+    );
+}
+
 export default function BlogCard({ post, onClick }: BlogCardProps) {
     const excerpt = getExcerpt(post.blocks);
+    const date = formatDate(post.createdAt);
+    const minutes = getReadingMinutes(post.blocks);
 
     return (
         <article
@@ -100,7 +174,11 @@ export default function BlogCard({ post, onClick }: BlogCardProps) {
                 </div>
             )}
             <div className="wnd-blog-card-content">
-                <div className="wnd-blog-card-category">{formatDate(post.createdAt) || "Artikel"}</div>
+                <div className="wnd-blog-card-category">
+                    <span>{date || "Article"}</span>
+                    <span className="wnd-blog-card-dot" aria-hidden="true" />
+                    <span>{minutes} min</span>
+                </div>
                 <h3 className="wnd-blog-card-title">{post.title}</h3>
                 <div className="wnd-blog-card-description">
                     <p>{excerpt}</p>

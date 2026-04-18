@@ -6,7 +6,7 @@ import { db } from "@/lib/firebase";
 import {
     CheckCircle, AlertCircle,
     Image as ImageIcon, FileText,
-    Link2, Plus,
+    Link2, Plus, Copy, Check,
 } from "lucide-react";
 import { SwipeDeleteItem } from "./SwipeDeleteItem";
 import type { GalleryItem } from "../types";
@@ -53,6 +53,25 @@ export default function AdminGalleryForm() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
     const [gdriveType, setGdriveType] = useState<"image" | "video">("image");
+    const [copiedId, setCopiedId] = useState<string | null>(null);
+
+    const copyUrl = async (id: string, value: string) => {
+        try {
+            await navigator.clipboard.writeText(value);
+            setCopiedId(id);
+            setTimeout(() => setCopiedId((curr) => (curr === id ? null : curr)), 1400);
+        } catch {
+            // Fallback: select + copy via hidden input
+            const ta = document.createElement("textarea");
+            ta.value = value;
+            ta.style.position = "fixed";
+            ta.style.left = "-9999px";
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand("copy"); setCopiedId(id); setTimeout(() => setCopiedId(null), 1400); } catch { /* noop */ }
+            document.body.removeChild(ta);
+        }
+    };
 
     useEffect(() => {
         const q = query(collection(db, "images"), orderBy("createdAt", "desc"));
@@ -157,18 +176,52 @@ export default function AdminGalleryForm() {
 
             {items.length > 0 ? (
                 <div className="adm-list">
-                    {items.map((item) => (
-                        <SwipeDeleteItem key={item.id} onDelete={() => handleDelete(item.id)}>
-                            <div className="adm-list-thumb">
-                                <img src={item.url} alt="" referrerPolicy="no-referrer"
-                                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
-                            </div>
-                            <div className="adm-list-info">
-                                <span className="adm-list-name">{item.name || "Media"}</span>
-                                <span className="adm-list-date">{formatDate(item.createdAt)}</span>
-                            </div>
-                        </SwipeDeleteItem>
-                    ))}
+                    {items.map((item) => {
+                        const displayUrl = item.originalUrl || item.url;
+                        const isCopied = copiedId === item.id;
+                        const sourceLabel = item.source === "youtube" ? "YouTube"
+                            : item.source === "gdrive" ? "Drive"
+                                : item.source ? "Image" : null;
+                        return (
+                            <SwipeDeleteItem key={item.id} onDelete={() => handleDelete(item.id)}>
+                                <div className="adm-list-thumb">
+                                    <img src={item.url} alt="" referrerPolicy="no-referrer"
+                                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+                                </div>
+                                <div className="adm-list-info">
+                                    <div className="adm-list-name-row">
+                                        <span className="adm-list-name">{item.name || "Media"}</span>
+                                        {sourceLabel && (
+                                            <span className={`adm-list-badge adm-list-badge-${item.source}`}>
+                                                {sourceLabel}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <a
+                                        href={displayUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="adm-list-url"
+                                        onClick={(e) => e.stopPropagation()}
+                                        title={displayUrl}
+                                    >
+                                        <Link2 size={11} />
+                                        <span>{displayUrl}</span>
+                                    </a>
+                                    <span className="adm-list-date">{formatDate(item.createdAt)}</span>
+                                </div>
+                                <button
+                                    type="button"
+                                    className={`adm-list-copy ${isCopied ? "adm-list-copy-done" : ""}`}
+                                    onClick={(e) => { e.stopPropagation(); copyUrl(item.id, displayUrl); }}
+                                    aria-label={isCopied ? "URL disalin" : "Salin URL"}
+                                    title={isCopied ? "Disalin!" : "Salin URL"}
+                                >
+                                    {isCopied ? <Check size={13} /> : <Copy size={13} />}
+                                </button>
+                            </SwipeDeleteItem>
+                        );
+                    })}
                 </div>
             ) : (
                 <div className="adm-empty">Belum ada media.</div>

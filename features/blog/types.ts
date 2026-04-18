@@ -1,7 +1,18 @@
+export type BlogBlockType =
+    | "text"
+    | "heading"
+    | "quote"
+    | "list"
+    | "code"
+    | "image"
+    | "divider";
+
 export interface BlogBlock {
     id: number;
-    type: "text" | "image";
+    type: BlogBlockType;
     content: string;
+    /** Generic side-channel per type: image caption, quote attribution, code language, list style (bullet|numbered), heading level (h2|h3). */
+    meta?: string;
 }
 
 export interface BlogPost {
