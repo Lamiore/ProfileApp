@@ -178,6 +178,7 @@ const Masonry: React.FC<MasonryProps> = ({
             duration: 0.8,
             ease: "power3.out",
             delay: index * stagger,
+            clearProps: blurToFocus ? "filter" : "",
           }
         );
       } else {
@@ -220,7 +221,6 @@ const Masonry: React.FC<MasonryProps> = ({
           key={item.id}
           data-key={item.id}
           className="absolute box-content cursor-pointer"
-          style={{ willChange: "transform, width, height, opacity" }}
           onClick={() =>
             onItemClick ? onItemClick(item) : window.open(item.url, "_blank", "noopener")
           }
