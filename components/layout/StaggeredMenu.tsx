@@ -238,6 +238,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     openTlRef.current?.kill();
     openTlRef.current = null;
     itemEntranceTweenRef.current?.kill();
+    busyRef.current = false;
 
     const panel = panelRef.current;
     const layers = preLayerElsRef.current;
@@ -437,7 +438,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
             return arr.map((c, i) => (
               <div
                 key={i}
-                className="sm-prelayer absolute top-0 right-0 h-full w-full translate-x-0"
+                className="sm-prelayer absolute top-0 right-0 h-full w-full"
                 style={{ background: c }}
               />
             ));
