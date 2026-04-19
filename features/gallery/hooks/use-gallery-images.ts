@@ -6,34 +6,18 @@ import { db } from "@/lib/firebase";
 import type { GalleryItem } from "../types";
 
 // ---------- YouTube helpers ----------
+// Supports: youtube.com/watch?v=, youtu.be/, /shorts/, /embed/, /live/
+// Also: m.youtube.com and music.youtube.com hosts.
 function getYouTubeId(url: string): string | null {
     try {
         const u = new URL(url);
-        // youtube.com/watch?v=ID
-        if (
-            (u.hostname === "www.youtube.com" || u.hostname === "youtube.com") &&
-            u.pathname === "/watch"
-        ) {
-            return u.searchParams.get("v");
-        }
-        // youtu.be/ID
-        if (u.hostname === "youtu.be") {
-            return u.pathname.slice(1) || null;
-        }
-        // youtube.com/shorts/ID
-        if (
-            (u.hostname === "www.youtube.com" || u.hostname === "youtube.com") &&
-            u.pathname.startsWith("/shorts/")
-        ) {
-            return u.pathname.split("/shorts/")[1]?.split("?")[0] || null;
-        }
-        // youtube.com/embed/ID
-        if (
-            (u.hostname === "www.youtube.com" || u.hostname === "youtube.com") &&
-            u.pathname.startsWith("/embed/")
-        ) {
-            return u.pathname.split("/embed/")[1]?.split("?")[0] || null;
-        }
+        const host = u.hostname.replace(/^www\./, "").replace(/^m\./, "");
+        if (host === "youtu.be") return u.pathname.slice(1).split("/")[0] || null;
+        if (host !== "youtube.com" && host !== "music.youtube.com") return null;
+        if (u.pathname === "/watch") return u.searchParams.get("v");
+        if (u.pathname.startsWith("/shorts/")) return u.pathname.split("/shorts/")[1]?.split("?")[0] || null;
+        if (u.pathname.startsWith("/embed/")) return u.pathname.split("/embed/")[1]?.split("?")[0] || null;
+        if (u.pathname.startsWith("/live/")) return u.pathname.split("/live/")[1]?.split("?")[0] || null;
     } catch {
         return null;
     }
