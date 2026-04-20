@@ -20,9 +20,9 @@ export default function Nav() {
     ];
 
     const socialItems = [
-        { label: 'Twitter', link: 'https://twitter.com' },
-        { label: 'Instagram', link: 'https://instagram.com/ikanguramegarorica' },
-        { label: 'LinkedIn', link: 'https://linkedin.com/in/irham-aadiyaat-mohammad' }
+        { label: 'Instagram', link: 'https://www.instagram.com/lamiore_/' },
+        { label: 'GitHub', link: 'https://github.com/Lamiore' },
+        { label: 'LinkedIn', link: 'https://www.linkedin.com/in/irham-aadiyaat-mohammad/' }
     ];
 
     const logoText = pageLabels[pathname] || "";

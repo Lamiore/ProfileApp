@@ -94,6 +94,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   const busyRef = useRef(false);
 
   const itemEntranceTweenRef = useRef<gsap.core.Tween | null>(null);
+  const [gsapReady, setGsapReady] = useState(false);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -127,6 +128,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
       if (toggleBtnRef.current) gsap.set(toggleBtnRef.current, { color: menuButtonColor });
     });
+    setGsapReady(true);
     return () => ctx.revert();
   }, [menuButtonColor, position]);
 
@@ -422,6 +424,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
         style={accentColor ? ({ ['--sm-accent' as any]: accentColor } as React.CSSProperties) : undefined}
         data-position={position}
         data-open={open || undefined}
+        data-gsap-ready={gsapReady || undefined}
       >
         <div
           ref={preLayersRef}

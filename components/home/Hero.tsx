@@ -34,8 +34,14 @@ export default function Hero({ name, role }: { name: string; role: string }) {
       }}
     >
       <div
-        className="hero-script"
-        style={{ position: "absolute", top: 80, left: "7vw", zIndex: 5 }}
+        className="hero-script hero-anim"
+        style={{
+          position: "absolute",
+          top: 80,
+          left: "7vw",
+          zIndex: 5,
+          animationDelay: "100ms",
+        }}
       >
         <div
           className="font-hand"
@@ -52,13 +58,14 @@ export default function Hero({ name, role }: { name: string; role: string }) {
       </div>
 
       <div
-        className="hero-script-sm hide-mobile"
+        className="hero-script-sm hide-mobile hero-anim"
         style={{
           position: "absolute",
           top: 100,
           right: "7vw",
           zIndex: 5,
           textAlign: "right",
+          animationDelay: "250ms",
         }}
       >
         <div
@@ -92,19 +99,25 @@ export default function Hero({ name, role }: { name: string; role: string }) {
         }}
       >
         <h1
-          className="font-display"
-          style={{ ...common, alignSelf: "flex-start", marginLeft: "6vw" }}
+          className="font-display hero-anim"
+          style={{
+            ...common,
+            alignSelf: "flex-start",
+            marginLeft: "6vw",
+            animationDelay: "400ms",
+          }}
         >
           {first}
         </h1>
         {last && (
           <h1
-            className="font-display"
+            className="font-display hero-anim"
             style={{
               ...common,
               alignSelf: "flex-end",
               marginRight: "4vw",
               marginTop: "-0.08em",
+              animationDelay: "550ms",
             }}
           >
             {last}
@@ -113,7 +126,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
       </div>
 
       <div
-        className="font-hand"
+        className="font-hand hero-anim-fade"
         style={{
           position: "absolute",
           top: "14%",
@@ -124,6 +137,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           transform: "rotate(-4deg)",
           zIndex: 3,
           color: "var(--ink)",
+          animationDelay: "700ms",
         }}
       >
         this is
@@ -148,6 +162,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
 
       {/* portrait — nempel di dasar section Hero, gede */}
       <div
+        className="hero-anim-portrait"
         style={{
           position: "absolute",
           left: 0,
@@ -158,6 +173,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           justifyContent: "center",
           alignItems: "flex-end",
           pointerEvents: "none",
+          animationDelay: "850ms",
         }}
       >
         <div
@@ -185,6 +201,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
       </div>
 
       <div
+        className="hero-anim"
         style={{
           position: "absolute",
           bottom: 40,
@@ -193,6 +210,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           display: "flex",
           alignItems: "center",
           gap: 14,
+          animationDelay: "1100ms",
         }}
       >
         <div
@@ -208,8 +226,14 @@ export default function Hero({ name, role }: { name: string; role: string }) {
       </div>
 
       <div
-        className="hide-mobile"
-        style={{ position: "absolute", bottom: 40, right: "7vw", zIndex: 5 }}
+        className="hide-mobile hero-anim"
+        style={{
+          position: "absolute",
+          bottom: 40,
+          right: "7vw",
+          zIndex: 5,
+          animationDelay: "1200ms",
+        }}
       >
         <div
           className="font-mono"
@@ -224,6 +248,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
       </div>
 
       <div
+        className="hero-anim-fade"
         style={{
           position: "absolute",
           bottom: 10,
@@ -233,9 +258,10 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           fontFamily: "var(--font-caveat), cursive",
           fontSize: 22,
           color: "var(--muted)",
+          animationDelay: "1300ms",
         }}
       >
-        scroll ↓
+        scroll <span className="hero-scroll-arrow">↓</span>
       </div>
     </section>
   );

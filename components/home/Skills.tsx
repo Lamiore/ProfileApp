@@ -188,9 +188,7 @@ export default function Skills() {
             posters, illustration, logos, etc.
           </div>
           <button className="sticky-btn" type="button">
-            currently working on
-            <br />
-            portfolio drop 2026
+            portfolio
           </button>
           <div
             className="font-mono"

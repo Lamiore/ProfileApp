@@ -5,9 +5,9 @@ import Image from "next/image";
 import { Polaroid, Reveal } from "./Primitives";
 
 const DECK = [
-  { src: "/image/home/origin/1.jpg", caption: "11 yr old ilham" },
-  { src: "/image/home/origin/2.jpg", caption: "early doodles" },
-  { src: "/image/home/origin/3.png", caption: "first rig" },
+  { src: "/image/home/origin/1.jpg", caption: "Elementry School" },
+  { src: "/image/home/origin/2.jpg", caption: "Bocil" },
+  { src: "/image/home/origin/3.png", caption: "Catfish Filter" },
 ];
 
 const CARD_W = 220;

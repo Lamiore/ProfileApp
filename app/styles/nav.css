@@ -197,3 +197,10 @@
 .mobile-fullview-content::-webkit-scrollbar {
   display: none;
 }
+
+/* Staggered menu — invisible until GSAP hydrates & positions it (prevents flicker) */
+.staggered-menu-wrapper:not([data-gsap-ready]) .staggered-menu-panel,
+.staggered-menu-wrapper:not([data-gsap-ready]) .sm-prelayer {
+  opacity: 0;
+  pointer-events: none;
+}
