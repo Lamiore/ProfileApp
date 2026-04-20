@@ -233,6 +233,21 @@
   gap: 14px;
 }
 
+/* hero portrait — fixed size, bit smaller on mobile */
+.home-root .hero-portrait {
+  width: 980px;
+}
+@media (max-width: 768px) {
+  .home-root .hero-portrait {
+    width: 780px;
+  }
+}
+@media (max-width: 480px) {
+  .home-root .hero-portrait {
+    width: 640px;
+  }
+}
+
 /* hide desktop-only annotations on mobile */
 @media (max-width: 768px) {
   .home-root .hide-mobile { display: none !important; }

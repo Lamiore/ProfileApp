@@ -2,11 +2,9 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "./styles/nav.css";
-@import "./styles/hero.css";
 @import "./styles/avatar-loader.css";
 @import "./styles/blog.css";
 @import "./styles/admin.css";
-@import "./styles/comparison.css";
 @import "./styles/map-pulse.css";
 @import "./styles/home.css";
 

@@ -5,8 +5,6 @@ import Hero from "@/components/home/Hero";
 import Origin from "@/components/home/Origin";
 import Moodboard from "@/components/home/Moodboard";
 import Marquee from "@/components/home/Marquee";
-import Pillars from "@/components/home/Pillars";
-import Stats from "@/components/home/Stats";
 import Skills from "@/components/home/Skills";
 import Contact from "@/components/home/Contact";
 
@@ -34,8 +32,6 @@ export default function Home() {
       <Origin />
       <Moodboard />
       <Marquee />
-      <Pillars />
-      <Stats />
       <Skills />
       <Contact name={name} />
     </main>

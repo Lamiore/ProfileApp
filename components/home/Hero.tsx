@@ -1,7 +1,7 @@
 "use client";
 
 import { CSSProperties } from "react";
-import { Placeholder, Tape } from "./Primitives";
+import Image from "next/image";
 
 export default function Hero({ name, role }: { name: string; role: string }) {
   const parts = name.trim().split(/\s+/);
@@ -35,7 +35,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
     >
       <div
         className="hero-script"
-        style={{ position: "absolute", top: 40, left: "7vw", zIndex: 5 }}
+        style={{ position: "absolute", top: 110, left: "7vw", zIndex: 5 }}
       >
         <div
           className="font-hand"
@@ -127,31 +127,58 @@ export default function Hero({ name, role }: { name: string; role: string }) {
         this is
       </div>
 
+      {/* bottom fade — biar foto lebur ke Origin, ga kepotong tajam */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          left: "50%",
+          bottom: 0,
+          width: "100vw",
+          height: "40vh",
+          transform: "translateX(-50%)",
+          background:
+            "linear-gradient(to bottom, rgba(42,42,42,0) 0%, rgba(42,42,42,0.35) 30%, rgba(42,42,42,0.85) 70%, #2a2a2a 100%)",
+          pointerEvents: "none",
+          zIndex: 4,
+        }}
+      />
+
+      {/* portrait — nempel di dasar section Hero, gede */}
       <div
         style={{
-          position: "relative",
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 0,
           zIndex: 2,
           display: "flex",
           justifyContent: "center",
-          marginTop: "14vh",
+          alignItems: "flex-end",
+          pointerEvents: "none",
         }}
       >
         <div
+          className="hero-portrait"
           style={{
-            width: "clamp(240px, 28vw, 440px)",
-            height: "clamp(340px, 42vw, 640px)",
+            flexShrink: 0,
             position: "relative",
+            pointerEvents: "auto",
           }}
         >
-          <Placeholder
-            label="portrait cutout"
-            w="100%"
-            h="100%"
-            tone="dark"
-            style={{ filter: "grayscale(100%) contrast(1.15)" }}
+          <Image
+            src="/image/home/me.png"
+            alt={`portrait of ${name}`}
+            width={1427}
+            height={1340}
+            priority
+            sizes="(max-width: 480px) 640px, (max-width: 768px) 780px, 980px"
+            style={{
+              width: "100%",
+              height: "auto",
+              display: "block",
+            }}
           />
-          <Tape top={-8} left={-10} rot={-35} />
-          <Tape bottom={-8} right={-10} rot={-30} />
         </div>
       </div>
 
@@ -160,6 +187,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           position: "absolute",
           bottom: 40,
           left: "7vw",
+          zIndex: 5,
           display: "flex",
           alignItems: "center",
           gap: 14,
@@ -179,7 +207,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
 
       <div
         className="hide-mobile"
-        style={{ position: "absolute", bottom: 40, right: "7vw" }}
+        style={{ position: "absolute", bottom: 40, right: "7vw", zIndex: 5 }}
       >
         <div
           className="font-mono"
@@ -199,6 +227,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           bottom: 10,
           left: "50%",
           transform: "translateX(-50%)",
+          zIndex: 5,
           fontFamily: "var(--font-caveat), cursive",
           fontSize: 22,
           color: "var(--muted)",
