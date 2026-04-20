@@ -1,6 +1,69 @@
 "use client";
 
-import { Placeholder, Polaroid, Arrow, Scribble, Reveal } from "./Primitives";
+import { useState } from "react";
+import { Placeholder, Polaroid, Reveal } from "./Primitives";
+
+const DECK = [
+  { label: "kid photo", caption: "11 yr old ilham" },
+  { label: "sketch", caption: "early doodles" },
+  { label: "setup", caption: "first rig" },
+];
+
+function OriginDeck() {
+  const [order, setOrder] = useState([0, 1, 2]);
+
+  const cycle = () => {
+    setOrder(([front, ...rest]) => [...rest, front]);
+  };
+
+  // transform per posisi (index 0 = depan, 1 & 2 = belakang)
+  const stackTransforms = [
+    "rotate(-6deg) translate(0, 0)",
+    "rotate(-18deg) translate(-56px, 14px)",
+    "rotate(10deg) translate(56px, 20px)",
+  ];
+
+  return (
+    <div
+      className="origin-stack"
+      onClick={cycle}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          cycle();
+        }
+      }}
+      aria-label="cycle photocards"
+    >
+      {order.map((deckIdx, stackPos) => {
+        const card = DECK[deckIdx];
+        const isFront = stackPos === 0;
+        return (
+          <div
+            key={deckIdx}
+            className="origin-stack-card"
+            style={{
+              transform: stackTransforms[stackPos],
+              zIndex: DECK.length - stackPos,
+              opacity: isFront ? 1 : 0.8,
+            }}
+          >
+            <Polaroid
+              rot={0}
+              caption={isFront ? card.caption : undefined}
+              w={220}
+              h={280}
+            >
+              <Placeholder label={card.label} w={220} h={280} tone="dark" />
+            </Polaroid>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function Origin() {
   return (
@@ -22,54 +85,7 @@ export default function Origin() {
               tablet and half a folder full of experiments.
             </p>
 
-            <div
-              className="origin-photos"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 20,
-                marginTop: 60,
-                position: "relative",
-                flexWrap: "nowrap",
-              }}
-            >
-              <Polaroid
-                rot={-6}
-                caption="11 yr old ilham"
-                w={120}
-                h={150}
-                style={{ flexShrink: 0 }}
-              >
-                <Placeholder label="kid photo" w={120} h={150} tone="dark" />
-              </Polaroid>
-
-              <Arrow
-                variant="curve"
-                w={160}
-                h={80}
-                style={{ marginTop: -20, flexShrink: 1, minWidth: 0 }}
-              />
-
-              <Polaroid rot={5} w={120} h={150} style={{ flexShrink: 0 }}>
-                <Placeholder label="now" w={120} h={150} tone="dark" />
-              </Polaroid>
-            </div>
-
-            <div
-              className="font-hand hide-mobile"
-              style={{
-                position: "absolute",
-                left: 180,
-                top: 200,
-                fontFamily: "var(--font-caveat), cursive",
-                fontSize: 22,
-                color: "var(--accent)",
-                transform: "rotate(-6deg)",
-              }}
-            >
-              glow up fr
-            </div>
+            <OriginDeck />
           </div>
         </Reveal>
 
@@ -102,13 +118,6 @@ export default function Origin() {
                 people are suckers for pretty visuals.
               </span>
             </p>
-
-            <div
-              className="hide-mobile"
-              style={{ position: "absolute", right: 0, bottom: -20 }}
-            >
-              <Scribble w={240} h={18} />
-            </div>
           </div>
         </Reveal>
       </div>

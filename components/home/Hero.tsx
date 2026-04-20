@@ -68,11 +68,13 @@ export default function Hero({ name, role }: { name: string; role: string }) {
             fontWeight: 600,
             fontSize: 32,
             lineHeight: 1,
-            transform: "rotate(3deg)",
+            transform: "rotate(-18deg)",
+            transformOrigin: "right center",
             color: "var(--ink-2)",
+            whiteSpace: "nowrap",
           }}
         >
-          let me be ya tour guide →
+          click here for menu →
         </div>
       </div>
 

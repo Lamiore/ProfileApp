@@ -259,16 +259,36 @@
   gap: 14px;
 }
 
-/* origin photos — tetap side-by-side di mobile, arrow yang menyesuaikan */
-.home-root .origin-photos > svg {
-  max-width: 100%;
-  height: auto;
-  flex: 1 1 0;
-  min-width: 0;
+/* origin — photocard stack (clickable to cycle) */
+.home-root .origin-stack {
+  position: relative;
+  width: 220px;
+  height: 330px;
+  margin-top: 60px;
+  cursor: pointer;
+  outline: none;
 }
-@media (max-width: 480px) {
-  .home-root .origin-photos {
-    gap: 10px !important;
+.home-root .origin-stack-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: center center;
+  transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.3, 1),
+    opacity 0.4s ease;
+  will-change: transform;
+}
+.home-root .origin-stack:hover .origin-stack-card:first-child {
+  transform: rotate(-8deg) translate(0, -4px) !important;
+}
+.home-root .origin-stack:focus-visible {
+  outline: 2px dashed var(--accent);
+  outline-offset: 12px;
+}
+
+@media (max-width: 900px) {
+  .home-root .origin-stack {
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
