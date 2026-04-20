@@ -1,1184 +1,1325 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { LogoLoop } from "@/components/ui/LogoLoop";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 import {
-  Figma,
-  Github,
-  Code,
-  Palette,
-  Layers,
-  Monitor,
-  Smartphone,
-  Globe,
-  Zap,
-  PenTool,
-  Mail,
-  Instagram,
-  Linkedin,
-  ArrowUpRight,
-} from "lucide-react";
+  Placeholder,
+  Tape,
+  Polaroid,
+  Arrow,
+  Scribble,
+  Reveal,
+  StickyNote,
+} from "@/components/about/CollagePrimitives";
 
-const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1517242810446-cc8951b2be40?w=2400&q=85&auto=format&fit=crop";
+const PROFILE = {
+  name: "Ilham Mohammad",
+  role: "designer · developer · video editor",
+  accent: "#d7263d",
+  paperTexture: false,
+};
 
-const logos = [
-  { node: <Figma size={22} />, title: "Figma" },
-  { node: <Github size={22} />, title: "GitHub" },
-  { node: <Code size={22} />, title: "Code" },
-  { node: <Palette size={22} />, title: "Design" },
-  { node: <Layers size={22} />, title: "Layers" },
-  { node: <Monitor size={22} />, title: "Desktop" },
-  { node: <Smartphone size={22} />, title: "Mobile" },
-  { node: <Globe size={22} />, title: "Web" },
-  { node: <Zap size={22} />, title: "Performance" },
-  { node: <PenTool size={22} />, title: "Creative" },
-];
+const ACCENT_SWATCHES = ["#d7263d", "#0f0f0f", "#1f5f3f", "#d97706", "#1e40af"];
 
-const timeline = [
-  {
-    year: "2019",
-    title: "Awal mula",
-    place: "Bandung — Self-taught",
-    desc: "Pertama kenal Figma dan mulai ngulik design poster, UI kit, dan tutorial YouTube sampai tengah malam.",
-  },
-  {
-    year: "2021",
-    title: "Klien pertama",
-    place: "Freelance — UI/UX",
-    desc: "Ngerjain brand identity dan landing page kecil. Belajar yang paling penting: design itu dialog, bukan monolog.",
-  },
-  {
-    year: "2023",
-    title: "Pindah ke web",
-    place: "React • Next.js • Three.js",
-    desc: "Berhenti kasih mockup statis — mulai nge-ship produk beneran. Dari design ke code, dari idea ke pixel yang hidup.",
-  },
-  {
-    year: "2025",
-    title: "Hybrid craft",
-    place: "Designer yang nulis code",
-    desc: "Menemukan ritme di persimpangan: desain yang bisa di-build, dan code yang terasa didesain. Dua-duanya satu bahasa.",
-  },
-  {
-    year: "Now",
-    title: "Building experiences",
-    place: "Open for collaboration",
-    desc: "Fokus di interface yang smooth, intentional, dan terasa personal. Tiap proyek — tiap pixel — punya cerita.",
-  },
-];
+/* ─────────────────────────── HERO ─────────────────────────── */
+function Hero({ name, role }: { name: string; role: string }) {
+  const [hover, setHover] = useState(false);
+  const parts = name.trim().split(/\s+/);
+  const first = (parts[0] || name).toUpperCase();
+  const last = (parts.slice(1).join(" ") || "").toUpperCase();
+  const longest = Math.max(first.length, last.length || 1);
+  const vw = Math.min(16, Math.max(6, 72 / longest));
 
-const works = [
-  {
-    title: "Personal Portfolio",
-    category: "Creative / 3D",
-    description: "Portfolio dengan elemen 3D dan animasi halus yang menonjolkan atmosfer.",
-    tags: ["Next.js", "Three.js", "GSAP"],
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=900&q=80&auto=format&fit=crop",
-    span: "md:col-span-2 md:row-span-2",
-  },
-  {
-    title: "E-Commerce",
-    category: "Fullstack",
-    description: "Platform belanja dengan checkout yang cepat dan UI yang tenang.",
-    tags: ["React", "TypeScript"],
-    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80&auto=format&fit=crop",
-    span: "md:col-span-1 md:row-span-1",
-  },
-  {
-    title: "Analytics Board",
-    category: "Dashboard",
-    description: "Visualisasi data real-time dengan chart yang bisa disentuh.",
-    tags: ["Next.js", "D3.js"],
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80&auto=format&fit=crop",
-    span: "md:col-span-1 md:row-span-1",
-  },
-  {
-    title: "Mobile App",
-    category: "Product",
-    description: "Aplikasi lintas-platform dengan performa native.",
-    tags: ["React Native"],
-    image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80&auto=format&fit=crop",
-    span: "md:col-span-1 md:row-span-1",
-  },
-  {
-    title: "Brand System",
-    category: "Identity",
-    description: "Dari logo sampai sistem digital — satu suara, banyak permukaan.",
-    tags: ["Figma", "Branding"],
-    image: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&q=80&auto=format&fit=crop",
-    span: "md:col-span-2 md:row-span-1",
-  },
-];
+  const displayCommon: CSSProperties = {
+    fontSize: `clamp(40px, ${vw}vw, 180px)`,
+    color: "var(--accent)",
+    lineHeight: 0.82,
+    margin: 0,
+    textAlign: "center",
+    letterSpacing: "-0.05em",
+    fontWeight: 400,
+    whiteSpace: "nowrap",
+    textShadow: "2px 2px 0 rgba(0,0,0,0.04)",
+  };
 
-const connects = [
-  {
-    label: "Email",
-    handle: "ilham_lam@icloud.com",
-    href: "mailto:ilham_lam@icloud.com",
-    icon: Mail,
-    note: "Paling cepat — biasanya balas dalam 24 jam.",
-  },
-  {
-    label: "GitHub",
-    handle: "@lamiore",
-    href: "https://github.com/lamiore",
-    icon: Github,
-    note: "Tempat kerja terbuka. Issues welcome.",
-  },
-  {
-    label: "Instagram",
-    handle: "@ilhm.lam",
-    href: "https://instagram.com",
-    icon: Instagram,
-    note: "Proses, moodboard, dan hal-hal kecil.",
-  },
-  {
-    label: "LinkedIn",
-    handle: "/in/ilham-lam",
-    href: "https://linkedin.com",
-    icon: Linkedin,
-    note: "Untuk yang lebih formal. Resume ada di sana.",
-  },
-];
+  return (
+    <section
+      className="section"
+      style={{
+        minHeight: "100vh",
+        paddingTop: 60,
+        paddingBottom: 80,
+        position: "relative",
+      }}
+    >
+      {/* top-left greeting */}
+      <div style={{ position: "absolute", top: 110, left: "7vw", zIndex: 5 }}>
+        <div
+          className="font-hand"
+          style={{
+            fontFamily: "var(--font-caveat), cursive",
+            fontWeight: 600,
+            fontSize: 44,
+            lineHeight: 1,
+            transform: "rotate(-2deg)",
+          }}
+        >
+          hi. since you&rsquo;re new here,
+        </div>
+      </div>
 
-export default function AboutPage() {
-  const rootRef = useRef<HTMLDivElement>(null);
+      {/* top-right greeting */}
+      <div
+        style={{
+          position: "absolute",
+          top: 170,
+          right: "7vw",
+          zIndex: 5,
+          textAlign: "right",
+        }}
+      >
+        <div
+          className="font-hand"
+          style={{
+            fontFamily: "var(--font-caveat), cursive",
+            fontWeight: 600,
+            fontSize: 32,
+            lineHeight: 1,
+            transform: "rotate(3deg)",
+            color: "var(--ink-2)",
+          }}
+        >
+          let me be ya tour guide →
+        </div>
+      </div>
 
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
+      {/* huge name behind portrait */}
+      <div
+        style={{
+          position: "absolute",
+          top: "18%",
+          left: 0,
+          right: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          zIndex: 1,
+          pointerEvents: "none",
+        }}
+      >
+        <h1
+          className="font-display"
+          style={{ ...displayCommon, alignSelf: "flex-start", marginLeft: "6vw" }}
+        >
+          {first}
+        </h1>
+        {last && (
+          <h1
+            className="font-display"
+            style={{
+              ...displayCommon,
+              alignSelf: "flex-end",
+              marginRight: "4vw",
+              marginTop: "-0.08em",
+            }}
+          >
+            {last}
+          </h1>
+        )}
+      </div>
 
-    const ctx = gsap.context(() => {
-      // Hero entrance
-      const heroTl = gsap.timeline({ defaults: { ease: "power3.out" } });
-      heroTl
-        .fromTo(
-          ".hero-image",
-          { scale: 1.12, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 2, ease: "power2.out" }
-        )
-        .fromTo(
-          ".hero-eyebrow",
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.9 },
-          "-=1.5"
-        )
-        .fromTo(
-          ".hero-title .reveal-line",
-          { y: "110%" },
-          { y: "0%", duration: 1.1, stagger: 0.12 },
-          "-=0.6"
-        )
-        .fromTo(
-          ".hero-desc",
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.9 },
-          "-=0.6"
-        )
-        .fromTo(
-          ".hero-meta",
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.9, stagger: 0.1 },
-          "-=0.7"
-        );
+      {/* "this is" annotation */}
+      <div
+        className="font-hand"
+        style={{
+          position: "absolute",
+          top: "14%",
+          left: "20vw",
+          fontFamily: "var(--font-caveat), cursive",
+          fontWeight: 600,
+          fontSize: 48,
+          transform: "rotate(-4deg)",
+          zIndex: 3,
+          color: "var(--ink)",
+        }}
+      >
+        this is
+      </div>
 
-      // Generic reveal for sections
-      gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
-        gsap.fromTo(
-          el,
-          { y: 60, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 1,
-            ease: "power3.out",
-            scrollTrigger: { trigger: el, start: "top 85%", once: true },
-          }
-        );
-      });
+      {/* portrait */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 2,
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "14vh",
+          filter: "contrast(1.1)",
+        }}
+      >
+        <div
+          style={{
+            width: "clamp(260px, 28vw, 440px)",
+            height: "clamp(380px, 42vw, 640px)",
+            position: "relative",
+          }}
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+        >
+          <Placeholder
+            label="portrait cutout"
+            w="100%"
+            h="100%"
+            tone="dark"
+            style={{
+              filter: hover
+                ? "grayscale(0%)"
+                : "grayscale(100%) contrast(1.15)",
+              transition: "filter 0.4s",
+            }}
+          />
+        </div>
+      </div>
 
-      // Timeline line fill
-      const line = document.querySelector<HTMLElement>(".timeline-line-fill");
-      if (line) {
-        gsap.fromTo(
-          line,
-          { scaleY: 0 },
-          {
-            scaleY: 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: ".timeline-root",
-              start: "top 65%",
-              end: "bottom 70%",
-              scrub: 0.6,
-            },
-          }
-        );
-      }
+      {/* bottom labels */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 40,
+          left: "7vw",
+          display: "flex",
+          alignItems: "center",
+          gap: 14,
+        }}
+      >
+        <div
+          className="font-mono"
+          style={{
+            fontSize: 12,
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+          }}
+        >
+          {role}
+        </div>
+      </div>
 
-      // Timeline items
-      gsap.utils.toArray<HTMLElement>(".timeline-item").forEach((el) => {
-        gsap.fromTo(
-          el,
-          { x: -40, opacity: 0 },
-          {
-            x: 0,
-            opacity: 1,
-            duration: 0.9,
-            ease: "power3.out",
-            scrollTrigger: { trigger: el, start: "top 85%", once: true },
-          }
-        );
-      });
-    }, rootRef);
+      <div
+        style={{
+          position: "absolute",
+          bottom: 40,
+          right: "7vw",
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+        }}
+      >
+        <div
+          className="font-mono"
+          style={{
+            fontSize: 12,
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+          }}
+        >
+          by {name.toLowerCase()} · {new Date().getFullYear()}
+        </div>
+      </div>
 
-    return () => ctx.revert();
-  }, []);
+      {/* scroll cue */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 40,
+          left: "50%",
+          transform: "translateX(-50%)",
+          fontFamily: "var(--font-caveat), cursive",
+          fontSize: 22,
+          color: "var(--muted)",
+        }}
+      >
+        scroll ↓
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────── ORIGIN ─────────────────────────── */
+function Origin() {
+  return (
+    <section className="section" style={{ paddingTop: 60 }}>
+      <Reveal>
+        <div className="section-label" style={{ marginBottom: 40 }}>
+          01 · origin story
+        </div>
+      </Reveal>
+
+      <div
+        className="two-col"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 80,
+          alignItems: "start",
+        }}
+      >
+        {/* LEFT */}
+        <Reveal>
+          <div style={{ position: "relative", paddingTop: 20 }}>
+            <p style={{ fontSize: 18, maxWidth: 440, lineHeight: 1.55 }}>
+              tiny, curious, and low-key destined for pixels
+              <br />
+              (though he didn&rsquo;t know it yet).
+              <br />
+              by the time he hit 11, he had a whole graphics
+              <br />
+              tablet and half a folder full of experiments.
+            </p>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 30,
+                marginTop: 60,
+                position: "relative",
+              }}
+            >
+              <Polaroid
+                rot={-6}
+                caption="11 yr old ilham"
+                w={120}
+                h={150}
+                style={{ flexShrink: 0 }}
+              >
+                <Placeholder label="kid photo" w={120} h={150} tone="dark" />
+              </Polaroid>
+
+              <Arrow variant="curve" w={160} h={80} style={{ marginTop: -20 }} />
+
+              <Polaroid rot={5} w={120} h={150} style={{ flexShrink: 0 }}>
+                <Placeholder label="now" w={120} h={150} tone="dark" />
+              </Polaroid>
+            </div>
+
+            <div
+              className="font-hand"
+              style={{
+                position: "absolute",
+                left: 180,
+                top: 200,
+                fontSize: 22,
+                color: "var(--accent)",
+                transform: "rotate(-6deg)",
+              }}
+            >
+              glow up fr
+            </div>
+          </div>
+        </Reveal>
+
+        {/* RIGHT */}
+        <Reveal delay={200}>
+          <div style={{ paddingTop: 140, position: "relative" }}>
+            <p style={{ fontSize: 18, lineHeight: 1.55 }}>
+              after realizing his edits earned more views with a little
+              <br />
+              aesthetic flair, he proudly hit 600 followers and
+              <br />
+              probably thought he was famous.
+            </p>
+
+            <p
+              className="font-hand"
+              style={{
+                fontSize: 34,
+                lineHeight: 1.1,
+                marginTop: 30,
+                color: "var(--ink)",
+              }}
+            >
+              that&rsquo;s when it clicked:
+              <br />
+              <span style={{ color: "var(--accent)" }}>
+                people are suckers for pretty visuals.
+              </span>
+            </p>
+
+            <div style={{ position: "absolute", right: 0, bottom: -20 }}>
+              <Scribble w={240} h={18} />
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────── MOODBOARD ─────────────────────────── */
+function Moodboard() {
+  const items = [
+    { label: "city fog", rot: -3, grid: "1 / 1 / 2 / 3" },
+    { label: "night portrait", rot: 2, grid: "1 / 3 / 3 / 4" },
+    { label: "gallery wall", rot: -1, grid: "1 / 4 / 2 / 6" },
+    { label: "street scene", rot: 4, grid: "2 / 1 / 4 / 3" },
+    { label: "dinner table", rot: -4, grid: "3 / 3 / 4 / 5" },
+    { label: "group shot", rot: 3, grid: "2 / 5 / 4 / 6" },
+  ];
+
+  return (
+    <section
+      className="section"
+      style={{
+        background: "var(--paper-2)",
+        maxWidth: "none",
+        padding: "120px 7vw",
+      }}
+    >
+      <div style={{ maxWidth: 1600, margin: "0 auto" }}>
+        <Reveal>
+          <div className="section-label" style={{ marginBottom: 50 }}>
+            02 · mood + moments
+          </div>
+        </Reveal>
+
+        <Reveal delay={100}>
+          <div
+            className="moodboard-grid"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(5, 1fr)",
+              gridTemplateRows: "repeat(3, 140px)",
+              gap: 16,
+              marginBottom: 40,
+            }}
+          >
+            {items.map((it, i) => (
+              <div key={i} style={{ gridArea: it.grid, position: "relative" }}>
+                <Placeholder
+                  label={it.label}
+                  w="100%"
+                  h="100%"
+                  rot={it.rot}
+                  tone="dark"
+                />
+                {i === 1 && <Tape top={-10} left="40%" rot={-8} />}
+                {i === 3 && <Tape top={-10} right="20%" rot={12} w={60} />}
+              </div>
+            ))}
+          </div>
+        </Reveal>
+
+        <Reveal delay={200}>
+          <div
+            style={{
+              marginTop: 80,
+              maxWidth: 520,
+              marginLeft: "auto",
+              textAlign: "right",
+            }}
+          >
+            <p style={{ fontSize: 17, lineHeight: 1.5 }}>
+              seven years later, he&rsquo;s basically a pro at grabbing attention.
+              <br />
+              snap the right moment or give it that extra spice in post?
+              <br />
+              <span
+                className="font-hand"
+                style={{ fontSize: 28, color: "var(--accent)" }}
+              >
+                if it&rsquo;s got vibes, ilham&rsquo;s behind it.
+              </span>
+            </p>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────── MARQUEE ─────────────────────────── */
+function Marquee() {
+  const words = [
+    "video editing",
+    "web dev",
+    "draw",
+    "entrepreneur",
+    "motion",
+    "branding",
+    "storytelling",
+    "ui design",
+  ];
+
+  const setStyle: CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    flexShrink: 0,
+    flexWrap: "nowrap",
+  };
+
+  const itemStyle: CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 40,
+    paddingRight: 40,
+    fontFamily: "var(--font-climate-crisis), sans-serif",
+    fontSize: 48,
+    lineHeight: 1,
+    whiteSpace: "nowrap",
+    flexShrink: 0,
+  };
+
+  const renderSet = (key: string, ariaHidden: boolean) => (
+    <div key={key} className="marquee-set" aria-hidden={ariaHidden} style={setStyle}>
+      {words.map((w, i) => (
+        <span key={`${key}-${w}`} className="marquee-item" style={itemStyle}>
+          <span style={{ color: i % 3 === 0 ? "var(--accent)" : "var(--paper)" }}>
+            {w}
+          </span>
+          <span style={{ fontSize: 24, color: "var(--accent)", flexShrink: 0 }}>
+            ✺
+          </span>
+        </span>
+      ))}
+    </div>
+  );
 
   return (
     <div
-      ref={rootRef}
+      className="marquee-wrap"
+      role="separator"
+      aria-label="skills"
       style={{
-        position: "relative",
-        width: "100%",
-        backgroundColor: "#0d0d0d",
-        color: "#f2efe9",
-        fontFamily: "var(--font-satoshi), system-ui, sans-serif",
+        overflow: "hidden",
+        borderTop: "1.5px solid var(--ink)",
+        borderBottom: "1.5px solid var(--ink)",
+        padding: "20px 0",
+        background: "var(--ink)",
+        color: "var(--paper)",
       }}
     >
-      {/* ──────────────────────────────── HERO ──────────────────────────────── */}
-      <section
+      <div
+        className="marquee-track"
         style={{
-          position: "relative",
-          width: "100%",
-          height: "100svh",
-          minHeight: 640,
-          overflow: "hidden",
+          display: "flex",
+          width: "max-content",
+          flexWrap: "nowrap",
+          animation: "marquee-scroll 40s linear infinite",
+          willChange: "transform",
         }}
       >
-        {/* Background image */}
-        <div
-          className="hero-image"
-          style={{
-            position: "absolute",
-            inset: 0,
-            willChange: "transform, opacity",
-          }}
-        >
-          <img
-            src={HERO_IMAGE}
-            alt="Atmosfer tempat kerja"
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: "center",
-              filter: "grayscale(0.35) contrast(1.05) brightness(0.82)",
-            }}
-          />
+        {renderSet("a", false)}
+        {renderSet("b", true)}
+      </div>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `@keyframes marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }`,
+        }}
+      />
+    </div>
+  );
+}
+
+/* ─────────────────────────── PILLARS ─────────────────────────── */
+function Pillars({ handle }: { handle: string }) {
+  return (
+    <section className="section" style={{ position: "relative" }}>
+      <Reveal>
+        <div className="section-label" style={{ marginBottom: 40 }}>
+          03 · what i create
         </div>
+      </Reveal>
 
-        {/* Gradient overlays */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(180deg, rgba(13,13,13,0.35) 0%, rgba(13,13,13,0.15) 35%, rgba(13,13,13,0.75) 80%, #0d0d0d 100%)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "radial-gradient(ellipse at 20% 100%, rgba(0,0,0,0.55), transparent 60%)",
-          }}
-        />
-        {/* grain */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            opacity: 0.08,
-            mixBlendMode: "overlay",
-            backgroundImage:
-              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='1'/></svg>\")",
-          }}
-        />
-
-        {/* Content grid */}
-        <div
-          style={{
-            position: "relative",
-            zIndex: 2,
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            padding: "clamp(100px, 14vh, 140px) clamp(1.25rem, 5vw, 4rem) clamp(2rem, 5vh, 3.5rem)",
-          }}
-        >
-          {/* Top meta row */}
-          <div
-            className="hero-eyebrow"
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
-              fontSize: "clamp(0.65rem, 0.9vw, 0.8rem)",
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "rgba(242,239,233,0.55)",
-            }}
-          >
-            <span>— About / 00</span>
-            <span style={{ textAlign: "right" }}>
-              Bandung, ID
-              <br />
-              <span style={{ opacity: 0.55 }}>6°54′ S · 107°36′ E</span>
-            </span>
-          </div>
-
-          {/* Title block */}
-          <div>
-            <h1
-              className="hero-title"
-              style={{
-                margin: 0,
-                color: "#f5f1e8",
-                fontFamily: "var(--font-satoshi), system-ui, sans-serif",
-                fontWeight: 900,
-                fontSize: "clamp(3.2rem, 11vw, 10.5rem)",
-                lineHeight: 0.92,
-                letterSpacing: "-0.045em",
-                textTransform: "uppercase",
-              }}
-            >
-              <span style={{ display: "block", overflow: "hidden" }}>
-                <span
-                  className="reveal-line"
-                  style={{ display: "block", willChange: "transform" }}
-                >
-                  Ilham
-                </span>
-              </span>
-              <span
-                style={{
-                  display: "block",
-                  overflow: "hidden",
-                  position: "relative",
-                }}
-              >
-                <span
-                  className="reveal-line"
-                  style={{
-                    display: "inline-block",
-                    willChange: "transform",
-                    position: "relative",
-                  }}
-                >
-                  Lamiore
-                  <span
-                    aria-hidden
-                    style={{
-                      fontFamily: "var(--font-sacramento), cursive",
-                      fontWeight: 400,
-                      fontSize: "0.28em",
-                      letterSpacing: "0",
-                      textTransform: "none",
-                      color: "#e8c07d",
-                      position: "absolute",
-                      top: "-0.25em",
-                      right: "-1.8em",
-                      transform: "rotate(-8deg)",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    — a.k.a Lam
-                  </span>
-                </span>
-              </span>
-            </h1>
-
+      <div
+        className="two-col"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1.3fr",
+          gap: 60,
+          alignItems: "start",
+        }}
+      >
+        <Reveal>
+          <div style={{ position: "relative", height: 560 }}>
             <div
               style={{
-                marginTop: "clamp(1.2rem, 2.5vh, 2rem)",
-                display: "grid",
-                gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
-                gap: "clamp(1rem, 3vw, 3rem)",
-                maxWidth: 1100,
+                position: "absolute",
+                top: 0,
+                left: -30,
+                fontSize: 180,
+                fontFamily: "var(--font-climate-crisis), sans-serif",
+                color: "var(--accent)",
+                lineHeight: 0.8,
+                writingMode: "vertical-rl",
+                textOrientation: "mixed",
+                opacity: 0.95,
+                zIndex: 0,
               }}
             >
-              <p
-                className="hero-desc"
-                style={{
-                  margin: 0,
-                  fontSize: "clamp(0.95rem, 1.25vw, 1.15rem)",
-                  lineHeight: 1.55,
-                  color: "rgba(242,239,233,0.82)",
-                  maxWidth: 560,
-                }}
-              >
-                Designer sekaligus developer yang meracik interface supaya
-                terasa smooth, intentional, dan sedikit manusiawi. Berbasis di
-                Indonesia, bekerja untuk siapapun yang peduli detail.
-              </p>
-              <div
-                className="hero-meta"
-                style={{
-                  alignSelf: "end",
-                  justifySelf: "end",
-                  display: "flex",
-                  gap: "clamp(1rem, 2.5vw, 2.5rem)",
-                  fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
-                  fontSize: "clamp(0.7rem, 0.9vw, 0.85rem)",
-                  color: "rgba(242,239,233,0.55)",
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                }}
-              >
-                <span>
-                  <span style={{ color: "rgba(242,239,233,0.35)" }}>Role</span>
-                  <br />
-                  Designer · Dev
-                </span>
-                <span>
-                  <span style={{ color: "rgba(242,239,233,0.35)" }}>Since</span>
-                  <br />
-                  2019
-                </span>
-                <span>
-                  <span style={{ color: "rgba(242,239,233,0.35)" }}>Status</span>
-                  <br />
-                  <span style={{ color: "#b7e2a6" }}>● Available</span>
-                </span>
-              </div>
+              PIXEL ARTIST
             </div>
-          </div>
-
-          {/* Scroll cue */}
-          <div
-            className="hero-meta"
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
-              fontSize: "0.7rem",
-              letterSpacing: "0.25em",
-              textTransform: "uppercase",
-              color: "rgba(242,239,233,0.45)",
-            }}
-          >
-            <span>↓ Scroll</span>
-            <span>Perjalanan singkat · Karya terpilih · Koneksi</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ──────────────────────────────── ABOUT ──────────────────────────────── */}
-      <section
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-          padding: "clamp(6rem, 14vh, 12rem) clamp(1.25rem, 5vw, 4rem) clamp(4rem, 8vh, 6rem)",
-        }}
-      >
-        <div
-          data-reveal
-          style={{
-            display: "grid",
-            gridTemplateColumns: "minmax(0, 0.4fr) minmax(0, 1fr)",
-            gap: "clamp(2rem, 5vw, 5rem)",
-            alignItems: "start",
-          }}
-          className="about-grid"
-        >
-          <div
-            style={{
-              fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
-              fontSize: "0.75rem",
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "rgba(242,239,233,0.5)",
-              paddingTop: "0.5rem",
-              borderTop: "1px solid rgba(242,239,233,0.2)",
-            }}
-          >
-            <div>01 — Perkenalan</div>
-            <div style={{ marginTop: "0.5rem", color: "rgba(242,239,233,0.3)" }}>
-              Kira-kira begini
-            </div>
-          </div>
-
-          <div>
-            <p
-              style={{
-                fontSize: "clamp(1.5rem, 3.2vw, 2.8rem)",
-                lineHeight: 1.2,
-                margin: 0,
-                color: "#f5f1e8",
-                letterSpacing: "-0.02em",
-                fontWeight: 400,
-              }}
-            >
-              Saya percaya desain yang baik{" "}
-              <span
-                style={{
-                  fontFamily: "var(--font-sacramento), cursive",
-                  fontWeight: 400,
-                  color: "#e8c07d",
-                  fontSize: "1.1em",
-                }}
-              >
-                bukan cuma soal tampilan
-              </span>
-              {" "}— tapi bagaimana ia terasa: halus, disengaja, dan punya
-              napas.
-            </p>
-
             <div
               style={{
-                marginTop: "clamp(2rem, 4vh, 3rem)",
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-                gap: "clamp(1.5rem, 3vw, 2.5rem)",
-                color: "rgba(242,239,233,0.7)",
-                fontSize: "1rem",
-                lineHeight: 1.65,
+                position: "relative",
+                zIndex: 2,
+                marginLeft: 60,
+                marginTop: 40,
               }}
             >
-              <p style={{ margin: 0 }}>
-                Mulai dari desain grafis, kemudian jatuh cinta sama
-                <em style={{ color: "#f5f1e8", fontStyle: "normal", fontWeight: 600 }}> web — </em>
-                tempat di mana pixel bisa bergerak, merespon, dan hidup. Sejak
-                itu saya nggak pernah berhenti ngulik.
-              </p>
-              <p style={{ margin: 0 }}>
-                Sekarang saya kerjain keduanya: desain di Figma, lalu
-                ngebangunnya pakai React / Next.js / Three.js. Kerjaan favorit
-                saya adalah yang kelihatan <em style={{ color: "#f5f1e8", fontStyle: "normal", fontWeight: 600 }}>simpel</em> tapi butuh banyak detail kecil.
-              </p>
-              <p style={{ margin: 0 }}>
-                Di luar layar — saya suka kopi manual brew, fotografi jalanan,
-                dan musik yang lambat. Hal-hal kecil yang bikin pekerjaan
-                terasa lebih sabar.
-              </p>
+              <Placeholder
+                label="ilham seated"
+                w={340}
+                h={440}
+                rot={-2}
+                tone="dark"
+              />
+              <Tape top={-10} left="30%" rot={-8} />
             </div>
           </div>
-        </div>
-      </section>
+        </Reveal>
 
-      {/* Logo Loop Divider */}
-      <section
-        style={{
-          padding: "3rem 0",
-          borderTop: "1px solid rgba(242,239,233,0.08)",
-          borderBottom: "1px solid rgba(242,239,233,0.08)",
-        }}
-      >
-        <div style={{ color: "rgba(242,239,233,0.4)" }}>
-          <LogoLoop
-            logos={logos}
-            speed={70}
-            logoHeight={22}
-            gap={52}
-            pauseOnHover
-            fadeOut
-            fadeOutColor="#0d0d0d"
-          />
-        </div>
-      </section>
-
-      {/* ──────────────────────────────── TIMELINE ──────────────────────────────── */}
-      <section
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-          padding: "clamp(6rem, 14vh, 12rem) clamp(1.25rem, 5vw, 4rem)",
-        }}
-      >
-        <header
-          data-reveal
-          style={{
-            display: "grid",
-            gridTemplateColumns: "minmax(0, 0.4fr) minmax(0, 1fr)",
-            gap: "clamp(2rem, 5vw, 5rem)",
-            marginBottom: "clamp(3rem, 7vh, 6rem)",
-          }}
-        >
-          <div
-            style={{
-              fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
-              fontSize: "0.75rem",
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "rgba(242,239,233,0.5)",
-              paddingTop: "0.5rem",
-              borderTop: "1px solid rgba(242,239,233,0.2)",
-            }}
-          >
-            <div>02 — Journey</div>
-            <div style={{ marginTop: "0.5rem", color: "rgba(242,239,233,0.3)" }}>
-              Sedikit garis waktu
-            </div>
-          </div>
-          <div>
-            <h2
+        <Reveal delay={150}>
+          <div style={{ paddingTop: 40 }}>
+            <div
+              className="font-mono"
               style={{
-                margin: 0,
-                fontSize: "clamp(2.2rem, 5.5vw, 4.5rem)",
-                fontFamily: "var(--font-satoshi), system-ui, sans-serif",
-                fontWeight: 900,
-                letterSpacing: "-0.035em",
-                lineHeight: 0.98,
-                color: "#f5f1e8",
-              }}
-            >
-              Dari poster ke pixel{" "}
-              <span
-                style={{
-                  fontFamily: "var(--font-sacramento), cursive",
-                  fontWeight: 400,
-                  fontSize: "0.55em",
-                  color: "#e8c07d",
-                  letterSpacing: "0",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                yang hidup.
-              </span>
-            </h2>
-          </div>
-        </header>
-
-        <div
-          className="timeline-root"
-          style={{
-            position: "relative",
-            paddingLeft: "clamp(4rem, 10vw, 8rem)",
-          }}
-        >
-          {/* Rail */}
-          <div
-            style={{
-              position: "absolute",
-              left: "clamp(3rem, 7vw, 5.5rem)",
-              top: 8,
-              bottom: 8,
-              width: 1,
-              background: "rgba(242,239,233,0.1)",
-            }}
-          />
-          <div
-            className="timeline-line-fill"
-            style={{
-              position: "absolute",
-              left: "clamp(3rem, 7vw, 5.5rem)",
-              top: 8,
-              bottom: 8,
-              width: 1,
-              background:
-                "linear-gradient(180deg, #e8c07d 0%, #f5f1e8 40%, rgba(242,239,233,0.1) 100%)",
-              transformOrigin: "top",
-            }}
-          />
-
-          <ol style={{ margin: 0, padding: 0, listStyle: "none" }}>
-            {timeline.map((item, i) => (
-              <li
-                key={i}
-                className="timeline-item"
-                style={{
-                  position: "relative",
-                  padding: "clamp(1.8rem, 3.5vh, 2.8rem) 0",
-                  borderBottom:
-                    i === timeline.length - 1
-                      ? "none"
-                      : "1px solid rgba(242,239,233,0.08)",
-                }}
-              >
-                {/* Dot */}
-                <span
-                  style={{
-                    position: "absolute",
-                    left: "calc(clamp(3rem, 7vw, 5.5rem) - clamp(4rem, 10vw, 8rem))",
-                    top: "calc(clamp(1.8rem, 3.5vh, 2.8rem) + 0.65rem)",
-                    width: 11,
-                    height: 11,
-                    borderRadius: "50%",
-                    background: "#0d0d0d",
-                    border: "2px solid #e8c07d",
-                    transform: "translateX(-5px)",
-                    boxShadow: "0 0 0 6px #0d0d0d",
-                  }}
-                />
-
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "minmax(0, 0.3fr) minmax(0, 1fr)",
-                    gap: "clamp(1rem, 3vw, 3rem)",
-                    alignItems: "baseline",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
-                      fontSize: "clamp(1rem, 1.4vw, 1.2rem)",
-                      color: "#e8c07d",
-                      letterSpacing: "0.05em",
-                    }}
-                  >
-                    {item.year}
-                  </div>
-                  <div>
-                    <h3
-                      style={{
-                        margin: 0,
-                        fontSize: "clamp(1.25rem, 2.2vw, 1.75rem)",
-                        fontWeight: 700,
-                        color: "#f5f1e8",
-                        letterSpacing: "-0.02em",
-                      }}
-                    >
-                      {item.title}
-                    </h3>
-                    <div
-                      style={{
-                        fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
-                        fontSize: "0.72rem",
-                        letterSpacing: "0.2em",
-                        textTransform: "uppercase",
-                        color: "rgba(242,239,233,0.4)",
-                        marginTop: "0.45rem",
-                      }}
-                    >
-                      {item.place}
-                    </div>
-                    <p
-                      style={{
-                        margin: "0.9rem 0 0",
-                        color: "rgba(242,239,233,0.7)",
-                        fontSize: "1rem",
-                        lineHeight: 1.65,
-                        maxWidth: 620,
-                      }}
-                    >
-                      {item.desc}
-                    </p>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      {/* ──────────────────────────────── WORK BENTO ──────────────────────────────── */}
-      <section
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-          padding: "clamp(6rem, 14vh, 12rem) clamp(1.25rem, 5vw, 4rem)",
-        }}
-      >
-        <header
-          data-reveal
-          style={{
-            display: "grid",
-            gridTemplateColumns: "minmax(0, 0.4fr) minmax(0, 1fr)",
-            gap: "clamp(2rem, 5vw, 5rem)",
-            marginBottom: "clamp(3rem, 7vh, 5rem)",
-            alignItems: "end",
-          }}
-        >
-          <div
-            style={{
-              fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
-              fontSize: "0.75rem",
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "rgba(242,239,233,0.5)",
-              paddingTop: "0.5rem",
-              borderTop: "1px solid rgba(242,239,233,0.2)",
-            }}
-          >
-            <div>03 — Selected Work</div>
-            <div style={{ marginTop: "0.5rem", color: "rgba(242,239,233,0.3)" }}>
-              Pilihan karya
-            </div>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "end",
-              gap: "2rem",
-              flexWrap: "wrap",
-            }}
-          >
-            <h2
-              style={{
-                margin: 0,
-                fontSize: "clamp(2.2rem, 5.5vw, 4.5rem)",
-                fontFamily: "var(--font-satoshi), system-ui, sans-serif",
-                fontWeight: 900,
-                letterSpacing: "-0.035em",
-                lineHeight: 0.98,
-                color: "#f5f1e8",
-              }}
-            >
-              Things I&rsquo;ve made.
-            </h2>
-            <span
-              style={{
-                fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
-                fontSize: "0.75rem",
+                fontSize: 11,
                 letterSpacing: "0.2em",
                 textTransform: "uppercase",
-                color: "rgba(242,239,233,0.4)",
+                color: "var(--muted)",
+                marginBottom: 20,
+                display: "inline-block",
+                border: "1px solid var(--ink)",
+                padding: "6px 12px",
+                borderRadius: 999,
               }}
             >
-              {works.length} projects — 2023 / 2026
-            </span>
-          </div>
-        </header>
+              {handle} · 3000+ across platforms
+            </div>
 
-        <div
-          data-reveal
-          className="grid grid-cols-1 md:grid-cols-3 auto-rows-[260px] gap-3"
-        >
-          {works.map((work, i) => (
-            <a
-              key={i}
-              href="#"
-              onClick={(e) => e.preventDefault()}
-              className={`group relative overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] cursor-pointer transition-all duration-500 hover:border-[#e8c07d]/40 ${work.span}`}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 40,
+                marginTop: 30,
+              }}
             >
-              <img
-                src={work.image}
-                alt={work.title}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
-                style={{ filter: "grayscale(0.15) brightness(0.9)" }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/10" />
-
-              {/* top badge */}
-              <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-                <span
-                  style={{
-                    fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
-                    fontSize: "0.65rem",
-                    letterSpacing: "0.25em",
-                    textTransform: "uppercase",
-                    color: "rgba(242,239,233,0.7)",
-                    background: "rgba(13,13,13,0.5)",
-                    backdropFilter: "blur(6px)",
-                    padding: "0.35rem 0.6rem",
-                    borderRadius: 999,
-                    border: "1px solid rgba(242,239,233,0.15)",
-                  }}
-                >
-                  {String(i + 1).padStart(2, "0")} / {work.category}
-                </span>
-                <span
-                  className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{
-                    color: "#f5f1e8",
-                    background: "rgba(232,192,125,0.2)",
-                    backdropFilter: "blur(6px)",
-                    padding: "0.4rem",
-                    borderRadius: 999,
-                    border: "1px solid rgba(232,192,125,0.4)",
-                  }}
-                >
-                  <ArrowUpRight size={14} />
-                </span>
-              </div>
-
-              {/* bottom content */}
-              <div className="absolute bottom-0 left-0 right-0 p-5">
-                <h3
-                  style={{
-                    fontSize: "clamp(1.1rem, 1.8vw, 1.5rem)",
-                    fontWeight: 800,
-                    color: "#f5f1e8",
-                    margin: "0 0 0.5rem 0",
-                    letterSpacing: "-0.02em",
-                  }}
-                >
-                  {work.title}
+              <div>
+                <h3 style={{ fontSize: 18, marginBottom: 14, fontWeight: 600 }}>
+                  i love content creating and
                 </h3>
-                <p
-                  className="text-white/60 text-sm leading-relaxed m-0 mb-3"
-                  style={{ maxWidth: 380 }}
-                >
-                  {work.description}
+                <p style={{ fontSize: 15, lineHeight: 1.55, color: "var(--ink-2)" }}>
+                  enjoying snippets of my lifestyle that reflect intentional
+                  living, self-growth, and an eye for aesthetic.
                 </p>
-                <div className="flex gap-2 flex-wrap">
-                  {work.tags.map((tag) => (
-                    <span
-                      key={tag}
+              </div>
+              <div>
+                <h3 style={{ fontSize: 18, marginBottom: 14, fontWeight: 600 }}>
+                  i do
+                </h3>
+                <ul style={{ listStyle: "none", fontSize: 15, lineHeight: 1.9 }}>
+                  {[
+                    "video scripting",
+                    "video editing",
+                    "graphic design",
+                    "web development",
+                    "branding",
+                  ].map((s) => (
+                    <li
+                      key={s}
                       style={{
-                        fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
-                        fontSize: "0.65rem",
-                        letterSpacing: "0.15em",
-                        textTransform: "uppercase",
-                        padding: "0.3rem 0.55rem",
-                        borderRadius: 4,
-                        background: "rgba(242,239,233,0.06)",
-                        color: "rgba(242,239,233,0.7)",
-                        border: "1px solid rgba(242,239,233,0.08)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
                       }}
                     >
-                      {tag}
-                    </span>
+                      <span
+                        style={{
+                          width: 6,
+                          height: 6,
+                          background: "var(--accent)",
+                          display: "inline-block",
+                          borderRadius: "50%",
+                        }}
+                      />
+                      {s}
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
-            </a>
-          ))}
-        </div>
-      </section>
+            </div>
 
-      {/* ──────────────────────────────── CONNECT ──────────────────────────────── */}
-      <section
-        style={{
-          position: "relative",
-          maxWidth: 1200,
-          margin: "0 auto",
-          padding: "clamp(6rem, 14vh, 12rem) clamp(1.25rem, 5vw, 4rem) clamp(4rem, 8vh, 6rem)",
-        }}
-      >
-        <header
-          data-reveal
+            <div style={{ marginTop: 50 }}>
+              <Polaroid
+                rot={-3}
+                caption="such aa..."
+                w={260}
+                h={180}
+                style={{ display: "inline-block" }}
+              >
+                <Placeholder label="bedroom shot" w={260} h={180} tone="dark" />
+              </Polaroid>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────── STATS ─────────────────────────── */
+function Stats() {
+  const [animate, setAnimate] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) setAnimate(true);
+      },
+      { threshold: 0.3 }
+    );
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+
+  const bars = [
+    { label: "IG", h: 88, v: "70%" },
+    { label: "TT", h: 62, v: "50%" },
+    { label: "YT", h: 96, v: "80%" },
+    { label: "X", h: 28, v: "22%" },
+    { label: "LI", h: 18, v: "15%" },
+  ];
+
+  return (
+    <section
+      ref={ref}
+      className="section"
+      style={{ background: "var(--paper-2)", maxWidth: "none" }}
+    >
+      <div style={{ maxWidth: 1600, margin: "0 auto" }}>
+        <Reveal>
+          <h2
+            style={{
+              fontSize: "clamp(40px, 6vw, 82px)",
+              fontWeight: 700,
+              lineHeight: 1.05,
+              letterSpacing: "-0.02em",
+              marginBottom: 60,
+            }}
+          >
+            it&rsquo;s not just editing,
+            <br />
+            <span style={{ color: "var(--accent)" }}>
+              it&rsquo;s vibing with visuals.
+            </span>
+          </h2>
+        </Reveal>
+
+        <div
+          className="two-col"
           style={{
             display: "grid",
-            gridTemplateColumns: "minmax(0, 0.4fr) minmax(0, 1fr)",
-            gap: "clamp(2rem, 5vw, 5rem)",
-            marginBottom: "clamp(3rem, 7vh, 5rem)",
-            alignItems: "end",
+            gridTemplateColumns: "1fr 1.2fr",
+            gap: 80,
+          }}
+        >
+          <Reveal>
+            <div>
+              <div
+                className="font-mono"
+                style={{
+                  fontSize: 11,
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  color: "var(--muted)",
+                  marginBottom: 16,
+                }}
+              >
+                best performing formats
+              </div>
+
+              <div
+                style={{
+                  fontSize: 96,
+                  fontFamily: "var(--font-climate-crisis), sans-serif",
+                  fontWeight: 400,
+                  lineHeight: 1,
+                  color: "var(--accent)",
+                  marginBottom: 40,
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                70/35
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-end",
+                  gap: 24,
+                  height: 180,
+                  borderBottom: "1.5px solid var(--ink)",
+                  paddingBottom: 4,
+                  marginBottom: 12,
+                }}
+              >
+                {bars.map((b, i) => (
+                  <div
+                    key={b.label}
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "100%",
+                        height: animate ? `${b.h}%` : "0%",
+                        background:
+                          i === 0 || i === 2 ? "var(--accent)" : "var(--ink)",
+                        transition: `height 1.2s cubic-bezier(.2,.9,.3,1) ${i * 0.15}s`,
+                        position: "relative",
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: -22,
+                          left: "50%",
+                          transform: "translateX(-50%)",
+                          fontFamily:
+                            "var(--font-jetbrains-mono), ui-monospace, monospace",
+                          fontSize: 11,
+                          color: "var(--ink)",
+                        }}
+                      >
+                        {b.v}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: "flex", gap: 24 }}>
+                {bars.map((b) => (
+                  <div
+                    key={b.label}
+                    style={{
+                      flex: 1,
+                      textAlign: "center",
+                      fontFamily:
+                        "var(--font-jetbrains-mono), ui-monospace, monospace",
+                      fontSize: 11,
+                      color: "var(--muted)",
+                    }}
+                  >
+                    {b.label}
+                  </div>
+                ))}
+              </div>
+
+              <p
+                style={{
+                  fontSize: 14,
+                  marginTop: 30,
+                  color: "var(--ink-2)",
+                  maxWidth: 400,
+                  lineHeight: 1.5,
+                }}
+              >
+                his content primarily resonates with gen-z,
+                <br />
+                with <b>61%</b> of audience aged 18-24.
+              </p>
+            </div>
+          </Reveal>
+
+          <Reveal delay={200}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 14,
+              }}
+            >
+              <div style={{ gridColumn: "1 / 3" }}>
+                <p
+                  style={{
+                    fontSize: 13,
+                    lineHeight: 1.55,
+                    color: "var(--ink-2)",
+                    marginBottom: 14,
+                    maxWidth: 320,
+                  }}
+                >
+                  <b>how to set the tempo</b> as clips fall into rhythm, like
+                  choreography?
+                  <br />
+                  how to write a caption that sticks? how to capture moments
+                  that look aesthetic but feel like a story? how to find the
+                  perfect hook that makes you stall for hours?
+                </p>
+              </div>
+              <Placeholder label="clip 01" w="100%" h={180} tone="dark" rot={-1} />
+              <Placeholder label="clip 02" w="100%" h={180} tone="dark" rot={1} />
+              <Placeholder label="clip 03" w="100%" h={180} tone="dark" rot={-1} />
+              <Placeholder label="clip 04" w="100%" h={180} tone="dark" rot={2} />
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────── SKILLS ─────────────────────────── */
+function Skills() {
+  type Item =
+    | {
+        type: "photo";
+        label: string;
+        rot: number;
+        style: CSSProperties;
+      }
+    | { type: "swatch" | "type"; style: CSSProperties };
+
+  const items: Item[] = [
+    {
+      type: "photo",
+      label: "sketch 01",
+      rot: -4,
+      style: { gridColumn: "1 / 3", gridRow: "1 / 3" },
+    },
+    {
+      type: "photo",
+      label: "edit rig",
+      rot: 3,
+      style: { gridColumn: "3 / 4", gridRow: "1 / 2" },
+    },
+    { type: "swatch", style: { gridColumn: "4 / 6", gridRow: "1 / 2" } },
+    {
+      type: "photo",
+      label: "site snap",
+      rot: -2,
+      style: { gridColumn: "6 / 7", gridRow: "1 / 3" },
+    },
+    {
+      type: "photo",
+      label: "food",
+      rot: 4,
+      style: { gridColumn: "7 / 8", gridRow: "1 / 2" },
+    },
+    {
+      type: "photo",
+      label: "mockup",
+      rot: -3,
+      style: { gridColumn: "3 / 5", gridRow: "2 / 3" },
+    },
+    { type: "type", style: { gridColumn: "5 / 7", gridRow: "2 / 3" } },
+    {
+      type: "photo",
+      label: "client 01",
+      rot: 2,
+      style: { gridColumn: "7 / 8", gridRow: "2 / 3" },
+    },
+  ];
+
+  return (
+    <section
+      className="section"
+      style={{ position: "relative", paddingTop: 80, paddingBottom: 80 }}
+    >
+      <Reveal>
+        <div className="section-label" style={{ marginBottom: 30 }}>
+          04 · skills + works
+        </div>
+      </Reveal>
+
+      <div
+        style={{
+          position: "absolute",
+          top: 140,
+          left: "20vw",
+          zIndex: 3,
+          pointerEvents: "none",
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "var(--font-climate-crisis), sans-serif",
+            fontSize: "clamp(100px, 14vw, 220px)",
+            color: "var(--accent)",
+            lineHeight: 0.82,
+            transform: "rotate(-3deg)",
+            textShadow: "3px 3px 0 rgba(0,0,0,0.03)",
+          }}
+        >
+          skills
+          <br />
+          &amp; works
+        </div>
+      </div>
+
+      <Reveal delay={100}>
+        <div
+          className="skills-grid"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(7, 1fr)",
+            gridTemplateRows: "200px 200px",
+            gap: 18,
+            marginTop: 40,
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          {items.map((it, i) => (
+            <div key={i} style={it.style}>
+              {it.type === "photo" && (
+                <Placeholder
+                  label={it.label}
+                  w="100%"
+                  h="100%"
+                  rot={it.rot}
+                  tone="dark"
+                />
+              )}
+              {it.type === "swatch" && (
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    background: "#fbfaf6",
+                    border: "1px solid var(--ink)",
+                    display: "grid",
+                    gridTemplateColumns: "repeat(6, 1fr)",
+                    gap: 6,
+                    padding: 10,
+                  }}
+                >
+                  {[
+                    "#0f0f0f",
+                    "var(--accent)",
+                    "#f2ede4",
+                    "#6b6b66",
+                    "#8a1828",
+                    "#e4ddcc",
+                  ].map((c, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        background: c,
+                        border: "1px solid rgba(0,0,0,0.1)",
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+              {it.type === "type" && (
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    background: "#fbfaf6",
+                    border: "1px solid var(--ink)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-around",
+                    padding: 10,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontFamily: "var(--font-climate-crisis), sans-serif",
+                      fontSize: 64,
+                      color: "var(--accent)",
+                      lineHeight: 1,
+                    }}
+                  >
+                    Aa
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-instrument-serif), serif",
+                      fontSize: 64,
+                      color: "#0f0f0f",
+                      lineHeight: 1,
+                    }}
+                  >
+                    Aa
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-space-grotesk), sans-serif",
+                      fontSize: 64,
+                      fontWeight: 700,
+                      color: "#0f0f0f",
+                      lineHeight: 1,
+                    }}
+                  >
+                    Aa
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </Reveal>
+
+      <Reveal delay={300}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            marginTop: 50,
+            flexWrap: "wrap",
+            gap: 24,
           }}
         >
           <div
+            className="font-mono"
             style={{
-              fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
-              fontSize: "0.75rem",
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "rgba(242,239,233,0.5)",
-              paddingTop: "0.5rem",
-              borderTop: "1px solid rgba(242,239,233,0.2)",
+              fontSize: 12,
+              maxWidth: 240,
+              lineHeight: 1.6,
+              color: "var(--ink-2)",
             }}
           >
-            <div>04 — Connect</div>
-            <div style={{ marginTop: "0.5rem", color: "rgba(242,239,233,0.3)" }}>
-              Say hi
+            <b>graphic design:</b>
+            <br />
+            posters, illustration, logos, etc.
+          </div>
+          <StickyNote rot={3} color="var(--accent)" style={{ color: "#fff" }}>
+            currently working on
+            <br />
+            portfolio drop 2026
+          </StickyNote>
+          <div
+            className="font-mono"
+            style={{
+              fontSize: 12,
+              maxWidth: 240,
+              lineHeight: 1.6,
+              color: "var(--ink-2)",
+            }}
+          >
+            <b>video editing:</b>
+            <br />
+            shorts, reels, long-form, motion graphics.
+          </div>
+        </div>
+      </Reveal>
+    </section>
+  );
+}
+
+/* ─────────────────────────── CONTACT ─────────────────────────── */
+function Contact({ name }: { name: string }) {
+  return (
+    <section
+      className="section"
+      style={{
+        background: "var(--paper-2)",
+        maxWidth: "none",
+        position: "relative",
+        minHeight: "90vh",
+        display: "flex",
+        alignItems: "center",
+      }}
+    >
+      <div
+        className="two-col"
+        style={{
+          maxWidth: 1600,
+          margin: "0 auto",
+          width: "100%",
+          display: "grid",
+          gridTemplateColumns: "1fr 1.2fr",
+          gap: 60,
+          alignItems: "center",
+        }}
+      >
+        <Reveal>
+          <div style={{ position: "relative", height: 480 }}>
+            <svg
+              viewBox="0 0 400 400"
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+              }}
+            >
+              <polygon
+                points="20,60 380,60 380,340 20,340"
+                fill="#f4b5be"
+                stroke="var(--accent)"
+                strokeWidth="1.5"
+              />
+              <polygon
+                points="20,60 200,220 380,60"
+                fill="#f4b5be"
+                stroke="var(--accent)"
+                strokeWidth="1.5"
+              />
+              <polygon
+                points="20,340 180,200 220,200 380,340"
+                fill="var(--accent)"
+                opacity="0.25"
+              />
+            </svg>
+
+            <div
+              style={{
+                position: "absolute",
+                top: 90,
+                left: 50,
+                width: 340,
+                background: "#fbfaf6",
+                padding: "24px 26px",
+                transform: "rotate(-2deg)",
+                boxShadow: "0 12px 24px rgba(0,0,0,0.15)",
+                fontFamily: "var(--font-caveat), cursive",
+                fontSize: 22,
+                lineHeight: 1.5,
+                color: "#1a1a1a",
+                backgroundImage:
+                  "repeating-linear-gradient(transparent 0 31px, rgba(0,0,0,0.08) 31px 32px)",
+                paddingTop: 16,
+              }}
+            >
+              thank you so much for taking the time
+              <br />
+              to look through my portfolio.
+              <br />
+              always appreciate new opportunities
+              <br />
+              to learn and grow.
+              <br />
+              <br />
+              if you&rsquo;re interested in working together,
+              <br />
+              i&rsquo;d love to chat.
             </div>
           </div>
-          <div>
+        </Reveal>
+
+        <Reveal delay={150}>
+          <div style={{ paddingLeft: 40 }}>
             <h2
               style={{
-                margin: 0,
-                fontSize: "clamp(2.4rem, 6.5vw, 6rem)",
-                fontFamily: "var(--font-satoshi), system-ui, sans-serif",
-                fontWeight: 900,
-                letterSpacing: "-0.04em",
-                lineHeight: 0.95,
-                color: "#f5f1e8",
+                fontSize: "clamp(60px, 10vw, 160px)",
+                fontWeight: 800,
+                lineHeight: 0.88,
+                letterSpacing: "-0.03em",
+                marginBottom: 40,
               }}
             >
-              Let&rsquo;s make{" "}
-              <span
-                style={{
-                  fontFamily: "var(--font-sacramento), cursive",
-                  fontWeight: 400,
-                  fontSize: "1.1em",
-                  color: "#e8c07d",
-                  letterSpacing: "0",
-                }}
-              >
-                something
-              </span>
+              and
               <br />
-              together.
+              that&rsquo;s
+              <br />
+              <span style={{ color: "var(--accent)" }}>a wrap.</span>
             </h2>
-            <p
+
+            <div
               style={{
-                marginTop: "1.5rem",
-                maxWidth: 520,
-                color: "rgba(242,239,233,0.6)",
-                fontSize: "1rem",
-                lineHeight: 1.65,
+                display: "flex",
+                flexDirection: "column",
+                gap: 14,
+                marginTop: 40,
               }}
             >
-              Punya ide, proyek, atau sekadar mau ngobrol soal kopi dan detail
-              kecil yang bikin interface terasa beda? Kirim pesan — saya akan
-              balas dengan senang hati.
-            </p>
-          </div>
-        </header>
-
-        <div
-          data-reveal
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-            gap: "1px",
-            background: "rgba(242,239,233,0.08)",
-            border: "1px solid rgba(242,239,233,0.08)",
-            borderRadius: 18,
-            overflow: "hidden",
-          }}
-        >
-          {connects.map((c) => {
-            const Icon = c.icon;
-            return (
-              <a
-                key={c.label}
-                href={c.href}
-                target={c.href.startsWith("http") ? "_blank" : undefined}
-                rel="noreferrer"
-                className="group"
-                style={{
-                  position: "relative",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  padding: "clamp(1.75rem, 3.5vw, 2.5rem)",
-                  background: "#0d0d0d",
-                  minHeight: 220,
-                  transition: "background 0.4s ease",
-                  textDecoration: "none",
-                  color: "inherit",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background =
-                    "rgba(232,192,125,0.06)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "#0d0d0d";
-                }}
-              >
+              {[
+                { icon: "✉", label: "ilham_lam@icloud.com" },
+                { icon: "◎", label: "@mohammad" },
+                { icon: "▶", label: "github.com/mohammad" },
+              ].map((s) => (
                 <div
+                  key={s.label}
                   style={{
                     display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
+                    alignItems: "center",
+                    gap: 14,
+                    fontFamily:
+                      "var(--font-jetbrains-mono), ui-monospace, monospace",
+                    fontSize: 14,
                   }}
                 >
                   <span
                     style={{
-                      width: 42,
-                      height: 42,
-                      borderRadius: 999,
-                      border: "1px solid rgba(242,239,233,0.2)",
-                      display: "flex",
+                      width: 32,
+                      height: 32,
+                      background: "var(--accent)",
+                      color: "#fff",
+                      display: "inline-flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      color: "#f5f1e8",
+                      borderRadius: "50%",
+                      fontSize: 14,
                     }}
                   >
-                    <Icon size={18} strokeWidth={1.5} />
+                    {s.icon}
                   </span>
-                  <ArrowUpRight
-                    size={18}
-                    className="transition-transform duration-300 group-hover:rotate-0 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                    style={{
-                      color: "rgba(242,239,233,0.4)",
-                      transform: "rotate(-45deg)",
-                    }}
-                  />
+                  <span>{s.label}</span>
                 </div>
+              ))}
+            </div>
 
-                <div>
-                  <div
-                    style={{
-                      fontFamily:
-                        "var(--font-geist-mono), ui-monospace, monospace",
-                      fontSize: "0.7rem",
-                      letterSpacing: "0.25em",
-                      textTransform: "uppercase",
-                      color: "rgba(242,239,233,0.45)",
-                      marginBottom: "0.6rem",
-                    }}
-                  >
-                    {c.label}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "clamp(1.05rem, 1.7vw, 1.35rem)",
-                      fontWeight: 700,
-                      color: "#f5f1e8",
-                      letterSpacing: "-0.01em",
-                      marginBottom: "0.5rem",
-                      wordBreak: "break-word",
-                    }}
-                  >
-                    {c.handle}
-                  </div>
-                  <div
-                    style={{
-                      color: "rgba(242,239,233,0.5)",
-                      fontSize: "0.85rem",
-                      lineHeight: 1.55,
-                    }}
-                  >
-                    {c.note}
-                  </div>
-                </div>
-              </a>
-            );
-          })}
-        </div>
+            <div style={{ marginTop: 60 }}>
+              <button className="rough-btn">let&rsquo;s work together →</button>
+            </div>
+          </div>
+        </Reveal>
+      </div>
 
-        {/* Footer strip */}
-        <div
-          data-reveal
-          style={{
-            marginTop: "clamp(4rem, 8vh, 6rem)",
-            paddingTop: "2rem",
-            borderTop: "1px solid rgba(242,239,233,0.08)",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: "1rem",
-            fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
-            fontSize: "0.72rem",
-            letterSpacing: "0.2em",
-            textTransform: "uppercase",
-            color: "rgba(242,239,233,0.4)",
-          }}
-        >
-          <span>© 2026 — Ilham Lamiore</span>
-          <span
-            style={{
-              fontFamily: "var(--font-sacramento), cursive",
-              fontSize: "1.6rem",
-              letterSpacing: 0,
-              textTransform: "none",
-              color: "#e8c07d",
-            }}
-          >
-            thanks for scrolling —
-          </span>
-          <span>Bandung · ID</span>
-        </div>
-      </section>
+      <div
+        style={{
+          position: "absolute",
+          bottom: 20,
+          left: 0,
+          right: 0,
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "0 7vw",
+          fontFamily: "var(--font-jetbrains-mono), ui-monospace, monospace",
+          fontSize: 10,
+          letterSpacing: "0.2em",
+          textTransform: "uppercase",
+          color: "var(--muted)",
+          flexWrap: "wrap",
+          gap: 12,
+        }}
+      >
+        <span>© {new Date().getFullYear()} {name}</span>
+        <span>made with ♥ + caffeine</span>
+        <span>v.1.0 / about page</span>
+      </div>
+    </section>
+  );
+}
 
-      <style jsx>{`
-        @media (max-width: 768px) {
-          .about-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
+/* ─────────────────────────── PAGE ─────────────────────────── */
+export default function AboutPage() {
+  const handle = `@${PROFILE.name.trim().toLowerCase().replace(/\s+/g, "")}`;
+
+  return (
+    <div
+      className={`about-root ${PROFILE.paperTexture ? "about-paper" : ""}`}
+      style={{ ["--accent" as string]: PROFILE.accent } as CSSProperties}
+    >
+      <Hero name={PROFILE.name} role={PROFILE.role} />
+      <Origin />
+      <Moodboard />
+      <Marquee />
+      <Pillars handle={handle} />
+      <Stats />
+      <Skills />
+      <Contact name={PROFILE.name} />
     </div>
   );
 }

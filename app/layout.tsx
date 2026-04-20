@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Geist, Geist_Mono, Sacramento } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  Sacramento,
+  Caveat,
+  Space_Grotesk,
+  JetBrains_Mono,
+  Instrument_Serif,
+  Climate_Crisis,
+} from "next/font/google";
 import "./globals.css";
 import PageTransitionProvider from "@/components/layout/PageTransition";
 import Nav from "@/components/layout/Nav";
@@ -36,6 +45,41 @@ const sacramento = Sacramento({
   weight: "400",
 });
 
+const caveat = Caveat({
+  variable: "--font-caveat",
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  display: "swap",
+});
+
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+});
+
+const climateCrisis = Climate_Crisis({
+  variable: "--font-climate-crisis",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Lam",
   description: "created by ilham",
@@ -49,7 +93,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${satoshi.variable} ${geistSans.variable} ${geistMono.variable} ${sacramento.variable} antialiased`}
+        className={`${satoshi.variable} ${geistSans.variable} ${geistMono.variable} ${sacramento.variable} ${caveat.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable} ${climateCrisis.variable} antialiased`}
       >
         <PageTransitionProvider>
           <Nav />
