@@ -47,30 +47,23 @@ export default function Moodboard() {
         </Reveal>
 
         <Reveal delay={200}>
-          <div
-            className="mobile-text-left"
-            style={{
-              marginTop: 80,
-              maxWidth: 520,
-              marginLeft: "auto",
-              textAlign: "right",
-            }}
-          >
+          <div className="moodboard-caption">
             <p style={{ fontSize: 17, lineHeight: 1.5 }}>
-              seven years later, he&rsquo;s basically a pro at grabbing attention.
-              <br />
-              snap the right moment or give it that extra spice in post?
-              <br />
-              <span
-                className="font-hand"
-                style={{
-                  fontFamily: "var(--font-caveat), cursive",
-                  fontSize: 28,
-                  color: "var(--accent)",
-                }}
-              >
-                if it&rsquo;s got vibes, ilham&rsquo;s behind it.
-              </span>
+              seven years later, he&rsquo;s basically a pro at grabbing
+              attention. snap the right moment or give it that extra spice in
+              post?
+            </p>
+            <p
+              className="font-hand"
+              style={{
+                fontFamily: "var(--font-caveat), cursive",
+                fontSize: 28,
+                lineHeight: 1.2,
+                color: "var(--accent)",
+                marginTop: 12,
+              }}
+            >
+              if it&rsquo;s got vibes, ilham&rsquo;s behind it.
             </p>
           </div>
         </Reveal>

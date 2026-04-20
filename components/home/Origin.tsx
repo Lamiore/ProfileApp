@@ -97,12 +97,13 @@ export default function Origin() {
       <div className="grid-2">
         <Reveal>
           <div style={{ position: "relative", paddingTop: 20 }}>
-            <p style={{ fontSize: 18, maxWidth: 440, lineHeight: 1.55 }}>
-              tiny, curious, and low-key destined for pixels <br />
-              (though he didn&rsquo;t know it yet).
-              <br />
-              by the time he hit 11, he had a whole graphics <br />
-              tablet and half a folder full of experiments.
+            <p style={{ fontSize: 18, maxWidth: 600, lineHeight: 1.55 }}>
+              tiny, curious, and low-key destined for pixels &mdash; though he
+              didn&rsquo;t know it yet. by the age of 11, he already had a
+              graphics tablet tucked under his arm, half a folder full of
+              experiments, and the kind of restless energy that only shows up
+              when you&rsquo;ve just figured out you can <em>make</em> things,
+              not just watch them.
             </p>
 
             <OriginDeck />
@@ -111,15 +112,16 @@ export default function Origin() {
 
         <Reveal delay={200}>
           <div
-            className="mobile-text-left"
+            className="mobile-text-left origin-right"
             style={{ paddingTop: 140, position: "relative" }}
           >
             <p style={{ fontSize: 18, lineHeight: 1.55 }}>
-              after realizing his edits earned more views with a little
-              <br />
-              aesthetic flair, he proudly hit 600 followers and
-              <br />
-              probably thought he was famous.
+              after realizing his edits earned way more views with a little
+              aesthetic flair &mdash; the right colors, the right cut on the
+              beat, a cover that actually made you stop scrolling &mdash; he
+              proudly hit 600 followers and probably thought he was famous.
+              somewhere between the comments and the save count, the obsession
+              quietly began.
             </p>
 
             <p

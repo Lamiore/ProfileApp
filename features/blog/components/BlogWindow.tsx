@@ -1,17 +1,22 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Search, X } from "lucide-react";
 import { usePageTransition } from "@/components/layout/PageTransition";
 import { useBlogPosts } from "../hooks/use-blog-posts";
 import BlogCard, { SkeletonCard } from "./BlogCard";
 
+const PAGE_SIZE = 9;
+
 export default function BlogWindow() {
     const { loading, searchQuery, setSearchQuery, filteredBlogs } = useBlogPosts();
     const { navigateTo } = usePageTransition();
+    const [page, setPage] = useState(0);
     const searchRef = useRef<HTMLInputElement>(null);
 
-    // Focus search with "/" shortcut — small designer touch
+    const isSearching = searchQuery.trim().length > 0;
+
+    // Focus with "/" shortcut
     useEffect(() => {
         const onKey = (e: KeyboardEvent) => {
             if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
@@ -29,79 +34,84 @@ export default function BlogWindow() {
         return () => window.removeEventListener("keydown", onKey);
     }, []);
 
-    const isSearching = searchQuery.trim().length > 0;
-    const gridPosts = filteredBlogs;
+    // reset pager when searching
+    useEffect(() => {
+        setPage(0);
+    }, [searchQuery]);
+
+    const total = filteredBlogs.length;
+    const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    const currentPage = Math.min(page, totalPages - 1);
+    const pagePosts = filteredBlogs.slice(
+        currentPage * PAGE_SIZE,
+        currentPage * PAGE_SIZE + PAGE_SIZE
+    );
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
-            {/* Toolbar: search + meta */}
-            <div className="wnd-blog-toolbar">
-                <div className="wnd-blog-search-field">
-                    <Search size={15} />
+        <div className="journal-root">
+            <section className="j-hero">
+                <h1 className="j-hero-title">JOURNAL</h1>
+                <div className="j-hero-sub">
+                    <p>
+                        Notes, teardowns, and small essays about design, video, and building
+                        things slower than the internet demands. No newsletter popups. No
+                        upsells. Just words I wish someone had written for me a few years
+                        back.
+                    </p>
+                    <div className="j-hero-meta">
+                        <div>
+                            <b>{loading ? "—" : String(total).padStart(2, "0")}</b> posts
+                        </div>
+                        <div style={{ marginTop: 6 }}>EST. 2023</div>
+                    </div>
+                </div>
+
+                <div className="j-search">
+                    <Search size={14} className="j-search-icon" aria-hidden />
                     <input
                         ref={searchRef}
                         type="text"
+                        className="j-search-input"
                         placeholder="Search articles by title or content"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="wnd-blog-search"
                         aria-label="Search articles"
                     />
                     {isSearching ? (
                         <button
                             type="button"
-                            className="wnd-blog-search-clear"
+                            className="j-search-clear"
                             aria-label="Clear search"
                             onClick={() => {
                                 setSearchQuery("");
                                 searchRef.current?.focus();
                             }}
                         >
-                            <X size={13} />
+                            <X size={12} />
                         </button>
                     ) : (
-                        <span className="wnd-blog-search-hint" aria-hidden="true">/</span>
+                        <kbd className="j-search-hint" aria-hidden>/</kbd>
                     )}
                 </div>
-                <div className="wnd-blog-meta">
-                    {loading ? (
-                        <span>Loading</span>
-                    ) : isSearching ? (
-                        <>
-                            <span>{filteredBlogs.length} result{filteredBlogs.length === 1 ? "" : "s"}</span>
-                        </>
-                    ) : (
-                        <>
-                            <span>{filteredBlogs.length} article{filteredBlogs.length === 1 ? "" : "s"}</span>
-                            <span className="wnd-blog-meta-dot" aria-hidden="true" />
-                            <span>Latest first</span>
-                        </>
-                    )}
-                </div>
-            </div>
+            </section>
 
-            {/* Body */}
             {loading ? (
-                <>
-                    <div className="wnd-blog-section-head">
-                        <span className="wnd-blog-section-label">Articles</span>
-                        <span className="wnd-blog-section-rule" aria-hidden="true" />
-                        <span className="wnd-blog-section-count">—</span>
-                    </div>
-                    <div className="wnd-blog-grid">
-                        {Array.from({ length: 6 }).map((_, i) => (
-                            <SkeletonCard key={i} />
-                        ))}
-                    </div>
-                </>
-            ) : filteredBlogs.length === 0 ? (
-                <div className="wnd-blog-empty">
-                    <span className="wnd-blog-empty-eyebrow">
+                <div className="j-grid">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                        <SkeletonCard key={i} />
+                    ))}
+                </div>
+            ) : total === 0 ? (
+                <div className="j-empty">
+                    <div className="j-empty-eyebrow">
                         {isSearching ? "No results" : "Nothing yet"}
-                    </span>
-                    <p className="wnd-blog-empty-text">
+                    </div>
+                    <p className="j-empty-text">
                         {isSearching ? (
-                            <>Nothing matched <strong>&ldquo;{searchQuery}&rdquo;</strong>. Try a different keyword.</>
+                            <>
+                                Nothing matched <strong>&ldquo;{searchQuery}&rdquo;</strong>.
+                                Try a different keyword.
+                            </>
                         ) : (
                             <>The journal is quiet for now — new writings land here soon.</>
                         )}
@@ -109,30 +119,52 @@ export default function BlogWindow() {
                 </div>
             ) : (
                 <>
-                    {gridPosts.length > 0 && (
-                        <>
-                            <div className="wnd-blog-section-head">
-                                <span className="wnd-blog-section-label">
-                                    {isSearching ? "Results" : "Articles"}
-                                </span>
-                                <span className="wnd-blog-section-rule" aria-hidden="true" />
-                                <span className="wnd-blog-section-count">
-                                    {String(gridPosts.length).padStart(2, "0")}
-                                </span>
+                    <div className="j-grid">
+                        {pagePosts.map((blog) => (
+                            <BlogCard
+                                key={blog.id}
+                                post={blog}
+                                onClick={() => navigateTo(`/blog/${blog.id}`)}
+                            />
+                        ))}
+                    </div>
+
+                    {totalPages > 1 && (
+                        <div className="j-pager">
+                            <button
+                                type="button"
+                                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                                disabled={currentPage === 0}
+                            >
+                                ← Prev
+                            </button>
+                            <div className="j-page-num">
+                                <b>{String(currentPage + 1).padStart(2, "0")}</b> /{" "}
+                                {String(totalPages).padStart(2, "0")}
                             </div>
-                            <div className="wnd-blog-grid">
-                                {gridPosts.map((blog) => (
-                                    <BlogCard
-                                        key={blog.id}
-                                        post={blog}
-                                        onClick={() => navigateTo(`/blog/${blog.id}`)}
-                                    />
-                                ))}
-                            </div>
-                        </>
+                            <button
+                                type="button"
+                                onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                                disabled={currentPage === totalPages - 1}
+                            >
+                                Next →
+                            </button>
+                        </div>
                     )}
                 </>
             )}
+
+            <footer className="j-footer">
+                <div>© {new Date().getFullYear()} Ilham Mohammad · All Rights Reserved</div>
+                <div>
+                    <a href="https://instagram.com/ikanguramegarorica" target="_blank" rel="noreferrer">
+                        Instagram
+                    </a>
+                    <a href="https://linkedin.com/in/irham-aadiyaat-mohammad" target="_blank" rel="noreferrer">
+                        LinkedIn
+                    </a>
+                </div>
+            </footer>
         </div>
     );
 }
