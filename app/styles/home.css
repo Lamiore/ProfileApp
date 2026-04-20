@@ -1,0 +1,244 @@
+/* ─────────────────────────────────────────────────────────────────
+   Home page — collage / scrapbook aesthetic
+   ─────────────────────────────────────────────────────────────── */
+
+.home-root {
+  --paper: #2a2a2a;
+  --paper-2: #1f1f1f;
+  --ink: #f2ede4;
+  --ink-2: #d4cec0;
+  --muted: #8a857c;
+  --accent: #d7263d;
+  --accent-soft: rgba(215, 38, 61, 0.15);
+  --line: #f2ede4;
+  --card: #fbfaf6;
+  --card-ink: #0f0f0f;
+
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  line-height: 1.5;
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.home-root ::selection {
+  background: var(--accent);
+  color: var(--paper);
+}
+
+/* paper grain overlays */
+.home-paper::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.025) 1px, transparent 1px),
+    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.02) 1px, transparent 1px),
+    radial-gradient(circle at 40% 80%, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size: 3px 3px, 5px 5px, 7px 7px;
+  mix-blend-mode: screen;
+  opacity: 0.7;
+}
+.home-paper::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.4) 100%),
+    radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.25) 100%);
+  mix-blend-mode: multiply;
+}
+
+/* typography utilities */
+.home-root .font-hand {
+  font-family: var(--font-caveat), 'Caveat', cursive;
+  font-weight: 600;
+}
+.home-root .font-display {
+  font-family: var(--font-climate-crisis), 'Climate Crisis', 'Rubik Mono One', sans-serif;
+  letter-spacing: -0.02em;
+}
+.home-root .font-serif {
+  font-family: var(--font-instrument-serif), 'Instrument Serif', serif;
+}
+.home-root .font-mono {
+  font-family: var(--font-jetbrains-mono), 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* polaroid */
+.home-root .polaroid {
+  background: var(--card);
+  padding: 10px 10px 32px;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.08),
+    0 8px 20px rgba(0,0,0,0.25);
+  position: relative;
+  display: inline-block;
+}
+
+/* sections */
+.home-root .section {
+  position: relative;
+  padding: 120px 7vw;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+@media (max-width: 768px) {
+  .home-root .section { padding: 70px 5vw; }
+}
+
+.home-root .section-label {
+  font-family: var(--font-jetbrains-mono), 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.home-root .section-label::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--ink);
+}
+
+/* rough button */
+.home-root .rough-btn {
+  display: inline-block;
+  padding: 14px 28px;
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-weight: 500;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.home-root .rough-btn:hover {
+  background: var(--accent);
+  color: var(--ink);
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+/* wobble */
+@keyframes home-wobble {
+  0%, 100% { transform: rotate(var(--rot, 0deg)); }
+  50% { transform: rotate(calc(var(--rot, 0deg) + 0.8deg)); }
+}
+.home-root .wobble { animation: home-wobble 6s ease-in-out infinite; }
+
+/* marquee */
+@keyframes home-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.home-root .marquee-track {
+  display: flex;
+  width: max-content;
+  animation: home-marquee 40s linear infinite;
+}
+
+/* scroll reveal */
+.home-root .reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.home-root .reveal.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ==== RESPONSIVE GRID HELPERS ==== */
+.home-root .grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .home-root .grid-2 { grid-template-columns: 1fr; gap: 50px; }
+}
+
+.home-root .grid-split {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 60px;
+  align-items: center;
+}
+@media (max-width: 900px) {
+  .home-root .grid-split { grid-template-columns: 1fr; gap: 40px; }
+}
+
+.home-root .pillars-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 60px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .home-root .pillars-grid { grid-template-columns: 1fr; gap: 40px; }
+}
+
+.home-root .moodboard-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(3, 140px);
+  gap: 16px;
+}
+@media (max-width: 768px) {
+  .home-root .moodboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(6, 120px);
+  }
+  .home-root .moodboard-grid > * {
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
+}
+
+.home-root .skills-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: 200px 200px;
+  gap: 18px;
+}
+@media (max-width: 900px) {
+  .home-root .skills-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, 160px);
+  }
+  .home-root .skills-grid > * {
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
+}
+
+.home-root .stats-photos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* hide desktop-only annotations on mobile */
+@media (max-width: 768px) {
+  .home-root .hide-mobile { display: none !important; }
+  .home-root .mobile-stack { flex-direction: column !important; gap: 20px !important; }
+  .home-root .mobile-text-left { text-align: left !important; }
+  .home-root .contact-big { font-size: clamp(52px, 14vw, 120px) !important; }
+  .home-root .hero-script { font-size: 32px !important; }
+  .home-root .hero-script-sm { font-size: 24px !important; }
+}

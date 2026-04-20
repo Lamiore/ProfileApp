@@ -8,7 +8,7 @@
 @import "./styles/admin.css";
 @import "./styles/comparison.css";
 @import "./styles/map-pulse.css";
-@import "./styles/about.css";
+@import "./styles/home.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -150,4 +150,14 @@
 
 .wnd-dragging * {
   pointer-events: none !important;
+}
+
+/* Global text selection — merah */
+::selection {
+  background: #d7263d;
+  color: #ffffff;
+}
+::-moz-selection {
+  background: #d7263d;
+  color: #ffffff;
 }

@@ -5,7 +5,6 @@ import { usePageTransition } from "@/components/layout/PageTransition";
 import StaggeredMenu from "./StaggeredMenu";
 
 const pageLabels: Record<string, string> = {
-    "/about": "ABOUT",
     "/blog": "BLOG",
     "/gallery": "GALLERY",
 };
@@ -16,7 +15,6 @@ export default function Nav() {
 
     const menuItems = [
         { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
-        { label: 'About', ariaLabel: 'Learn about us', link: '/about' },
         { label: 'Blog', ariaLabel: 'Read our blog', link: '/blog' },
         { label: 'Gallery', ariaLabel: 'View our gallery', link: '/gallery' }
     ];
