@@ -15,7 +15,7 @@ export default function Home() {
     const prevBackground = document.body.style.background;
     document.body.style.overflow = "auto";
     document.body.style.height = "auto";
-    document.body.style.background = "#2a2a2a";
+    document.body.style.background = "#161415";
     return () => {
       document.body.style.overflow = prevOverflow;
       document.body.style.height = prevHeight;

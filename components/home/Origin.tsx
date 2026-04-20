@@ -23,13 +23,15 @@ export default function Origin() {
             </p>
 
             <div
-              className="mobile-stack"
+              className="origin-photos"
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 30,
+                justifyContent: "space-between",
+                gap: 20,
                 marginTop: 60,
                 position: "relative",
+                flexWrap: "nowrap",
               }}
             >
               <Polaroid
@@ -42,7 +44,12 @@ export default function Origin() {
                 <Placeholder label="kid photo" w={120} h={150} tone="dark" />
               </Polaroid>
 
-              <Arrow variant="curve" w={160} h={80} style={{ marginTop: -20 }} />
+              <Arrow
+                variant="curve"
+                w={160}
+                h={80}
+                style={{ marginTop: -20, flexShrink: 1, minWidth: 0 }}
+              />
 
               <Polaroid rot={5} w={120} h={150} style={{ flexShrink: 0 }}>
                 <Placeholder label="now" w={120} h={150} tone="dark" />

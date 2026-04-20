@@ -1,7 +1,7 @@
 "use client";
 
 import { CSSProperties } from "react";
-import { Placeholder, Reveal, StickyNote } from "./Primitives";
+import { Placeholder, Reveal } from "./Primitives";
 
 type Item =
   | { type: "photo"; label: string; rot: number; style: CSSProperties }
@@ -207,11 +207,11 @@ export default function Skills() {
             <br />
             posters, illustration, logos, etc.
           </div>
-          <StickyNote rot={3} color="var(--accent)" style={{ color: "#fff" }}>
+          <button className="sticky-btn" type="button">
             currently working on
             <br />
             portfolio drop 2026
-          </StickyNote>
+          </button>
           <div
             className="font-mono"
             style={{

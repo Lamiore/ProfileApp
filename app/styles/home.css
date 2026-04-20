@@ -3,7 +3,7 @@
    ─────────────────────────────────────────────────────────────── */
 
 .home-root {
-  --paper: #2a2a2a;
+  --paper: #161415;
   --paper-2: #1f1f1f;
   --ink: #f2ede4;
   --ink-2: #d4cec0;
@@ -133,6 +133,32 @@
   box-shadow: 4px 4px 0 var(--ink);
 }
 
+/* sticky-note styled button (like rough-btn animation) */
+.home-root .sticky-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 18px 20px;
+  max-width: 220px;
+  text-align: left;
+  font-family: var(--font-caveat), 'Caveat', cursive;
+  font-size: 22px;
+  line-height: 1.2;
+  cursor: pointer;
+  transform: rotate(3deg);
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.12),
+    0 1px 2px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, background 0.2s, box-shadow 0.2s, color 0.2s;
+}
+.home-root .sticky-btn:hover {
+  background: var(--ink);
+  color: var(--accent);
+  transform: rotate(3deg) translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--accent);
+}
+
 /* wobble */
 @keyframes home-wobble {
   0%, 100% { transform: rotate(var(--rot, 0deg)); }
@@ -231,6 +257,19 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
+}
+
+/* origin photos — tetap side-by-side di mobile, arrow yang menyesuaikan */
+.home-root .origin-photos > svg {
+  max-width: 100%;
+  height: auto;
+  flex: 1 1 0;
+  min-width: 0;
+}
+@media (max-width: 480px) {
+  .home-root .origin-photos {
+    gap: 10px !important;
+  }
 }
 
 /* hero portrait — fixed size, bit smaller on mobile */

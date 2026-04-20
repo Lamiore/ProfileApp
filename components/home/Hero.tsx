@@ -35,7 +35,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
     >
       <div
         className="hero-script"
-        style={{ position: "absolute", top: 110, left: "7vw", zIndex: 5 }}
+        style={{ position: "absolute", top: 80, left: "7vw", zIndex: 5 }}
       >
         <div
           className="font-hand"
@@ -111,7 +111,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
       </div>
 
       <div
-        className="font-hand hide-mobile"
+        className="font-hand"
         style={{
           position: "absolute",
           top: "14%",
@@ -138,7 +138,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           height: "40vh",
           transform: "translateX(-50%)",
           background:
-            "linear-gradient(to bottom, rgba(42,42,42,0) 0%, rgba(42,42,42,0.35) 30%, rgba(42,42,42,0.85) 70%, #2a2a2a 100%)",
+            "linear-gradient(to bottom, rgba(22,20,21,0) 0%, rgba(22,20,21,0.35) 30%, rgba(22,20,21,0.85) 70%, #161415 100%)",
           pointerEvents: "none",
           zIndex: 4,
         }}
