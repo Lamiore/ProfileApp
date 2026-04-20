@@ -60,37 +60,16 @@ export default function Skills() {
         </div>
       </Reveal>
 
-      <div
-        className="hide-mobile"
-        style={{
-          position: "absolute",
-          top: 140,
-          left: "20vw",
-          zIndex: 3,
-          pointerEvents: "none",
-        }}
-      >
-        <div
-          style={{
-            fontFamily:
-              "var(--font-climate-crisis), 'Climate Crisis', sans-serif",
-            fontSize: "clamp(100px, 14vw, 220px)",
-            color: "var(--accent)",
-            lineHeight: 0.82,
-            transform: "rotate(-3deg)",
-            textShadow: "3px 3px 0 rgba(0,0,0,0.08)",
-          }}
-        >
-          skills
-          <br />
-          &amp; works
-        </div>
-      </div>
-
       <Reveal delay={100}>
+        <div className="skills-grid-wrap" style={{ position: "relative", marginTop: 40 }}>
+          <div className="skills-title" aria-hidden>
+            skills
+            <br />
+            &amp; works
+          </div>
         <div
           className="skills-grid"
-          style={{ marginTop: 40, position: "relative", zIndex: 1 }}
+          style={{ position: "relative", zIndex: 1 }}
         >
           {items.map((it, i) => (
             <div key={i} style={it.style}>
@@ -180,6 +159,7 @@ export default function Skills() {
               )}
             </div>
           ))}
+        </div>
         </div>
       </Reveal>
 

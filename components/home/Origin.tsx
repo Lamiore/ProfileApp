@@ -1,13 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Placeholder, Polaroid, Reveal } from "./Primitives";
+import Image from "next/image";
+import { Polaroid, Reveal } from "./Primitives";
 
 const DECK = [
-  { label: "kid photo", caption: "11 yr old ilham" },
-  { label: "sketch", caption: "early doodles" },
-  { label: "setup", caption: "first rig" },
+  { src: "/image/home/origin/1.jpg", caption: "11 yr old ilham" },
+  { src: "/image/home/origin/2.jpg", caption: "early doodles" },
+  { src: "/image/home/origin/3.png", caption: "first rig" },
 ];
+
+const CARD_W = 220;
+const CARD_H = 280;
 
 function OriginDeck() {
   const [order, setOrder] = useState([0, 1, 2]);
@@ -53,10 +57,26 @@ function OriginDeck() {
             <Polaroid
               rot={0}
               caption={isFront ? card.caption : undefined}
-              w={220}
-              h={280}
+              w={CARD_W}
+              h={CARD_H}
             >
-              <Placeholder label={card.label} w={220} h={280} tone="dark" />
+              <div
+                style={{
+                  width: CARD_W,
+                  height: CARD_H,
+                  position: "relative",
+                  overflow: "hidden",
+                  background: "#1a1a1a",
+                }}
+              >
+                <Image
+                  src={card.src}
+                  alt={card.caption}
+                  fill
+                  sizes="220px"
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
             </Polaroid>
           </div>
         );

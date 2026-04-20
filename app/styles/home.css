@@ -292,6 +292,28 @@
   }
 }
 
+/* skills & works title — overlay center pada grid area */
+.home-root .skills-title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-3deg);
+  z-index: 3;
+  pointer-events: none;
+  font-family: var(--font-climate-crisis), 'Climate Crisis', sans-serif;
+  font-size: clamp(64px, 14vw, 220px);
+  color: var(--accent);
+  line-height: 0.82;
+  text-align: center;
+  text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.08);
+  white-space: nowrap;
+}
+@media (max-width: 768px) {
+  .home-root .skills-title {
+    font-size: clamp(48px, 18vw, 120px);
+  }
+}
+
 /* hero portrait — fixed size, bit smaller on mobile */
 .home-root .hero-portrait {
   width: 980px;
