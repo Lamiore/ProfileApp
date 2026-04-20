@@ -3,7 +3,7 @@
    ─────────────────────────────────────────────────────────────── */
 
 .home-root {
-  --paper: #161415;
+  --paper: #0d0d0d;
   --paper-2: #1f1f1f;
   --ink: #f2ede4;
   --ink-2: #d4cec0;
@@ -30,8 +30,8 @@
   color: var(--paper);
 }
 
-/* paper grain overlays */
-.home-paper::before {
+/* paper grain + vignette overlays — reusable for any page wrapper */
+.paper-texture::before {
   content: '';
   position: fixed;
   inset: 0;
@@ -45,7 +45,7 @@
   mix-blend-mode: screen;
   opacity: 0.7;
 }
-.home-paper::after {
+.paper-texture::after {
   content: '';
   position: fixed;
   inset: 0;

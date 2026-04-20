@@ -15,7 +15,7 @@ export default function Home() {
     const prevBackground = document.body.style.background;
     document.body.style.overflow = "auto";
     document.body.style.height = "auto";
-    document.body.style.background = "#161415";
+    document.body.style.background = "#0d0d0d";
     return () => {
       document.body.style.overflow = prevOverflow;
       document.body.style.height = prevHeight;
@@ -27,7 +27,7 @@ export default function Home() {
   const role = "graphic designer / video editor";
 
   return (
-    <main className="home-root home-paper">
+    <main className="home-root paper-texture">
       <Hero name={name} role={role} />
       <Origin />
       <Moodboard />

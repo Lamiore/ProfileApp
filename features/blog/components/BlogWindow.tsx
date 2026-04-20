@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { Search, X } from "lucide-react";
 import { usePageTransition } from "@/components/layout/PageTransition";
 import { useBlogPosts } from "../hooks/use-blog-posts";
-import BlogCard, { FeaturedBlogCard, FeaturedSkeleton, SkeletonCard } from "./BlogCard";
+import BlogCard, { SkeletonCard } from "./BlogCard";
 
 export default function BlogWindow() {
     const { loading, searchQuery, setSearchQuery, filteredBlogs } = useBlogPosts();
@@ -30,9 +30,7 @@ export default function BlogWindow() {
     }, []);
 
     const isSearching = searchQuery.trim().length > 0;
-    const [featured, ...rest] = filteredBlogs;
-    const showFeatured = !isSearching && !!featured;
-    const gridPosts = showFeatured ? rest : filteredBlogs;
+    const gridPosts = filteredBlogs;
 
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
@@ -85,9 +83,8 @@ export default function BlogWindow() {
             {/* Body */}
             {loading ? (
                 <>
-                    <FeaturedSkeleton />
                     <div className="wnd-blog-section-head">
-                        <span className="wnd-blog-section-label">All articles</span>
+                        <span className="wnd-blog-section-label">Articles</span>
                         <span className="wnd-blog-section-rule" aria-hidden="true" />
                         <span className="wnd-blog-section-count">—</span>
                     </div>
@@ -112,17 +109,11 @@ export default function BlogWindow() {
                 </div>
             ) : (
                 <>
-                    {showFeatured && (
-                        <FeaturedBlogCard
-                            post={featured}
-                            onClick={() => navigateTo(`/blog/${featured.id}`)}
-                        />
-                    )}
                     {gridPosts.length > 0 && (
                         <>
                             <div className="wnd-blog-section-head">
                                 <span className="wnd-blog-section-label">
-                                    {isSearching ? "Results" : showFeatured ? "All articles" : "Articles"}
+                                    {isSearching ? "Results" : "Articles"}
                                 </span>
                                 <span className="wnd-blog-section-rule" aria-hidden="true" />
                                 <span className="wnd-blog-section-count">

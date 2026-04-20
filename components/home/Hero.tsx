@@ -138,7 +138,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           height: "40vh",
           transform: "translateX(-50%)",
           background:
-            "linear-gradient(to bottom, rgba(22,20,21,0) 0%, rgba(22,20,21,0.35) 30%, rgba(22,20,21,0.85) 70%, #161415 100%)",
+            "linear-gradient(to bottom, rgba(13,13,13,0) 0%, rgba(13,13,13,0.35) 30%, rgba(13,13,13,0.85) 70%, #0d0d0d 100%)",
           pointerEvents: "none",
           zIndex: 4,
         }}
