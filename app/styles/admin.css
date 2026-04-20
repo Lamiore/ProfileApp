@@ -901,6 +901,44 @@ body.adm-scroll {
   letter-spacing: 0.01em;
 }
 
+/* Category chip picker */
+.adm-cat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.adm-cat-chip {
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.adm-cat-chip:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.adm-cat-chip.active {
+  background: rgba(215, 38, 61, 0.15);
+  border-color: rgba(215, 38, 61, 0.55);
+  color: #f2ede4;
+}
+
+.adm-cat-chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* Divider block preview in the editor */
 .adm-divider-preview {
   display: flex;

@@ -24,6 +24,7 @@ export function useBlogPosts() {
         const q = searchQuery.toLowerCase();
         return blogs.filter((blog) =>
             blog.title.toLowerCase().includes(q) ||
+            blog.category?.toLowerCase().includes(q) ||
             blog.blocks?.some(b => b.type === "text" && b.content.toLowerCase().includes(q))
         );
     }, [blogs, searchQuery]);

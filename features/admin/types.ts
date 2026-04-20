@@ -27,6 +27,7 @@ export interface BlogBlock {
 export interface BlogItem {
     id: string;
     title: string;
+    category?: string;
     thumbnail?: string;
     blocks?: { type: string; content: string; meta?: string }[];
     createdAt?: { toDate: () => Date };

@@ -73,7 +73,7 @@ export default function BlogCard({ post, onClick }: BlogCardProps) {
         <button className="j-card" type="button" onClick={onClick}>
             <div className="j-card-top">
                 <span>{date}</span>
-                <span className="j-card-cat">Journal</span>
+                <span className="j-card-cat">{post.category || "Journal"}</span>
             </div>
 
             <div className="j-card-thumb">

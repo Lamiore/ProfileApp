@@ -195,6 +195,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
               width: "100%",
               height: "auto",
               display: "block",
+              filter: "grayscale(100%) contrast(1.08)",
             }}
           />
         </div>

@@ -72,7 +72,7 @@ export default function BlogWindow() {
                         ref={searchRef}
                         type="text"
                         className="j-search-input"
-                        placeholder="Search articles by title or content"
+                        placeholder="Search by title, category, or content"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         aria-label="Search articles"

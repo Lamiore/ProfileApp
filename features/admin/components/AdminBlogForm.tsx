@@ -236,12 +236,22 @@ export default function AdminBlogForm() {
     const [editingId, setEditingId] = useState<string | null>(null);
     const { blogs, saveBlog, deleteBlog } = useAdminBlog();
     const [title, setTitle] = useState("");
+    const [category, setCategory] = useState("");
     const [thumbnail, setThumbnail] = useState("");
     const [thumbnailBroken, setThumbnailBroken] = useState(false);
     const [blocks, setBlocks] = useState<BlogBlock[]>([newBlock("text")]);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
+
+    // unique existing categories for datalist suggestions
+    const existingCategories = Array.from(
+        new Set(
+            blogs
+                .map((b) => b.category?.trim())
+                .filter((c): c is string => Boolean(c))
+        )
+    ).sort();
 
     const addBlock = (type: BlogBlockType) => setBlocks((p) => [...p, newBlock(type)]);
     const patchBlock = (id: number, patch: Partial<BlogBlock>) =>
@@ -255,6 +265,7 @@ export default function AdminBlogForm() {
 
     const resetForm = () => {
         setTitle("");
+        setCategory("");
         setThumbnail("");
         setThumbnailBroken(false);
         setBlocks([newBlock("text")]);
@@ -266,6 +277,7 @@ export default function AdminBlogForm() {
     const startEdit = (blog: BlogItem) => {
         setEditingId(blog.id);
         setTitle(blog.title);
+        setCategory(blog.category ?? "");
         setThumbnail(blog.thumbnail ?? "");
         setThumbnailBroken(false);
         if (blog.blocks && blog.blocks.length > 0) {
@@ -296,6 +308,7 @@ export default function AdminBlogForm() {
             const data: Record<string, unknown> = {
                 title: title.trim(),
                 slug: docId,
+                category: category.trim() || null,
                 blocks: blocks.map((b) => {
                     const content = b.type === "divider" ? "" : b.content.trim();
                     const out: { type: string; content: string; meta?: string } = { type: b.type, content };
@@ -329,6 +342,43 @@ export default function AdminBlogForm() {
                             <label className="adm-label">Judul</label>
                             <input type="text" className="adm-input" placeholder="Masukkan judul blog..." value={title}
                                 onChange={(e) => { setTitle(e.target.value); setError(""); }} disabled={submitting} />
+                        </div>
+
+                        <div className="adm-field">
+                            <label className="adm-label">Kategori</label>
+                            <input
+                                type="text"
+                                className="adm-input"
+                                list="adm-blog-categories"
+                                placeholder="Contoh: Design, Journal, Dev notes…"
+                                value={category}
+                                onChange={(e) => setCategory(e.target.value)}
+                                disabled={submitting}
+                                maxLength={40}
+                            />
+                            <datalist id="adm-blog-categories">
+                                {existingCategories.map((c) => (
+                                    <option key={c} value={c} />
+                                ))}
+                            </datalist>
+                            {existingCategories.length > 0 && (
+                                <div className="adm-cat-chips">
+                                    {existingCategories.map((c) => (
+                                        <button
+                                            key={c}
+                                            type="button"
+                                            className={`adm-cat-chip ${category.trim().toLowerCase() === c.toLowerCase() ? "active" : ""}`}
+                                            onClick={() => setCategory(c)}
+                                            disabled={submitting}
+                                        >
+                                            {c}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                            <span className="adm-field-hint">
+                                Ketik baru atau pilih dari yang sudah ada.
+                            </span>
                         </div>
 
                         <div className="adm-field">
@@ -449,7 +499,10 @@ export default function AdminBlogForm() {
                                 </div>
                                 <div className="adm-list-info">
                                     <span className="adm-list-name">{blog.title}</span>
-                                    <span className="adm-list-date">{formatDate(blog.createdAt)}</span>
+                                    <span className="adm-list-date">
+                                        {blog.category ? `${blog.category} · ` : ""}
+                                        {formatDate(blog.createdAt)}
+                                    </span>
                                 </div>
                             </div>
                             <button type="button" className="adm-list-edit" onClick={(e) => { e.stopPropagation(); startEdit(blog); }}>

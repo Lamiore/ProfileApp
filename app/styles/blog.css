@@ -396,6 +396,7 @@
   color: var(--ink);
   font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
   line-height: 1.5;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 .journal-root ::selection { background: var(--accent); color: var(--bg); }
@@ -423,11 +424,14 @@
 }
 .journal-root .j-hero-title {
   font-family: var(--font-climate-crisis), 'Climate Crisis', sans-serif;
-  font-size: clamp(64px, 20vw, 320px);
+  font-size: clamp(56px, 14vw, 220px);
   line-height: 0.82;
   letter-spacing: -0.04em;
   color: var(--accent);
   font-weight: 400;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 .journal-root .j-hero-sub {
   display: flex;
