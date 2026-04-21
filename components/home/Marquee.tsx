@@ -16,11 +16,9 @@ export default function Marquee() {
     <div
       style={{
         overflow: "hidden",
-        borderTop: "1.5px solid var(--ink)",
-        borderBottom: "1.5px solid var(--ink)",
         padding: "20px 0",
-        background: "#0f0f0f",
-        color: "var(--ink)",
+        background: "var(--ink)",
+        color: "#0f0f0f",
       }}
     >
       <div className="marquee-track">
@@ -38,7 +36,7 @@ export default function Marquee() {
               whiteSpace: "nowrap",
             }}
           >
-            <span style={{ color: i % 3 === 0 ? "var(--accent)" : "var(--ink)" }}>
+            <span style={{ color: i % 3 === 0 ? "var(--accent)" : "#0f0f0f" }}>
               {w}
             </span>
             <span style={{ fontSize: 24, color: "var(--accent)" }}>✺</span>

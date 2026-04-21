@@ -3,6 +3,7 @@
 import { CSSProperties, useEffect, useRef } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
+import { SparklesOverlay } from "@/components/ui/sparkles-text";
 
 export default function Hero({ name, role }: { name: string; role: string }) {
   const parts = name.trim().split(/\s+/);
@@ -23,7 +24,10 @@ export default function Hero({ name, role }: { name: string; role: string }) {
     fontWeight: 400,
     whiteSpace: "nowrap",
     textShadow: "0.06em 0.07em 0 var(--ink)",
+    position: "relative",
   };
+
+  const sparkleColors = { first: "#f2ede4", second: "#d7263d" };
 
   const rootRef = useRef<HTMLElement>(null);
 
@@ -57,6 +61,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
       });
       gsap.set(q(".hero-gsap-mono"), { opacity: 0, y: 18 });
       gsap.set(q(".hero-gsap-scroll"), { opacity: 0, y: 8 });
+      gsap.set(q(".hero-gsap-sparkles"), { opacity: 0 });
 
       // ── entrance timeline ─────────────────────────────────────
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
@@ -138,6 +143,11 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           q(".hero-gsap-scroll"),
           { opacity: 1, y: 0, duration: 0.6 },
           2.15
+        )
+        .to(
+          q(".hero-gsap-sparkles"),
+          { opacity: 1, duration: 0.9, ease: "power2.out" },
+          2.5
         );
 
       // ── ambient loops (starts after entrance) ─────────────────
@@ -285,6 +295,11 @@ export default function Hero({ name, role }: { name: string; role: string }) {
             paddingBottom: "0.1em",
           }}
         >
+          <SparklesOverlay
+            className="hero-gsap-sparkles"
+            colors={sparkleColors}
+            sparklesCount={14}
+          />
           {splitChars(first, "hero-gsap-first-char")}
         </h1>
         {last && (
@@ -300,6 +315,11 @@ export default function Hero({ name, role }: { name: string; role: string }) {
               paddingBottom: "0.12em",
             }}
           >
+            <SparklesOverlay
+              className="hero-gsap-sparkles"
+              colors={sparkleColors}
+              sparklesCount={14}
+            />
             {splitChars(last, "hero-gsap-last-char")}
           </h1>
         )}
