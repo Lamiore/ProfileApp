@@ -213,13 +213,13 @@ export default function NotFound() {
       <style>{`
         .nf-wrap {
           background: #1a1a1a;
-          min-height: 100vh;
+          min-height: 100dvh;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          padding: 40px 20px;
-          gap: 18px;
+          padding: 24px 20px 32px;
+          gap: 14px;
           color: #f2ede4;
           font-family: var(--font-space-grotesk), system-ui, sans-serif;
         }
@@ -243,8 +243,8 @@ export default function NotFound() {
         }
         .nf-game {
           position: relative;
-          width: min(400px, 92vw);
-          aspect-ratio: 400 / 560;
+          width: min(380px, 90vw, 48vh);
+          aspect-ratio: 400 / 460;
           border: 1px solid #3a3a3a;
           background: #1a1a1a;
           box-shadow: 0 20px 40px rgba(0,0,0,0.35);
@@ -324,7 +324,7 @@ export default function NotFound() {
         <canvas
           ref={canvasRef}
           width={400}
-          height={560}
+          height={460}
           className="nf-canvas"
         />
         <div className="nf-hud">
