@@ -1,7 +1,8 @@
 "use client";
 
-import { CSSProperties } from "react";
+import { CSSProperties, useEffect, useRef } from "react";
 import Image from "next/image";
+import { gsap } from "gsap";
 
 export default function Hero({ name, role }: { name: string; role: string }) {
   const parts = name.trim().split(/\s+/);
@@ -11,7 +12,8 @@ export default function Hero({ name, role }: { name: string; role: string }) {
   const vw = Math.min(16, Math.max(6, 72 / longest));
 
   const common: CSSProperties = {
-    fontFamily: "var(--font-climate-crisis), 'Climate Crisis', 'Rubik Mono One', sans-serif",
+    fontFamily:
+      "var(--font-climate-crisis), 'Climate Crisis', 'Rubik Mono One', sans-serif",
     fontSize: `clamp(40px, ${vw}vw, 180px)`,
     color: "var(--accent)",
     lineHeight: 0.82,
@@ -20,11 +22,191 @@ export default function Hero({ name, role }: { name: string; role: string }) {
     letterSpacing: "-0.05em",
     fontWeight: 400,
     whiteSpace: "nowrap",
-    textShadow: "2px 2px 0 rgba(0,0,0,0.08)",
+    textShadow: "0.06em 0.07em 0 var(--ink)",
   };
+
+  const rootRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const q = gsap.utils.selector(rootRef);
+
+      // ── initial state ─────────────────────────────────────────
+      gsap.set(q(".hero-gsap-hi"), { opacity: 0, x: -40, rotate: -14 });
+      gsap.set(q(".hero-gsap-menu"), { opacity: 0, x: 60, rotate: -40 });
+      gsap.set(q(".hero-gsap-first-char"), {
+        yPercent: 130,
+        opacity: 0,
+        rotate: (i) => (i % 2 === 0 ? -12 : 8),
+      });
+      gsap.set(q(".hero-gsap-last-char"), {
+        yPercent: -130,
+        opacity: 0,
+        rotate: (i) => (i % 2 === 0 ? 10 : -10),
+      });
+      gsap.set(q(".hero-gsap-this-is"), {
+        opacity: 0,
+        scale: 0,
+        rotate: 40,
+        transformOrigin: "center center",
+      });
+      gsap.set(q(".hero-gsap-portrait"), {
+        opacity: 0,
+        clipPath: "inset(100% 0% 0% 0%)",
+        scale: 1.04,
+      });
+      gsap.set(q(".hero-gsap-mono"), { opacity: 0, y: 18 });
+      gsap.set(q(".hero-gsap-scroll"), { opacity: 0, y: 8 });
+
+      // ── entrance timeline ─────────────────────────────────────
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+      tl.to(
+        q(".hero-gsap-hi"),
+        { opacity: 1, x: 0, rotate: -2, duration: 0.9, ease: "back.out(1.4)" },
+        0.2
+      )
+        .to(
+          q(".hero-gsap-menu"),
+          {
+            opacity: 1,
+            x: 0,
+            rotate: -18,
+            duration: 1.0,
+            ease: "back.out(1.6)",
+          },
+          0.35
+        )
+        .to(
+          q(".hero-gsap-first-char"),
+          {
+            yPercent: 0,
+            opacity: 1,
+            rotate: 0,
+            duration: 1.1,
+            stagger: 0.055,
+            ease: "back.out(1.9)",
+          },
+          0.55
+        )
+        .to(
+          q(".hero-gsap-this-is"),
+          {
+            opacity: 1,
+            scale: 1,
+            rotate: -4,
+            duration: 0.85,
+            ease: "back.out(2)",
+          },
+          0.85
+        )
+        .to(
+          q(".hero-gsap-last-char"),
+          {
+            yPercent: 0,
+            opacity: 1,
+            rotate: 0,
+            duration: 1.1,
+            stagger: { each: 0.055, from: "end" },
+            ease: "back.out(1.9)",
+          },
+          0.95
+        )
+        .to(
+          q(".hero-gsap-portrait"),
+          {
+            opacity: 1,
+            clipPath: "inset(0% 0% 0% 0%)",
+            scale: 1,
+            duration: 1.5,
+            ease: "power2.out",
+          },
+          1.35
+        )
+        .to(
+          q(".hero-gsap-mono"),
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            stagger: 0.12,
+            ease: "power2.out",
+          },
+          1.8
+        )
+        .to(
+          q(".hero-gsap-scroll"),
+          { opacity: 1, y: 0, duration: 0.6 },
+          2.15
+        );
+
+      // ── ambient loops (starts after entrance) ─────────────────
+      gsap.to(q(".hero-gsap-hi"), {
+        rotate: -4,
+        y: -3,
+        duration: 3.4,
+        yoyo: true,
+        repeat: -1,
+        ease: "sine.inOut",
+        delay: 2.6,
+      });
+      gsap.to(q(".hero-gsap-menu"), {
+        rotate: -20,
+        y: 3,
+        duration: 3.8,
+        yoyo: true,
+        repeat: -1,
+        ease: "sine.inOut",
+        delay: 2.8,
+      });
+      gsap.to(q(".hero-gsap-this-is"), {
+        rotate: -2,
+        y: -6,
+        duration: 2.8,
+        yoyo: true,
+        repeat: -1,
+        ease: "sine.inOut",
+        delay: 2.4,
+      });
+
+      // ── mouse parallax on portrait ────────────────────────────
+      const portrait = q(".hero-gsap-portrait")[0] as HTMLElement | undefined;
+      const quickX = portrait
+        ? gsap.quickTo(portrait, "x", { duration: 0.9, ease: "power3.out" })
+        : null;
+      const quickY = portrait
+        ? gsap.quickTo(portrait, "y", { duration: 0.9, ease: "power3.out" })
+        : null;
+
+      const onMove = (e: MouseEvent) => {
+        if (!quickX || !quickY) return;
+        const dx = (e.clientX / window.innerWidth - 0.5) * 18;
+        const dy = (e.clientY / window.innerHeight - 0.5) * 12;
+        quickX(dx);
+        quickY(dy);
+      };
+      window.addEventListener("mousemove", onMove);
+
+      return () => window.removeEventListener("mousemove", onMove);
+    }, rootRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  const splitChars = (s: string, className: string) =>
+    s.split("").map((c, i) => (
+      <span
+        key={i}
+        className={className}
+        style={{ display: "inline-block", whiteSpace: "pre" }}
+      >
+        {c === " " ? " " : c}
+      </span>
+    ));
 
   return (
     <section
+      ref={rootRef}
       className="section"
       style={{
         minHeight: "100vh",
@@ -34,13 +216,12 @@ export default function Hero({ name, role }: { name: string; role: string }) {
       }}
     >
       <div
-        className="hero-script hero-anim"
+        className="hero-script hero-gsap-hi"
         style={{
           position: "absolute",
           top: 80,
           left: "7vw",
           zIndex: 5,
-          animationDelay: "300ms",
         }}
       >
         <div
@@ -50,7 +231,6 @@ export default function Hero({ name, role }: { name: string; role: string }) {
             fontWeight: 600,
             fontSize: 44,
             lineHeight: 1,
-            transform: "rotate(-2deg)",
           }}
         >
           hi. since you&rsquo;re new here,
@@ -58,14 +238,14 @@ export default function Hero({ name, role }: { name: string; role: string }) {
       </div>
 
       <div
-        className="hero-script-sm hide-mobile hero-anim"
+        className="hero-script-sm hide-mobile hero-gsap-menu"
         style={{
           position: "absolute",
           top: 100,
           right: "7vw",
           zIndex: 5,
           textAlign: "right",
-          animationDelay: "450ms",
+          transformOrigin: "right center",
         }}
       >
         <div
@@ -75,8 +255,6 @@ export default function Hero({ name, role }: { name: string; role: string }) {
             fontWeight: 600,
             fontSize: 32,
             lineHeight: 1,
-            transform: "rotate(-18deg)",
-            transformOrigin: "right center",
             color: "var(--ink-2)",
             whiteSpace: "nowrap",
           }}
@@ -99,34 +277,36 @@ export default function Hero({ name, role }: { name: string; role: string }) {
         }}
       >
         <h1
-          className="font-display hero-anim"
+          className="font-display"
           style={{
             ...common,
             alignSelf: "flex-start",
             marginLeft: "6vw",
-            animationDelay: "650ms",
+            paddingBottom: "0.1em",
           }}
         >
-          {first}
+          {splitChars(first, "hero-gsap-first-char")}
         </h1>
         {last && (
           <h1
-            className="font-display hero-anim"
+            className="font-display"
             style={{
               ...common,
               alignSelf: "flex-end",
-              marginRight: "4vw",
+              marginRight: "calc(4vw - 0.12em)",
               marginTop: "-0.08em",
-              animationDelay: "850ms",
+              overflow: "hidden",
+              paddingRight: "0.12em",
+              paddingBottom: "0.12em",
             }}
           >
-            {last}
+            {splitChars(last, "hero-gsap-last-char")}
           </h1>
         )}
       </div>
 
       <div
-        className="font-hand hero-anim-fade"
+        className="font-hand hero-gsap-this-is"
         style={{
           position: "absolute",
           top: "14%",
@@ -134,10 +314,8 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           fontFamily: "var(--font-caveat), cursive",
           fontWeight: 600,
           fontSize: 48,
-          transform: "rotate(-4deg)",
           zIndex: 3,
           color: "var(--ink)",
-          animationDelay: "1050ms",
         }}
       >
         this is
@@ -162,7 +340,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
 
       {/* portrait — nempel di dasar section Hero, gede */}
       <div
-        className="hero-anim-portrait"
+        className="hero-gsap-portrait"
         style={{
           position: "absolute",
           left: 0,
@@ -173,7 +351,6 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           justifyContent: "center",
           alignItems: "flex-end",
           pointerEvents: "none",
-          animationDelay: "1250ms",
         }}
       >
         <div
@@ -202,7 +379,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
       </div>
 
       <div
-        className="hero-anim"
+        className="hero-gsap-mono"
         style={{
           position: "absolute",
           bottom: 40,
@@ -211,7 +388,6 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           display: "flex",
           alignItems: "center",
           gap: 14,
-          animationDelay: "1500ms",
         }}
       >
         <div
@@ -227,13 +403,12 @@ export default function Hero({ name, role }: { name: string; role: string }) {
       </div>
 
       <div
-        className="hide-mobile hero-anim"
+        className="hide-mobile hero-gsap-mono"
         style={{
           position: "absolute",
           bottom: 40,
           right: "7vw",
           zIndex: 5,
-          animationDelay: "1650ms",
         }}
       >
         <div
@@ -249,7 +424,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
       </div>
 
       <div
-        className="hero-anim-fade"
+        className="hero-gsap-scroll"
         style={{
           position: "absolute",
           bottom: 10,
@@ -259,7 +434,6 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           fontFamily: "var(--font-caveat), cursive",
           fontSize: 22,
           color: "var(--muted)",
-          animationDelay: "1800ms",
         }}
       >
         scroll <span className="hero-scroll-arrow">↓</span>

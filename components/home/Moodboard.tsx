@@ -1,7 +1,14 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { Tape, Reveal } from "./Primitives";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Tape } from "./Primitives";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export default function Moodboard() {
   type TapeCfg = {
@@ -67,8 +74,123 @@ export default function Moodboard() {
     },
   ];
 
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const q = gsap.utils.selector(sectionRef);
+
+      gsap.set(q(".mb-label"), { opacity: 0, x: -50 });
+      gsap.set(q(".mb-caption p"), { opacity: 0, y: 24 });
+      gsap.set(q(".mb-hand"), { opacity: 0, scale: 0, rotate: 10 });
+
+      // setiap foto scatter-in dari arah random
+      const cells = q(".moodboard-cell");
+      cells.forEach((cell, i) => {
+        const photo = cell.querySelector<HTMLElement>(".mb-photo");
+        const tapes = cell.querySelectorAll<HTMLElement>(".mb-tape");
+
+        if (photo) {
+          const dirs = [
+            { x: -200, y: -120, r: -40 },
+            { x: 160, y: -140, r: 35 },
+            { x: -140, y: 180, r: -25 },
+            { x: 180, y: 140, r: 45 },
+            { x: 0, y: -220, r: -60 },
+            { x: 0, y: 200, r: 50 },
+          ];
+          const d = dirs[i % dirs.length];
+          gsap.set(photo, {
+            opacity: 0,
+            x: d.x,
+            y: d.y,
+            rotate: d.r,
+            scale: 0.5,
+          });
+        }
+        tapes.forEach((t) =>
+          gsap.set(t, { opacity: 0, scale: 0, transformOrigin: "center center" })
+        );
+      });
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 70%",
+          toggleActions: "play none none none",
+        },
+      });
+
+      tl.to(q(".mb-label"), {
+        opacity: 1,
+        x: 0,
+        duration: 0.7,
+        ease: "power3.out",
+      });
+
+      cells.forEach((cell, i) => {
+        const photo = cell.querySelector<HTMLElement>(".mb-photo");
+        const tapes = cell.querySelectorAll<HTMLElement>(".mb-tape");
+        const rotFinal = parseFloat(cell.getAttribute("data-rot") || "0");
+
+        tl.to(
+          photo,
+          {
+            opacity: 1,
+            x: 0,
+            y: 0,
+            rotate: rotFinal,
+            scale: 1,
+            duration: 0.9,
+            ease: "back.out(1.3)",
+          },
+          0.25 + i * 0.09
+        );
+
+        if (tapes.length) {
+          tl.to(
+            tapes,
+            {
+              opacity: 1,
+              scale: 1,
+              duration: 0.45,
+              stagger: 0.08,
+              ease: "back.out(2.4)",
+            },
+            0.55 + i * 0.09
+          );
+        }
+      });
+
+      tl.to(
+        q(".mb-caption p"),
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          stagger: 0.12,
+          ease: "power3.out",
+        },
+        ">-0.3"
+      ).to(
+        q(".mb-hand"),
+        {
+          opacity: 1,
+          scale: 1,
+          rotate: -2,
+          duration: 0.7,
+          ease: "back.out(2)",
+        },
+        "<0.1"
+      );
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       className="section"
       style={{
         background: "var(--paper-2)",
@@ -77,69 +199,66 @@ export default function Moodboard() {
       }}
     >
       <div style={{ maxWidth: 1600, margin: "0 auto" }}>
-        <Reveal>
-          <div className="section-label" style={{ marginBottom: 50 }}>
-            02 · mood + moments
-          </div>
-        </Reveal>
+        <div className="section-label mb-label" style={{ marginBottom: 50 }}>
+          02 · mood + moments
+        </div>
 
-        <Reveal delay={100}>
-          <div className="moodboard-grid" style={{ marginBottom: 40 }}>
-            {items.map((it, i) => (
-              <div
-                key={i}
-                className="moodboard-cell"
-                style={{ gridArea: it.grid, position: "relative" }}
-              >
-                <div
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    transform: `rotate(${it.rot}deg)`,
-                    position: "relative",
-                    overflow: "hidden",
-                    boxShadow:
-                      "0 2px 4px rgba(0,0,0,0.18), 0 10px 24px rgba(0,0,0,0.35)",
-                    background: "#1a1a1a",
-                  }}
-                >
-                  <Image
-                    src={it.src}
-                    alt={it.label}
-                    fill
-                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 22vw"
-                    style={{ objectFit: "cover" }}
-                  />
-                </div>
-                {it.tapes.map((t, ti) => (
-                  <Tape key={ti} {...t} />
-                ))}
-              </div>
-            ))}
-          </div>
-        </Reveal>
-
-        <Reveal delay={200}>
-          <div className="moodboard-caption">
-            <p style={{ fontSize: 17, lineHeight: 1.5 }}>
-              seven years later, he&rsquo;s basically a pro at grabbing
-              attention. snap the right moment or give it that extra spice in
-              post?
-            </p>
-            <p
-              className="font-hand"
-              style={{
-                fontFamily: "var(--font-caveat), cursive",
-                fontSize: 28,
-                lineHeight: 1.2,
-                color: "var(--accent)",
-                marginTop: 12,
-              }}
+        <div className="moodboard-grid" style={{ marginBottom: 40 }}>
+          {items.map((it, i) => (
+            <div
+              key={i}
+              className="moodboard-cell"
+              data-rot={it.rot}
+              style={{ gridArea: it.grid, position: "relative" }}
             >
-              if it&rsquo;s got vibes, ilham&rsquo;s behind it.
-            </p>
-          </div>
-        </Reveal>
+              <div
+                className="mb-photo"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  transform: `rotate(${it.rot}deg)`,
+                  position: "relative",
+                  overflow: "hidden",
+                  boxShadow:
+                    "0 2px 4px rgba(0,0,0,0.18), 0 10px 24px rgba(0,0,0,0.35)",
+                  background: "#1a1a1a",
+                }}
+              >
+                <Image
+                  src={it.src}
+                  alt={it.label}
+                  fill
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 22vw"
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
+              {it.tapes.map((t, ti) => (
+                <Tape key={ti} className="mb-tape" {...t} />
+              ))}
+            </div>
+          ))}
+        </div>
+
+        <div className="moodboard-caption mb-caption">
+          <p style={{ fontSize: 17, lineHeight: 1.5 }}>
+            seven years later, he&rsquo;s basically a pro at grabbing
+            attention. snap the right moment or give it that extra spice in
+            post?
+          </p>
+          <p
+            className="font-hand mb-hand"
+            style={{
+              fontFamily: "var(--font-caveat), cursive",
+              fontSize: 28,
+              lineHeight: 1.2,
+              color: "var(--accent)",
+              marginTop: 12,
+              display: "inline-block",
+            }}
+          >
+            if it&rsquo;s got vibes, ilham&rsquo;s behind it.
+          </p>
+        </div>
       </div>
     </section>
   );

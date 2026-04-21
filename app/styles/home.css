@@ -461,13 +461,14 @@
   color: var(--accent);
   line-height: 0.82;
   text-align: center;
-  text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.08);
+  text-shadow: 10px 12px 0 var(--ink);
   white-space: nowrap;
 }
 
 @media (max-width: 768px) {
   .home-root .skills-title {
     font-size: clamp(48px, 18vw, 120px);
+    text-shadow: 6px 8px 0 var(--ink);
   }
 }
 

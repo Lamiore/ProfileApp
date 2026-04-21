@@ -70,6 +70,7 @@ export function Tape({
   rot = 0,
   w = 70,
   color,
+  className,
 }: {
   top?: number | string;
   left?: number | string;
@@ -78,10 +79,12 @@ export function Tape({
   rot?: number;
   w?: number;
   color?: string;
+  className?: string;
 }) {
   const c = color || "rgba(215, 38, 61, 0.22)";
   return (
     <div
+      className={className}
       style={{
         position: "absolute",
         top,
