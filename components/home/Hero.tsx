@@ -40,7 +40,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           top: 80,
           left: "7vw",
           zIndex: 5,
-          animationDelay: "100ms",
+          animationDelay: "300ms",
         }}
       >
         <div
@@ -65,7 +65,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           right: "7vw",
           zIndex: 5,
           textAlign: "right",
-          animationDelay: "250ms",
+          animationDelay: "450ms",
         }}
       >
         <div
@@ -104,7 +104,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
             ...common,
             alignSelf: "flex-start",
             marginLeft: "6vw",
-            animationDelay: "400ms",
+            animationDelay: "650ms",
           }}
         >
           {first}
@@ -117,7 +117,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
               alignSelf: "flex-end",
               marginRight: "4vw",
               marginTop: "-0.08em",
-              animationDelay: "550ms",
+              animationDelay: "850ms",
             }}
           >
             {last}
@@ -137,7 +137,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           transform: "rotate(-4deg)",
           zIndex: 3,
           color: "var(--ink)",
-          animationDelay: "700ms",
+          animationDelay: "1050ms",
         }}
       >
         this is
@@ -173,7 +173,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           justifyContent: "center",
           alignItems: "flex-end",
           pointerEvents: "none",
-          animationDelay: "850ms",
+          animationDelay: "1250ms",
         }}
       >
         <div
@@ -211,7 +211,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           display: "flex",
           alignItems: "center",
           gap: 14,
-          animationDelay: "1100ms",
+          animationDelay: "1500ms",
         }}
       >
         <div
@@ -233,7 +233,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           bottom: 40,
           right: "7vw",
           zIndex: 5,
-          animationDelay: "1200ms",
+          animationDelay: "1650ms",
         }}
       >
         <div
@@ -259,7 +259,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           fontFamily: "var(--font-caveat), cursive",
           fontSize: 22,
           color: "var(--muted)",
-          animationDelay: "1300ms",
+          animationDelay: "1800ms",
         }}
       >
         scroll <span className="hero-scroll-arrow">↓</span>

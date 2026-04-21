@@ -204,14 +204,8 @@
 }
 
 @keyframes hero-portrait-rise {
-  from {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes hero-scroll-bounce {
@@ -221,17 +215,17 @@
 
 .home-root .hero-anim {
   opacity: 0;
-  animation: hero-fade-up 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: hero-fade-up 2400ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .home-root .hero-anim-fade {
   opacity: 0;
-  animation: hero-fade-only 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: hero-fade-only 2400ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .home-root .hero-anim-portrait {
   opacity: 0;
-  animation: hero-portrait-rise 1100ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: hero-portrait-rise 3000ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .home-root .hero-scroll-arrow {
@@ -324,7 +318,7 @@
     grid-template-rows: repeat(3, 120px);
   }
 
-  .home-root .moodboard-grid>* {
+  .home-root .moodboard-grid > * {
     grid-column: auto !important;
     grid-row: auto !important;
   }
@@ -355,15 +349,13 @@
   gap: 14px;
 }
 
-/* origin — photocard stack (clickable to cycle) */
+/* origin — photocard stack (each card clickable) */
 .home-root .origin-stack {
   position: relative;
   width: 220px;
   height: 330px;
   margin-top: 60px;
   margin-left: 140px;
-  cursor: pointer;
-  outline: none;
 }
 
 .home-root .origin-stack-card {
@@ -374,15 +366,44 @@
   transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.3, 1),
     opacity 0.4s ease;
   will-change: transform;
+  cursor: pointer;
+  outline: none;
 }
 
-.home-root .origin-stack:hover .origin-stack-card:first-child {
-  transform: rotate(-8deg) translate(0, -4px) !important;
-}
-
-.home-root .origin-stack:focus-visible {
+.home-root .origin-stack-card:focus-visible {
   outline: 2px dashed var(--accent);
   outline-offset: 12px;
+}
+
+.home-root .origin-stack-card:nth-child(1):hover {
+  transform: rotate(-8deg) translate(0, -6px) scale(1.06) !important;
+}
+
+.home-root .origin-stack-card:nth-child(2):hover {
+  transform: rotate(-12deg) translate(-92px, 2px) !important;
+  opacity: 1 !important;
+}
+
+.home-root .origin-stack-card:nth-child(3):hover {
+  transform: rotate(6deg) translate(92px, 6px) !important;
+  opacity: 1 !important;
+}
+
+.home-root .origin-stack-card-inner {
+  opacity: 0;
+  transform: translateY(24px) scale(0.88) rotate(-4deg);
+  transform-origin: center bottom;
+}
+
+.home-root .origin-stack-card-inner.is-in {
+  animation: origin-card-in 720ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes origin-card-in {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
 }
 
 @media (max-width: 900px) {

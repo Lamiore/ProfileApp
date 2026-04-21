@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Polaroid, Reveal } from "./Primitives";
 
@@ -15,9 +15,37 @@ const CARD_H = 280;
 
 function OriginDeck() {
   const [order, setOrder] = useState([0, 1, 2]);
+  const [mounted, setMounted] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
-  const cycle = () => {
-    setOrder(([front, ...rest]) => [...rest, front]);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            setMounted(true);
+            obs.disconnect();
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  const bringToFront = (stackPos: number) => {
+    setOrder((prev) => {
+      if (stackPos === 0) {
+        const [front, ...rest] = prev;
+        return [...rest, front];
+      }
+      const next = [...prev];
+      const [picked] = next.splice(stackPos, 1);
+      return [picked, ...next];
+    });
   };
 
   // transform per posisi (index 0 = depan, 1 & 2 = belakang)
@@ -28,19 +56,7 @@ function OriginDeck() {
   ];
 
   return (
-    <div
-      className="origin-stack"
-      onClick={cycle}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          cycle();
-        }
-      }}
-      aria-label="cycle photocards"
-    >
+    <div className="origin-stack" ref={ref} aria-label="photocards">
       {order.map((deckIdx, stackPos) => {
         const card = DECK[deckIdx];
         const isFront = stackPos === 0;
@@ -53,31 +69,46 @@ function OriginDeck() {
               zIndex: DECK.length - stackPos,
               opacity: isFront ? 1 : 0.8,
             }}
+            role="button"
+            tabIndex={0}
+            aria-label={`bring ${card.caption} to front`}
+            onClick={() => bringToFront(stackPos)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                bringToFront(stackPos);
+              }
+            }}
           >
-            <Polaroid
-              rot={0}
-              caption={isFront ? card.caption : undefined}
-              w={CARD_W}
-              h={CARD_H}
+            <div
+              className={`origin-stack-card-inner ${mounted ? "is-in" : ""}`}
+              style={{ animationDelay: `${stackPos * 140}ms` }}
             >
-              <div
-                style={{
-                  width: CARD_W,
-                  height: CARD_H,
-                  position: "relative",
-                  overflow: "hidden",
-                  background: "#1a1a1a",
-                }}
+              <Polaroid
+                rot={0}
+                caption={isFront ? card.caption : undefined}
+                w={CARD_W}
+                h={CARD_H}
               >
-                <Image
-                  src={card.src}
-                  alt={card.caption}
-                  fill
-                  sizes="220px"
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-            </Polaroid>
+                <div
+                  style={{
+                    width: CARD_W,
+                    height: CARD_H,
+                    position: "relative",
+                    overflow: "hidden",
+                    background: "#1a1a1a",
+                  }}
+                >
+                  <Image
+                    src={card.src}
+                    alt={card.caption}
+                    fill
+                    sizes="220px"
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
+              </Polaroid>
+            </div>
           </div>
         );
       })}

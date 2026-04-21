@@ -1,22 +1,31 @@
 "use client";
 
+import Image from "next/image";
 import { CSSProperties } from "react";
-import { Placeholder, Reveal } from "./Primitives";
+import { Reveal } from "./Primitives";
 
 type Item =
-  | { type: "photo"; label: string; rot: number; style: CSSProperties }
+  | {
+      type: "photo" | "video";
+      src: string;
+      label: string;
+      rot: number;
+      style: CSSProperties;
+    }
   | { type: "swatch" | "type"; style: CSSProperties };
 
 export default function Skills() {
   const items: Item[] = [
     {
-      type: "photo",
+      type: "video",
+      src: "/image/home/skills/edit1.mp4",
       label: "sketch 01",
       rot: -4,
       style: { gridColumn: "1 / 3", gridRow: "1 / 3" },
     },
     {
       type: "photo",
+      src: "/image/home/skills/editrig.png",
       label: "edit rig",
       rot: 3,
       style: { gridColumn: "3 / 4", gridRow: "1 / 2" },
@@ -24,25 +33,29 @@ export default function Skills() {
     { type: "swatch", style: { gridColumn: "4 / 6", gridRow: "1 / 2" } },
     {
       type: "photo",
+      src: "/image/home/skills/draw.jpeg",
       label: "site snap",
       rot: -2,
       style: { gridColumn: "6 / 7", gridRow: "1 / 3" },
     },
     {
       type: "photo",
+      src: "/image/home/skills/flower.jpg",
       label: "food",
       rot: 4,
       style: { gridColumn: "7 / 8", gridRow: "1 / 2" },
     },
     {
       type: "photo",
+      src: "/image/home/skills/mockup.jpg",
       label: "mockup",
       rot: -3,
       style: { gridColumn: "3 / 5", gridRow: "2 / 3" },
     },
     { type: "type", style: { gridColumn: "5 / 7", gridRow: "2 / 3" } },
     {
-      type: "photo",
+      type: "video",
+      src: "/image/home/skills/edit2.mp4",
       label: "client 01",
       rot: 2,
       style: { gridColumn: "7 / 8", gridRow: "2 / 3" },
@@ -73,14 +86,44 @@ export default function Skills() {
         >
           {items.map((it, i) => (
             <div key={i} style={it.style}>
-              {it.type === "photo" && (
-                <Placeholder
-                  label={it.label}
-                  w="100%"
-                  h="100%"
-                  rot={it.rot}
-                  tone="dark"
-                />
+              {(it.type === "photo" || it.type === "video") && (
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    transform: `rotate(${it.rot}deg)`,
+                    position: "relative",
+                    overflow: "hidden",
+                    boxShadow:
+                      "0 2px 4px rgba(0,0,0,0.18), 0 10px 24px rgba(0,0,0,0.35)",
+                    background: "#1a1a1a",
+                  }}
+                >
+                  {it.type === "photo" ? (
+                    <Image
+                      src={it.src}
+                      alt={it.label}
+                      fill
+                      sizes="(max-width: 900px) 50vw, 20vw"
+                      style={{ objectFit: "cover" }}
+                    />
+                  ) : (
+                    <video
+                      src={it.src}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      preload="metadata"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        display: "block",
+                      }}
+                    />
+                  )}
+                </div>
               )}
               {it.type === "swatch" && (
                 <div
