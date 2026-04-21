@@ -7,6 +7,7 @@ import StaggeredMenu from "./StaggeredMenu";
 const pageLabels: Record<string, string> = {
     "/blog": "BLOG",
     "/gallery": "GALLERY",
+    "/shop": "SHOP",
 };
 
 export default function Nav() {
@@ -18,7 +19,8 @@ export default function Nav() {
     const menuItems = [
         { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
         { label: 'Blog', ariaLabel: 'Read our blog', link: '/blog' },
-        { label: 'Gallery', ariaLabel: 'View our gallery', link: '/gallery' }
+        { label: 'Gallery', ariaLabel: 'View our gallery', link: '/gallery' },
+        { label: 'Shop', ariaLabel: 'Browse the shop', link: '/shop' }
     ];
 
     const socialItems = [

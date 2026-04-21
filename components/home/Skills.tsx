@@ -4,6 +4,51 @@ import Image from "next/image";
 import { CSSProperties, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Tape } from "./Primitives";
+import { useWorks } from "@/features/works/hooks/use-works";
+
+type Project = {
+  tag: string;
+  title: string;
+  desc: string;
+  media: string;
+  isVideo?: boolean;
+};
+
+const FALLBACK_BASE: Project[] = [
+  {
+    tag: "01 · video",
+    title: "scroll-stoppers",
+    desc: "shorts, reels, and long-form edits — cut on the beat, graded to stop the thumb mid-swipe.",
+    media: "/image/home/skills/edit2.mp4",
+    isVideo: true,
+  },
+  {
+    tag: "02 · design",
+    title: "print, pixel, punch",
+    desc: "posters, covers, and brand systems that lean into bold type and a single unforgettable accent.",
+    media: "/image/home/skills/flower.jpg",
+  },
+  {
+    tag: "03 · web + motion",
+    title: "sites that move",
+    desc: "next.js builds with hand-tuned gsap, micro-interactions, and a writer's eye for pacing.",
+    media: "/image/home/skills/mockup.jpg",
+  },
+];
+
+const FALLBACK_PROJECTS: Project[] = [...FALLBACK_BASE, ...FALLBACK_BASE];
+
+// cycling tape position/rotation per card index so admins don't have to input it
+const TAPE_PATTERNS: { left?: number; right?: number; rot: number }[] = [
+  { left: 24, rot: -8 },
+  { right: 28, rot: 12 },
+  { left: 40, rot: -5 },
+];
+
+// cycling card tilt + vertical offset so admins don't have to input these either
+const CARD_ROT_PATTERNS = [-2, 1.5, -1];
+const CARD_Y_PATTERNS = [0, 26, 0];
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -68,6 +113,22 @@ export default function Skills() {
   ];
 
   const sectionRef = useRef<HTMLElement>(null);
+  const works = useWorks();
+  const displayWorks: Project[] =
+    works && works.length > 0
+      ? works.map((w) => ({
+          tag: w.tag,
+          title: w.title,
+          desc: w.desc,
+          media: w.media,
+          isVideo: !!w.isVideo,
+        }))
+      : FALLBACK_PROJECTS;
+
+  useEffect(() => {
+    // Track width changes when works list updates; let GSAP recompute pin distance.
+    ScrollTrigger.refresh();
+  }, [works]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -197,6 +258,30 @@ export default function Skills() {
           },
           "<0.1"
         );
+
+      // ── horizontal pin scroll for project cards (desktop only) ──
+      const mm = gsap.matchMedia();
+      mm.add("(min-width: 900px)", () => {
+        const track = q(".sk-projects")[0] as HTMLElement | undefined;
+        const pin = q(".sk-projects-pin")[0] as HTMLElement | undefined;
+        if (!track || !pin) return;
+
+        const getDist = () => track.scrollWidth - pin.offsetWidth;
+
+        gsap.to(track, {
+          x: () => -getDist(),
+          ease: "none",
+          scrollTrigger: {
+            trigger: pin,
+            start: "top top",
+            end: () => `+=${getDist()}`,
+            pin: true,
+            scrub: 1,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+      });
     }, sectionRef);
 
     return () => ctx.revert();
@@ -361,6 +446,68 @@ export default function Skills() {
                     </div>
                   </div>
                 )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="sk-projects-pin">
+        <div className="sk-projects">
+          {displayWorks.map((p, i) => {
+            const tape = TAPE_PATTERNS[i % TAPE_PATTERNS.length];
+            const rot = CARD_ROT_PATTERNS[i % CARD_ROT_PATTERNS.length];
+            const yOff = CARD_Y_PATTERNS[i % CARD_Y_PATTERNS.length];
+            const isRemote = /^https?:\/\//.test(p.media);
+            return (
+              <div key={i} className="sk-project-slot">
+                <article
+                  className="sk-project-card"
+                  data-idx={i}
+                  style={
+                    {
+                      "--card-base-rot": `${rot}deg`,
+                      "--card-base-y": `${yOff}px`,
+                    } as CSSProperties
+                  }
+                >
+                  <Tape
+                    top={-11}
+                    left={tape.left}
+                    right={tape.right}
+                    rot={tape.rot}
+                    w={96}
+                  />
+                  <div className="sk-project-tag font-mono">{p.tag}</div>
+                  <div className="sk-project-media">
+                    {p.isVideo ? (
+                      <video
+                        src={p.media}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        preload="metadata"
+                      />
+                    ) : isRemote ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={p.media}
+                        alt={p.title}
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <Image
+                        src={p.media}
+                        alt={p.title}
+                        fill
+                        sizes="(max-width: 900px) 90vw, 30vw"
+                      />
+                    )}
+                  </div>
+                  <h3 className="sk-project-title font-display">{p.title}</h3>
+                  <p className="sk-project-desc">{p.desc}</p>
+                </article>
               </div>
             );
           })}

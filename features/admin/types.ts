@@ -32,3 +32,13 @@ export interface BlogItem {
     blocks?: { type: string; content: string; meta?: string }[];
     createdAt?: { toDate: () => Date };
 }
+
+export interface WorkItem {
+    id: string;
+    tag: string;
+    title: string;
+    desc: string;
+    media: string;
+    isVideo?: boolean;
+    createdAt?: { toDate: () => Date };
+}

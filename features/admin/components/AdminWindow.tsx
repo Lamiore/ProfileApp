@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
-import { LogOut, Image as ImageIcon, FileText, LayoutGrid } from "lucide-react";
+import { LogOut, Image as ImageIcon, FileText, LayoutGrid, Briefcase } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { useAdminAuth } from "../hooks/use-admin-auth";
 import { AdminLogin } from "./AdminLogin";
 import AdminGalleryForm from "./AdminGalleryForm";
 import AdminBlogForm from "./AdminBlogForm";
+import AdminWorksForm from "./AdminWorksForm";
 
-type TabKey = "gallery" | "blog";
+type TabKey = "gallery" | "blog" | "works";
 
 const TABS: { key: TabKey; icon: React.ReactNode; label: string; subtitle: string }[] = [
     {
@@ -23,6 +24,12 @@ const TABS: { key: TabKey; icon: React.ReactNode; label: string; subtitle: strin
         icon: <FileText size={15} />,
         label: "Blog",
         subtitle: "Artikel dan tulisan yang terbit di halaman blog.",
+    },
+    {
+        key: "works",
+        icon: <Briefcase size={15} />,
+        label: "Works",
+        subtitle: "Card pekerjaan yang tampil di section skills + works.",
     },
 ];
 
@@ -41,10 +48,15 @@ export default function AdminWindow() {
 
     const galleryCount = useCollectionCount("images");
     const blogCount = useCollectionCount("blogs");
+    const worksCount = useCollectionCount("works");
 
     if (!user) return <AdminLogin onLogin={login} />;
 
-    const counts: Record<TabKey, number | null> = { gallery: galleryCount, blog: blogCount };
+    const counts: Record<TabKey, number | null> = {
+        gallery: galleryCount,
+        blog: blogCount,
+        works: worksCount,
+    };
     const active = TABS.find((t) => t.key === tab)!;
     const activeCount = counts[tab];
 
@@ -110,7 +122,11 @@ export default function AdminWindow() {
                                 {activeCount === null ? "—" : String(activeCount).padStart(2, "0")}
                             </span>
                             <span className="adm-page-stat-label">
-                                {tab === "gallery" ? "media" : "artikel"}
+                                {tab === "gallery"
+                                    ? "media"
+                                    : tab === "blog"
+                                        ? "artikel"
+                                        : "works"}
                             </span>
                         </div>
                     </div>
@@ -121,6 +137,7 @@ export default function AdminWindow() {
                 <div className="adm-pane">
                     {tab === "gallery" && <AdminGalleryForm />}
                     {tab === "blog" && <AdminBlogForm />}
+                    {tab === "works" && <AdminWorksForm />}
                 </div>
             </main>
         </div>
