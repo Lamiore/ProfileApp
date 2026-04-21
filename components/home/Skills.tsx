@@ -452,6 +452,47 @@ export default function Skills() {
         </div>
       </div>
 
+      <div
+        className="mobile-stack"
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-end",
+          marginTop: 50,
+          gap: 30,
+        }}
+      >
+        <div
+          className="font-mono sk-caption"
+          style={{
+            fontSize: 12,
+            maxWidth: 240,
+            lineHeight: 1.6,
+            color: "var(--ink-2)",
+          }}
+        >
+          <b>graphic design:</b>
+          <br />
+          posters, illustration, logos, etc.
+        </div>
+        <button className="sticky-btn sk-btn" type="button">
+          portfolio
+        </button>
+        <div
+          className="font-mono sk-caption"
+          style={{
+            fontSize: 12,
+            maxWidth: 240,
+            lineHeight: 1.6,
+            color: "var(--ink-2)",
+          }}
+        >
+          <b>video editing:</b>
+          <br />
+          shorts, reels, long-form, motion graphics.
+        </div>
+      </div>
+
       <div className="sk-projects-pin">
         <div className="sk-projects">
           {displayWorks.map((p, i) => {
@@ -511,47 +552,6 @@ export default function Skills() {
               </div>
             );
           })}
-        </div>
-      </div>
-
-      <div
-        className="mobile-stack"
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-end",
-          marginTop: 50,
-          gap: 30,
-        }}
-      >
-        <div
-          className="font-mono sk-caption"
-          style={{
-            fontSize: 12,
-            maxWidth: 240,
-            lineHeight: 1.6,
-            color: "var(--ink-2)",
-          }}
-        >
-          <b>graphic design:</b>
-          <br />
-          posters, illustration, logos, etc.
-        </div>
-        <button className="sticky-btn sk-btn" type="button">
-          portfolio
-        </button>
-        <div
-          className="font-mono sk-caption"
-          style={{
-            fontSize: 12,
-            maxWidth: 240,
-            lineHeight: 1.6,
-            color: "var(--ink-2)",
-          }}
-        >
-          <b>video editing:</b>
-          <br />
-          shorts, reels, long-form, motion graphics.
         </div>
       </div>
     </section>
