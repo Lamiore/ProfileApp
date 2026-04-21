@@ -312,6 +312,16 @@
   gap: 16px;
 }
 
+.home-root .moodboard-cell {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.home-root .moodboard-cell:hover {
+  transform: scale(1.08);
+  z-index: 10;
+}
+
 @media (max-width: 768px) {
   .home-root .moodboard-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -486,6 +496,7 @@
 
   .home-root .mobile-stack {
     flex-direction: column !important;
+    align-items: flex-start !important;
     gap: 20px !important;
   }
 

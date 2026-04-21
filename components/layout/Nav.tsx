@@ -13,6 +13,8 @@ export default function Nav() {
     const { navigateTo } = usePageTransition();
     const pathname = usePathname();
 
+    if (pathname === "/admin/login") return null;
+
     const menuItems = [
         { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
         { label: 'Blog', ariaLabel: 'Read our blog', link: '/blog' },

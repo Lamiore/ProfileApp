@@ -86,7 +86,11 @@ export default function Moodboard() {
         <Reveal delay={100}>
           <div className="moodboard-grid" style={{ marginBottom: 40 }}>
             {items.map((it, i) => (
-              <div key={i} style={{ gridArea: it.grid, position: "relative" }}>
+              <div
+                key={i}
+                className="moodboard-cell"
+                style={{ gridArea: it.grid, position: "relative" }}
+              >
                 <div
                   style={{
                     width: "100%",
