@@ -116,8 +116,8 @@ const SparklesText: React.FC<SparklesTextProps> = ({
       }
     >
       <span className="relative inline-block">
-        {sparkles.map((sparkle) => (
-          <Sparkle key={sparkle.id} {...sparkle} />
+        {sparkles.map(({ lifespan: _l, ...rest }) => (
+          <Sparkle key={rest.id} {...rest} />
         ))}
         <strong>{text}</strong>
       </span>
@@ -131,44 +131,65 @@ interface SparklesOverlayProps {
   className?: string;
 }
 
+interface SparkleWithExpiry {
+  id: string;
+  x: string;
+  y: string;
+  color: string;
+  delay: number;
+  scale: number;
+  expiresAt: number;
+}
+
 // Overlay-only varian: cuma render sparkle SVG, tanpa bungkus teks.
 // Taruh sebagai child dari elemen yang punya `position: relative` — sparkles
 // akan mengisi bounding box parent-nya via `inset-0`.
+//
+// Perf: pakai timestamp `expiresAt` (bukan counter yang di-decrement), jadi
+// interval cukup 500ms dan setState di-bail-out kalau nggak ada sparkle
+// yang expired. Animasi sparkle sendiri jalan di rAF via framer-motion,
+// jadi visual-nya identik dengan implementasi awal.
 const SparklesOverlay: React.FC<SparklesOverlayProps> = ({
   colors = { first: "#9E7AFF", second: "#FE8BBB" },
   sparklesCount = 10,
   className,
 }) => {
-  const [sparkles, setSparkles] = useState<Sparkle[]>([]);
+  const [sparkles, setSparkles] = useState<SparkleWithExpiry[]>([]);
 
   useEffect(() => {
-    const generateStar = (): Sparkle => {
-      const starX = `${Math.random() * 100}%`;
-      const starY = `${Math.random() * 100}%`;
-      const color = Math.random() > 0.5 ? colors.first : colors.second;
-      const delay = Math.random() * 2;
-      const scale = Math.random() * 1 + 0.3;
-      const lifespan = Math.random() * 10 + 5;
-      const id = `${starX}-${starY}-${Date.now()}-${Math.random()}`;
-      return { id, x: starX, y: starY, color, delay, scale, lifespan };
+    const generateStar = (now: number): SparkleWithExpiry => {
+      const lifespanMs = (Math.random() * 10 + 5) * 1000;
+      return {
+        id: `${now}-${Math.random()}`,
+        x: `${Math.random() * 100}%`,
+        y: `${Math.random() * 100}%`,
+        color: Math.random() > 0.5 ? colors.first : colors.second,
+        delay: Math.random() * 2,
+        scale: Math.random() * 1 + 0.3,
+        expiresAt: now + lifespanMs,
+      };
     };
 
-    const initializeStars = () => {
-      setSparkles(Array.from({ length: sparklesCount }, generateStar));
-    };
+    const start = Date.now();
+    setSparkles(
+      Array.from({ length: sparklesCount }, () => generateStar(start)),
+    );
 
-    const updateStars = () => {
-      setSparkles((currentSparkles) =>
-        currentSparkles.map((star) =>
-          star.lifespan <= 0
-            ? generateStar()
-            : { ...star, lifespan: star.lifespan - 0.1 },
-        ),
-      );
-    };
+    const interval = setInterval(() => {
+      const t = Date.now();
+      setSparkles((current) => {
+        let changed = false;
+        const next = current.map((s) => {
+          if (s.expiresAt <= t) {
+            changed = true;
+            return generateStar(t);
+          }
+          return s;
+        });
+        return changed ? next : current;
+      });
+    }, 500);
 
-    initializeStars();
-    const interval = setInterval(updateStars, 100);
     return () => clearInterval(interval);
   }, [colors.first, colors.second, sparklesCount]);
 
@@ -180,14 +201,23 @@ const SparklesOverlay: React.FC<SparklesOverlayProps> = ({
         className,
       )}
     >
-      {sparkles.map((sparkle) => (
-        <Sparkle key={sparkle.id} {...sparkle} />
+      {sparkles.map(({ expiresAt: _e, ...rest }) => (
+        <Sparkle key={rest.id} {...rest} />
       ))}
     </span>
   );
 };
 
-const Sparkle: React.FC<Sparkle> = ({ id, x, y, color, delay, scale }) => {
+interface SparkleVisual {
+  id: string;
+  x: string;
+  y: string;
+  color: string;
+  delay: number;
+  scale: number;
+}
+
+const Sparkle: React.FC<SparkleVisual> = ({ id, x, y, color, delay, scale }) => {
   return (
     <motion.svg
       key={id}

@@ -5,6 +5,8 @@ import Image from "next/image";
 import { gsap } from "gsap";
 import { SparklesOverlay } from "@/components/ui/sparkles-text";
 
+const SPARKLE_COLORS = { first: "#f2ede4", second: "#d7263d" };
+
 export default function Hero({ name, role }: { name: string; role: string }) {
   const parts = name.trim().split(/\s+/);
   const first = (parts[0] || name).toUpperCase();
@@ -26,8 +28,6 @@ export default function Hero({ name, role }: { name: string; role: string }) {
     textShadow: "0.06em 0.07em 0 var(--ink)",
     position: "relative",
   };
-
-  const sparkleColors = { first: "#f2ede4", second: "#d7263d" };
 
   const rootRef = useRef<HTMLElement>(null);
 
@@ -195,7 +195,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
         quickX(dx);
         quickY(dy);
       };
-      window.addEventListener("mousemove", onMove);
+      window.addEventListener("mousemove", onMove, { passive: true });
 
       return () => window.removeEventListener("mousemove", onMove);
     }, rootRef);
@@ -297,7 +297,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
         >
           <SparklesOverlay
             className="hero-gsap-sparkles"
-            colors={sparkleColors}
+            colors={SPARKLE_COLORS}
             sparklesCount={14}
           />
           {splitChars(first, "hero-gsap-first-char")}
@@ -317,7 +317,7 @@ export default function Hero({ name, role }: { name: string; role: string }) {
           >
             <SparklesOverlay
               className="hero-gsap-sparkles"
-              colors={sparkleColors}
+              colors={SPARKLE_COLORS}
               sparklesCount={14}
             />
             {splitChars(last, "hero-gsap-last-char")}
