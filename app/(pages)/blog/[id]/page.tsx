@@ -138,13 +138,9 @@ export default function BlogDetailPage() {
     const readingMinutes = Math.max(1, Math.round(wordCount / 200));
 
     return (
-        <div style={{
+        <div className="journal-detail" style={{
             width: "100%",
             minHeight: "100vh",
-            background: "#0a0a0a",
-            color: "#d4d4d4",
-            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-            WebkitFontSmoothing: "antialiased",
         }}>
             {/* Reading progress */}
             <div className="blog-detail-progress" aria-hidden="true">
@@ -218,7 +214,7 @@ export default function BlogDetailPage() {
                                 left: 0,
                                 right: 0,
                                 height: "45%",
-                                background: "linear-gradient(to top, #0a0a0a 0%, transparent 100%)",
+                                background: "linear-gradient(to top, #0d0d0d 0%, transparent 100%)",
                                 pointerEvents: "none",
                             }} />
                         </div>
