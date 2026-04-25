@@ -1,0 +1,313 @@
+/* ── Project & Shop shared color vars (reuse from home) ── */
+.pj-root,
+.sp-root {
+  --paper: #0d0d0d;
+  --paper-2: #1f1f1f;
+  --ink: #f2ede4;
+  --ink-2: #d4cec0;
+  --muted: #6b6b66;
+  --accent: #d7263d;
+}
+
+/* ── Shared state ── */
+.pj-state,
+.sp-state {
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted, #6b6b66);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pj-state-loading,
+.sp-state-loading {
+  opacity: 0.5;
+}
+
+/* ── Project page ── */
+.pj-root {
+  max-width: 1200px;
+  margin: 0 auto;
+  color: var(--ink);
+}
+
+.pj-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 48px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(242, 237, 228, 0.08);
+}
+
+.pj-title {
+  font-size: clamp(56px, 10vw, 120px);
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+  text-shadow: 0.05em 0.06em 0 var(--ink);
+  margin: 0;
+}
+
+.pj-subtitle {
+  font-family: var(--font-instrument-serif), 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: clamp(16px, 1.8vw, 22px);
+  color: var(--ink-2);
+  margin: 0;
+  max-width: 560px;
+  line-height: 1.4;
+}
+
+.pj-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: clamp(20px, 3vw, 36px);
+}
+
+.pj-card {
+  background: var(--paper-2);
+  border: 1px solid rgba(242, 237, 228, 0.08);
+  padding: 18px 18px 22px;
+  display: flex;
+  flex-direction: column;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.28),
+    0 20px 44px rgba(0, 0, 0, 0.45);
+  transition: transform 0.5s cubic-bezier(0.2, 0.85, 0.25, 1);
+}
+
+.pj-card:hover {
+  transform: translateY(-6px);
+}
+
+.pj-card-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #1a1a1a;
+  box-shadow: inset 0 0 0 1px rgba(242, 237, 228, 0.06);
+  margin-bottom: 16px;
+}
+
+.pj-card-media img,
+.pj-card-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.05) contrast(1.02);
+}
+
+.pj-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pj-card-tag {
+  display: inline-block;
+  align-self: flex-start;
+  background: var(--accent);
+  color: var(--ink);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 5px 10px 4px;
+}
+
+.pj-card-title {
+  font-size: clamp(24px, 2.2vw, 34px);
+  line-height: 0.9;
+  color: var(--ink);
+  margin: 0 0 10px;
+  letter-spacing: -0.02em;
+}
+
+.pj-card-desc {
+  font-family: var(--font-instrument-serif), 'Instrument Serif', serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  font-style: italic;
+  margin: 0;
+}
+
+.pj-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 8px 12px;
+  align-self: flex-start;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink);
+  border: 1px solid rgba(242, 237, 228, 0.2);
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.pj-card-link:hover {
+  background: var(--accent);
+  color: var(--ink);
+  border-color: var(--accent);
+}
+
+/* ── Shop page ── */
+.sp-root {
+  max-width: 1200px;
+  margin: 0 auto;
+  color: var(--ink);
+}
+
+.sp-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 48px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(242, 237, 228, 0.08);
+}
+
+.sp-title {
+  font-size: clamp(56px, 10vw, 120px);
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+  text-shadow: 0.05em 0.06em 0 var(--ink);
+  margin: 0;
+}
+
+.sp-subtitle {
+  font-family: var(--font-instrument-serif), 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: clamp(16px, 1.8vw, 22px);
+  color: var(--ink-2);
+  margin: 0;
+  max-width: 560px;
+  line-height: 1.4;
+}
+
+.sp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: clamp(20px, 3vw, 36px);
+}
+
+.sp-card {
+  background: var(--paper-2);
+  border: 1px solid rgba(242, 237, 228, 0.08);
+  padding: 16px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.28),
+    0 20px 44px rgba(0, 0, 0, 0.45);
+  transition: transform 0.5s cubic-bezier(0.2, 0.85, 0.25, 1);
+}
+
+.sp-card:hover {
+  transform: translateY(-6px);
+}
+
+.sp-card-muted .sp-card-media img {
+  filter: grayscale(60%) brightness(0.78);
+}
+
+.sp-card-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #1a1a1a;
+  box-shadow: inset 0 0 0 1px rgba(242, 237, 228, 0.06);
+  margin-bottom: 14px;
+}
+
+.sp-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.05) contrast(1.02);
+}
+
+.sp-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 5px 10px 4px;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.sp-badge-available {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.sp-badge-sold-out {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.sp-badge-coming-soon {
+  background: #e4b94a;
+  color: var(--paper);
+}
+
+.sp-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sp-card-category {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.sp-card-title {
+  font-size: clamp(20px, 1.8vw, 26px);
+  line-height: 1;
+  color: var(--ink);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.sp-card-desc {
+  font-family: var(--font-instrument-serif), 'Instrument Serif', serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  font-style: italic;
+  margin: 0;
+}
+
+.sp-card-price {
+  margin-top: 6px;
+  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--accent);
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 640px) {
+  .pj-grid,
+  .sp-grid {
+    grid-template-columns: 1fr;
+  }
+}

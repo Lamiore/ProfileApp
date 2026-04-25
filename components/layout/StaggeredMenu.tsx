@@ -468,8 +468,16 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
               />
             )}
             {!logoUrl && logoText && (
-              <span style={{ fontSize: "1.4rem", fontWeight: 700, color: "#fff", lineHeight: 1 }}>
-                {logoText}
+              <span className="sm-logo-text" key={logoText}>
+                {Array.from(logoText).map((c, i) => (
+                  <span
+                    key={i}
+                    className="sm-logo-text-char"
+                    style={{ animationDelay: `${i * 0.06}s` }}
+                  >
+                    {c === " " ? " " : c}
+                  </span>
+                ))}
               </span>
             )}
           </div>
@@ -593,6 +601,14 @@ body.gallery-preview-active .sm-scope .staggered-menu-header { opacity: 0; point
 .sm-scope .staggered-menu-header > * { pointer-events: auto; }
 .sm-scope .sm-logo { display: flex; align-items: center; user-select: none; }
 .sm-scope .sm-logo-img { display: block; height: 32px; width: auto; object-fit: contain; }
+.sm-scope .sm-logo-text { display: inline-flex; font-size: 1.4rem; font-weight: 700; color: #fff; line-height: 1; height: 1.4rem; overflow: hidden; }
+.sm-scope .sm-logo-text-char { display: inline-block; white-space: pre; animation: sm-logo-roll 5s cubic-bezier(0.7, 0, 0.3, 1) infinite; }
+@keyframes sm-logo-roll {
+  0%, 80% { transform: translateY(0); }
+  88% { transform: translateY(-115%); }
+  88.01% { transform: translateY(115%); }
+  94%, 100% { transform: translateY(0); }
+}
 .sm-scope .sm-toggle { position: relative; display: inline-flex; align-items: center; gap: 0.5rem; background: transparent; border: none; cursor: pointer; color: #e9e9ef; font-weight: 700; line-height: 1; overflow: visible; font-size: 1.4rem; }
 .sm-scope .sm-drop-shadow { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); }
 .sm-scope .sm-toggle:focus-visible { outline: 2px solid #ffffffaa; outline-offset: 4px; border-radius: 4px; }

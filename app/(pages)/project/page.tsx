@@ -1,6 +1,6 @@
-import ShopGrid from "@/features/shop/components/ShopGrid";
+import ProjectGrid from "@/features/project/components/ProjectGrid";
 
-export default function ShopPage() {
+export default function ProjectPage() {
     return (
         <div
             style={{
@@ -8,7 +8,7 @@ export default function ShopPage() {
                 padding: "80px clamp(1rem, 2.6vw, 2.5rem) 64px",
             }}
         >
-            <ShopGrid />
+            <ProjectGrid />
         </div>
     );
 }

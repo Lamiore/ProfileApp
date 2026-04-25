@@ -42,3 +42,27 @@ export interface WorkItem {
     isVideo?: boolean;
     createdAt?: { toDate: () => Date };
 }
+
+export interface ProjectItem {
+    id: string;
+    tag: string;
+    title: string;
+    desc: string;
+    media: string;
+    isVideo?: boolean;
+    link?: string;
+    createdAt?: { toDate: () => Date };
+}
+
+export type ShopStatus = "available" | "sold-out" | "coming-soon";
+
+export interface ShopItem {
+    id: string;
+    title: string;
+    image: string;
+    price: string;
+    desc: string;
+    category: string;
+    status: ShopStatus;
+    createdAt?: { toDate: () => Date };
+}

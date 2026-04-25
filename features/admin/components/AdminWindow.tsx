@@ -2,15 +2,25 @@
 
 import { useEffect, useState } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
-import { LogOut, Image as ImageIcon, FileText, LayoutGrid, Briefcase } from "lucide-react";
+import {
+    LogOut,
+    Image as ImageIcon,
+    FileText,
+    LayoutGrid,
+    Briefcase,
+    FolderGit2,
+    ShoppingBag,
+} from "lucide-react";
 import { db } from "@/lib/firebase";
 import { useAdminAuth } from "../hooks/use-admin-auth";
 import { AdminLogin } from "./AdminLogin";
 import AdminGalleryForm from "./AdminGalleryForm";
 import AdminBlogForm from "./AdminBlogForm";
 import AdminWorksForm from "./AdminWorksForm";
+import AdminProjectsForm from "./AdminProjectsForm";
+import AdminShopForm from "./AdminShopForm";
 
-type TabKey = "gallery" | "blog" | "works";
+type TabKey = "gallery" | "blog" | "works" | "projects" | "shop";
 
 const TABS: { key: TabKey; icon: React.ReactNode; label: string; subtitle: string }[] = [
     {
@@ -31,6 +41,18 @@ const TABS: { key: TabKey; icon: React.ReactNode; label: string; subtitle: strin
         label: "Works",
         subtitle: "Card pekerjaan yang tampil di section skills + works.",
     },
+    {
+        key: "projects",
+        icon: <FolderGit2 size={15} />,
+        label: "Projects",
+        subtitle: "Card project yang tampil di halaman /project.",
+    },
+    {
+        key: "shop",
+        icon: <ShoppingBag size={15} />,
+        label: "Shop",
+        subtitle: "Item yang dijual di halaman /shop.",
+    },
 ];
 
 function useCollectionCount(path: string) {
@@ -49,6 +71,8 @@ export default function AdminWindow() {
     const galleryCount = useCollectionCount("images");
     const blogCount = useCollectionCount("blogs");
     const worksCount = useCollectionCount("works");
+    const projectsCount = useCollectionCount("projects");
+    const shopCount = useCollectionCount("shop");
 
     if (!user) return <AdminLogin onLogin={login} />;
 
@@ -56,6 +80,8 @@ export default function AdminWindow() {
         gallery: galleryCount,
         blog: blogCount,
         works: worksCount,
+        projects: projectsCount,
+        shop: shopCount,
     };
     const active = TABS.find((t) => t.key === tab)!;
     const activeCount = counts[tab];
@@ -126,7 +152,11 @@ export default function AdminWindow() {
                                     ? "media"
                                     : tab === "blog"
                                         ? "artikel"
-                                        : "works"}
+                                        : tab === "works"
+                                            ? "works"
+                                            : tab === "projects"
+                                                ? "projects"
+                                                : "items"}
                             </span>
                         </div>
                     </div>
@@ -138,6 +168,8 @@ export default function AdminWindow() {
                     {tab === "gallery" && <AdminGalleryForm />}
                     {tab === "blog" && <AdminBlogForm />}
                     {tab === "works" && <AdminWorksForm />}
+                    {tab === "projects" && <AdminProjectsForm />}
+                    {tab === "shop" && <AdminShopForm />}
                 </div>
             </main>
         </div>

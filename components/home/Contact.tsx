@@ -159,12 +159,6 @@ export default function Contact({ name }: { name: string }) {
         transformOrigin: "left center",
       });
       gsap.set(q(".ct-item"), { opacity: 0, y: 30 });
-      gsap.set(q(".ct-btn"), {
-        opacity: 0,
-        scale: 0,
-        rotate: -30,
-        transformOrigin: "center center",
-      });
       gsap.set(q(".ct-footer span"), { opacity: 0, y: 10 });
 
       const tl = gsap.timeline({
@@ -219,17 +213,6 @@ export default function Contact({ name }: { name: string }) {
             ease: "power3.out",
           },
           "-=0.4"
-        )
-        .to(
-          q(".ct-btn"),
-          {
-            opacity: 1,
-            scale: 1,
-            rotate: 0,
-            duration: 0.7,
-            ease: "back.out(2)",
-          },
-          "-=0.3"
         )
         .to(
           q(".ct-footer span"),
@@ -440,7 +423,7 @@ export default function Contact({ name }: { name: string }) {
                 </div>
               ) : (
                 <div className="ct-bubble-empty">
-                  no rich presence right now.
+                  no activity right now.
                 </div>
               )}
 
@@ -456,15 +439,6 @@ export default function Contact({ name }: { name: string }) {
           </a>
         </div>
 
-        <div className="ct-cta">
-          <a
-            className="rough-btn ct-btn"
-            href="mailto:ilhamaditmohammad@gmail.com"
-            style={{ textDecoration: "none" }}
-          >
-            let&rsquo;s work together →
-          </a>
-        </div>
       </div>
 
       <div className="hide-mobile ct-footer">

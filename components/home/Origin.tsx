@@ -159,15 +159,15 @@ export default function Origin() {
       gsap.set(q(".og-hand-click"), { opacity: 0, scale: 0.4, rotate: -12 });
       gsap.set(q(".og-hand-punch"), { opacity: 0, scale: 0, rotate: 25 });
 
-      // deck cards — tiap card masuk dari arah beda
+      // deck cards — flick cascade dari bawah
       const deckTargets = q(".og-card");
       deckTargets.forEach((el, i) => {
         gsap.set(el, {
           opacity: 0,
-          x: [-160, 180, -120][i] ?? 0,
-          y: [-120, 160, -80][i] ?? 0,
-          rotate: [-380, 420, -540][i] ?? 0,
-          scale: 0.4,
+          y: 110,
+          rotate: [-10, 8, -5][i] ?? 0,
+          scale: 0.86,
+          transformOrigin: "50% 90%",
         });
       });
 
@@ -182,7 +182,7 @@ export default function Origin() {
       tl.to(q(".og-label"), {
         opacity: 1,
         x: 0,
-        duration: 0.7,
+        duration: 0.45,
         ease: "power3.out",
       })
         .to(
@@ -191,25 +191,24 @@ export default function Origin() {
             opacity: 1,
             y: 0,
             filter: "blur(0px)",
-            duration: 0.55,
+            duration: 0.4,
             ease: "power2.out",
-            stagger: { each: 0.022, from: "start" },
+            stagger: { each: 0.014, from: "start" },
           },
-          "-=0.35"
+          "-=0.22"
         )
         .to(
           deckTargets,
           {
             opacity: 1,
-            x: 0,
             y: 0,
             rotate: 0,
             scale: 1,
-            duration: 1.0,
-            stagger: 0.14,
-            ease: "back.out(1.4)",
+            duration: 0.55,
+            stagger: 0.12,
+            ease: "back.out(2.2)",
           },
-          "-=0.9"
+          "-=0.6"
         )
         .to(
           rightWords,
@@ -217,11 +216,11 @@ export default function Origin() {
             opacity: 1,
             y: 0,
             filter: "blur(0px)",
-            duration: 0.55,
+            duration: 0.4,
             ease: "power2.out",
-            stagger: { each: 0.02, from: "start" },
+            stagger: { each: 0.013, from: "start" },
           },
-          "-=0.7"
+          "-=0.5"
         )
         .to(
           q(".og-hand-click"),
@@ -229,10 +228,10 @@ export default function Origin() {
             opacity: 1,
             scale: 1,
             rotate: 0,
-            duration: 0.7,
+            duration: 0.5,
             ease: "back.out(1.9)",
           },
-          "-=0.2"
+          "-=0.15"
         )
         .to(
           q(".og-hand-punch"),
@@ -240,10 +239,10 @@ export default function Origin() {
             opacity: 1,
             scale: 1,
             rotate: -3,
-            duration: 0.7,
+            duration: 0.5,
             ease: "back.out(2.2)",
           },
-          "-=0.35"
+          "-=0.25"
         );
     }, sectionRef);
 
@@ -251,7 +250,16 @@ export default function Origin() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="section" style={{ paddingTop: 60 }}>
+    <section
+      ref={sectionRef}
+      className="section og-section"
+      style={{
+        paddingTop: 60,
+        position: "relative",
+        zIndex: 2,
+        background: "var(--paper)",
+      }}
+    >
       <div className="section-label og-label" style={{ marginBottom: 40 }}>
         01 · origin story
       </div>
