@@ -275,12 +275,12 @@ export default function Origin() {
               visibility: "hidden",
             }}
           >
-            tiny, curious, and low-key destined for pixels &mdash; though he
-            didn&rsquo;t know it yet. by the age of 11, he already had a
-            graphics tablet tucked under his arm, half a folder full of
-            experiments, and the kind of restless energy that only shows up
-            when you&rsquo;ve just figured out you can <em>make</em> things,
-            not just watch them.
+            lorem ipsum dolor sit amet, consectetur adipiscing elit. sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat. duis aute irure dolor in
+            reprehenderit in voluptate velit esse cillum <em>dolore</em> eu
+            fugiat nulla pariatur.
           </p>
 
           <OriginDeck />
@@ -298,12 +298,12 @@ export default function Origin() {
               visibility: "hidden",
             }}
           >
-            after realizing his edits earned way more views with a little
-            aesthetic flair &mdash; the right colors, the right cut on the
-            beat, a cover that actually made you stop scrolling &mdash; he
-            proudly hit 600 followers and probably thought he was famous.
-            somewhere between the comments and the save count, the obsession
-            quietly began.
+            excepteur sint occaecat cupidatat non proident &mdash; sunt in
+            culpa qui officia deserunt mollit anim id est laborum &mdash; sed
+            ut perspiciatis unde omnis iste natus error sit voluptatem
+            accusantium doloremque laudantium, totam rem aperiam, eaque ipsa
+            quae ab illo inventore veritatis et quasi architecto beatae vitae
+            dicta sunt explicabo.
           </p>
 
           <p
@@ -317,7 +317,7 @@ export default function Origin() {
             }}
           >
             <span className="og-hand-click" style={{ display: "inline-block" }}>
-              that&rsquo;s when it clicked:
+              lorem ipsum dolor sit:
             </span>
             <br />
             <span
@@ -328,7 +328,7 @@ export default function Origin() {
                 transformOrigin: "left center",
               }}
             >
-              people are suckers for pretty visuals.
+              consectetur adipiscing elit sed do.
             </span>
           </p>
         </div>
