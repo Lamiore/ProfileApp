@@ -941,6 +941,8 @@ body.adm-scroll {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  max-height: 55vh;
+  overflow-y: auto;
 }
 
 .adm-list-item {
@@ -1326,6 +1328,11 @@ body.adm-scroll {
     gap: 1rem;
     /* push content below fixed Nav button (top-right) so sidebar tidak stack di menu */
     padding-top: 3.25rem;
+  }
+
+  .adm-list {
+    max-height: none;
+    overflow: visible;
   }
 
   .adm-sidebar {

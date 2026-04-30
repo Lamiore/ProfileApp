@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { serverTimestamp } from "firebase/firestore";
 import {
-    Trash2,
     CheckCircle,
     AlertCircle,
     Image as ImageIcon,
@@ -38,9 +37,7 @@ export default function AdminWorksForm() {
     const [editingId, setEditingId] = useState<string | null>(null);
     const { works, addWork, updateWork, deleteWork } = useAdminWorks();
 
-    const [tag, setTag] = useState("");
     const [title, setTitle] = useState("");
-    const [desc, setDesc] = useState("");
     const [media, setMedia] = useState("");
     const [mediaBroken, setMediaBroken] = useState(false);
     const [isVideo, setIsVideo] = useState(false);
@@ -49,9 +46,7 @@ export default function AdminWorksForm() {
     const [success, setSuccess] = useState(false);
 
     const resetForm = () => {
-        setTag("");
         setTitle("");
-        setDesc("");
         setMedia("");
         setMediaBroken(false);
         setIsVideo(false);
@@ -62,9 +57,7 @@ export default function AdminWorksForm() {
 
     const startEdit = (w: WorkItem) => {
         setEditingId(w.id);
-        setTag(w.tag ?? "");
         setTitle(w.title ?? "");
-        setDesc(w.desc ?? "");
         setMedia(w.media ?? "");
         setMediaBroken(false);
         setIsVideo(!!w.isVideo);
@@ -75,23 +68,20 @@ export default function AdminWorksForm() {
     const handleMediaChange = (value: string) => {
         setMedia(value);
         setMediaBroken(false);
-        // auto-toggle video detection only when user hasn't touched it manually
         if (value.trim()) setIsVideo(guessIsVideo(value));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!title.trim() || !tag.trim() || !media.trim()) {
-            setError("Tag, judul, dan URL media wajib diisi.");
+        if (!title.trim() || !media.trim()) {
+            setError("Judul dan URL media wajib diisi.");
             return;
         }
         setSubmitting(true);
         setError("");
         try {
             const data: Record<string, unknown> = {
-                tag: tag.trim(),
                 title: title.trim(),
-                desc: desc.trim(),
                 media: media.trim(),
                 isVideo,
             };
@@ -146,25 +136,6 @@ export default function AdminWorksForm() {
                         style={{ display: "flex", flexDirection: "column", gap: "16px" }}
                     >
                         <div className="adm-field">
-                            <label className="adm-label">Tag</label>
-                            <input
-                                type="text"
-                                className="adm-input"
-                                placeholder="Contoh: 01 · video"
-                                value={tag}
-                                onChange={(e) => {
-                                    setTag(e.target.value);
-                                    setError("");
-                                }}
-                                disabled={submitting}
-                                maxLength={40}
-                            />
-                            <span className="adm-field-hint">
-                                Label kecil di atas judul — misal kategori, nomor, atau keduanya.
-                            </span>
-                        </div>
-
-                        <div className="adm-field">
                             <label className="adm-label">Judul</label>
                             <input
                                 type="text"
@@ -177,19 +148,6 @@ export default function AdminWorksForm() {
                                 }}
                                 disabled={submitting}
                                 maxLength={80}
-                            />
-                        </div>
-
-                        <div className="adm-field">
-                            <label className="adm-label">Deskripsi singkat</label>
-                            <textarea
-                                className="adm-input adm-textarea"
-                                placeholder="1–2 kalimat pendek yang muncul di card."
-                                value={desc}
-                                onChange={(e) => setDesc(e.target.value)}
-                                disabled={submitting}
-                                rows={3}
-                                maxLength={220}
                             />
                         </div>
 
@@ -275,12 +233,7 @@ export default function AdminWorksForm() {
                         <button
                             type="submit"
                             className="adm-btn-primary"
-                            disabled={
-                                submitting ||
-                                !title.trim() ||
-                                !tag.trim() ||
-                                !media.trim()
-                            }
+                            disabled={submitting || !title.trim() || !media.trim()}
                         >
                             <Briefcase size={14} />{" "}
                             {submitting
@@ -360,7 +313,6 @@ export default function AdminWorksForm() {
                                 <div className="adm-list-info">
                                     <span className="adm-list-name">{w.title}</span>
                                     <span className="adm-list-date">
-                                        {w.tag ? `${w.tag} · ` : ""}
                                         {formatDate(w.createdAt)}
                                     </span>
                                 </div>

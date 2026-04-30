@@ -27,6 +27,7 @@ export interface StaggeredMenuProps {
   changeMenuColorOnOpen?: boolean;
   closeOnClickAway?: boolean;
   showDropShadow?: boolean;
+  extraSocialContent?: React.ReactNode;
   onMenuOpen?: () => void;
   onMenuClose?: () => void;
   onItemClick?: (link: string) => void;
@@ -49,6 +50,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   isFixed = false,
   closeOnClickAway = true,
   showDropShadow = false,
+  extraSocialContent,
   onMenuOpen,
   onMenuClose,
   onItemClick
@@ -568,7 +570,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
               )}
             </ul>
 
-            {displaySocials && socialItems && socialItems.length > 0 && (
+            {displaySocials && (socialItems.length > 0 || extraSocialContent) && (
               <div className="sm-socials mt-auto pt-8 flex flex-col gap-3" aria-label="Social links">
                 <h3 className="sm-socials-title m-0 text-base font-medium [color:var(--sm-accent,#ff0000)]">Socials</h3>
                 <ul
@@ -588,6 +590,9 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                     </li>
                   ))}
                 </ul>
+                {extraSocialContent && (
+                  <div className="sm-socials-extra mt-2">{extraSocialContent}</div>
+                )}
               </div>
             )}
           </div>
@@ -643,6 +648,8 @@ body.gallery-preview-active .sm-scope .staggered-menu-header { opacity: 0; point
 .sm-scope .sm-panel-item:hover { color: var(--sm-accent, #ff0000); }
 .sm-scope .sm-panel-list[data-numbering] { counter-reset: smItem; }
 .sm-scope .sm-panel-list[data-numbering] .sm-panel-item::after { counter-increment: smItem; content: counter(smItem, decimal-leading-zero); position: absolute; top: 0.1em; right: 3.2em; font-size: 18px; font-weight: 400; color: var(--sm-accent, #ff0000); letter-spacing: 0; pointer-events: none; user-select: none; opacity: var(--sm-num-opacity, 0); }
+.sm-scope .sm-logo { transition: opacity 0.3s ease, transform 0.3s ease; }
+.sm-scope .staggered-menu-wrapper[data-open] .sm-logo { opacity: 0; transform: translateY(-8px); pointer-events: none; }
 @media (max-width: 1024px) { .sm-scope .staggered-menu-panel { width: 100%; left: 0; right: 0; } .sm-scope .staggered-menu-wrapper[data-open] .sm-logo-img { filter: invert(100%); } }
 @media (max-width: 640px) { .sm-scope .staggered-menu-panel { width: 100%; left: 0; right: 0; } .sm-scope .staggered-menu-wrapper[data-open] .sm-logo-img { filter: invert(100%); } }
       `}</style>

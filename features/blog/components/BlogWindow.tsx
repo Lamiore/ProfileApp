@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Search, X } from "lucide-react";
+import { gsap } from "gsap";
 import { usePageTransition } from "@/components/layout/PageTransition";
 import { useBlogPosts } from "../hooks/use-blog-posts";
 import BlogCard, { SkeletonCard } from "./BlogCard";
@@ -13,6 +14,7 @@ export default function BlogWindow() {
     const { navigateTo } = usePageTransition();
     const [page, setPage] = useState(0);
     const searchRef = useRef<HTMLInputElement>(null);
+    const rootRef = useRef<HTMLDivElement>(null);
 
     const isSearching = searchQuery.trim().length > 0;
 
@@ -39,6 +41,74 @@ export default function BlogWindow() {
         setPage(0);
     }, [searchQuery]);
 
+    // hero entrance — runs once on mount
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            const q = gsap.utils.selector(rootRef);
+
+            gsap.set(q(".j-hero-title"), { opacity: 0, y: 36, letterSpacing: "0.1em" });
+            gsap.set(q(".j-hero-sub p"), { opacity: 0, y: 18 });
+            gsap.set(q(".j-hero-meta > div"), { opacity: 0, y: 10 });
+            gsap.set(q(".j-search"), { opacity: 0, y: 14 });
+            gsap.set(q(".j-footer"), { opacity: 0, y: 12 });
+
+            gsap.timeline({ defaults: { ease: "power3.out" } })
+                .to(q(".j-hero-title"), {
+                    opacity: 1,
+                    y: 0,
+                    letterSpacing: "0em",
+                    duration: 1.0,
+                    ease: "expo.out",
+                }, 0.05)
+                .to(q(".j-hero-sub p"), {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.7,
+                }, 0.3)
+                .to(q(".j-hero-meta > div"), {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.55,
+                    stagger: 0.08,
+                }, 0.45)
+                .to(q(".j-search"), {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.55,
+                }, 0.55)
+                .to(q(".j-footer"), {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.6,
+                }, 0.7);
+        }, rootRef);
+
+        return () => ctx.revert();
+    }, []);
+
+    // cards entrance — re-runs when posts list/page changes
+    useEffect(() => {
+        if (loading) return;
+        const ctx = gsap.context(() => {
+            const cards = gsap.utils.selector(rootRef)(".j-grid > .j-card");
+            if (cards.length === 0) return;
+            gsap.fromTo(
+                cards,
+                { opacity: 0, y: 28, scale: 0.98 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    duration: 0.7,
+                    stagger: 0.07,
+                    ease: "power3.out",
+                    clearProps: "transform",
+                }
+            );
+        }, rootRef);
+        return () => ctx.revert();
+    }, [loading, page, filteredBlogs.length]);
+
     const total = filteredBlogs.length;
     const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
     const currentPage = Math.min(page, totalPages - 1);
@@ -48,7 +118,7 @@ export default function BlogWindow() {
     );
 
     return (
-        <div className="journal-root">
+        <div className="journal-root" ref={rootRef}>
             <section className="j-hero">
                 <h1 className="j-hero-title">JOURNAL</h1>
                 <div className="j-hero-sub">

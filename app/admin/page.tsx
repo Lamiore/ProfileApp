@@ -23,15 +23,6 @@ export default function AdminPage() {
         return () => unsub();
     }, [router]);
 
-    useEffect(() => {
-        document.documentElement.classList.add("adm-scroll");
-        document.body.classList.add("adm-scroll");
-        return () => {
-            document.documentElement.classList.remove("adm-scroll");
-            document.body.classList.remove("adm-scroll");
-        };
-    }, []);
-
     if (checking || !user) {
         return (
             <div style={{ minHeight: "100vh", backgroundColor: "#0d0d0d", display: "flex", alignItems: "center", justifyContent: "center" }}>

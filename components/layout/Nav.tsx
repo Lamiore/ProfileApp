@@ -28,7 +28,8 @@ export default function Nav() {
     const socialItems = [
         { label: 'Instagram', link: 'https://www.instagram.com/lamiore_/' },
         { label: 'GitHub', link: 'https://github.com/Lamiore' },
-        { label: 'LinkedIn', link: 'https://www.linkedin.com/in/irham-aadiyaat-mohammad/' }
+        { label: 'LinkedIn', link: 'https://www.linkedin.com/in/irham-aadiyaat-mohammad/' },
+        { label: 'Email', link: 'mailto:ilhamaditmohammad@gmail.com' }
     ];
 
     const logoText = pageLabels[pathname] || "";

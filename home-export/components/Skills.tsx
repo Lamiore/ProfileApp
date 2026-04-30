@@ -90,6 +90,12 @@ export default function Skills() {
         rotate: (i) => (i === 0 ? -15 : i === 1 ? 10 : -8),
       });
       gsap.set(q(".sk-caption"), { opacity: 0, y: 20 });
+      gsap.set(q(".sk-btn"), {
+        opacity: 0,
+        scale: 0,
+        rotate: -20,
+        transformOrigin: "center center",
+      });
 
       const cells = q(".sk-cell");
       cells.forEach((cell) => {
@@ -179,6 +185,17 @@ export default function Skills() {
             ease: "power3.out",
           },
           ">-0.3"
+        )
+        .to(
+          q(".sk-btn"),
+          {
+            opacity: 1,
+            scale: 1,
+            rotate: 3,
+            duration: 0.7,
+            ease: "back.out(2.2)",
+          },
+          "<0.1"
         );
 
     }, sectionRef);
@@ -197,16 +214,13 @@ export default function Skills() {
       </div>
 
       <div className="skills-grid-wrap" style={{ position: "relative", marginTop: 40 }}>
-        <div className="skills-title">
+        <div className="skills-title" aria-hidden>
           <span className="sk-title-line" style={{ display: "block" }}>
-            works
+            works &amp;
           </span>
           <span className="sk-title-line" style={{ display: "block" }}>
-            &amp; skills
+            skills
           </span>
-          <button className="sticky-btn skills-title-btn" type="button">
-            portfolio
-          </button>
         </div>
         <div
           className="skills-grid"
@@ -376,6 +390,9 @@ export default function Skills() {
           <br />
           posters, illustration, logos, etc.
         </div>
+        <button className="sticky-btn sk-btn" type="button">
+          portfolio
+        </button>
         <div
           className="font-mono sk-caption"
           style={{

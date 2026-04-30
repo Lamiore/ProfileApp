@@ -83,8 +83,12 @@ export default function AdminProjectsForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!title.trim() || !tag.trim() || !media.trim()) {
-            setError("Tag, judul, dan URL media wajib diisi.");
+        if (!title.trim() || !tag.trim()) {
+            setError("Tag dan judul wajib diisi.");
+            return;
+        }
+        if (!media.trim() && !link.trim()) {
+            setError("Isi salah satu: URL media, atau link website (untuk auto-screenshot).");
             return;
         }
         setSubmitting(true);
@@ -197,7 +201,7 @@ export default function AdminProjectsForm() {
                         </div>
 
                         <div className="adm-field">
-                            <label className="adm-label">Media (URL gambar / video)</label>
+                            <label className="adm-label">Media (URL gambar / video) — opsional kalau ada link website</label>
                             <div className="adm-thumbnail-picker">
                                 {media.trim() && !mediaBroken ? (
                                     <div className="adm-thumbnail-preview">
@@ -280,7 +284,7 @@ export default function AdminProjectsForm() {
                                 disabled={submitting}
                             />
                             <span className="adm-field-hint">
-                                Kalau diisi, di card muncul tombol &quot;visit site →&quot;.
+                                Kalau diisi & media kosong, screenshot website otomatis dipakai sebagai cover (via Microlink).
                             </span>
                         </div>
 
@@ -297,7 +301,7 @@ export default function AdminProjectsForm() {
                                 submitting ||
                                 !title.trim() ||
                                 !tag.trim() ||
-                                !media.trim()
+                                (!media.trim() && !link.trim())
                             }
                         >
                             <FolderGit2 size={14} />{" "}

@@ -128,13 +128,36 @@
     @apply border-border outline-ring/50;
   }
 
+  html {
+    overflow-x: hidden;
+  }
+
   body {
     @apply bg-background text-foreground;
     background-color: #0d0d0d;
-    height: 100dvh;
+    min-height: 100dvh;
     overflow-x: hidden;
-    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
     box-sizing: border-box;
+  }
+
+  html,
+  body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  *::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 }
 
