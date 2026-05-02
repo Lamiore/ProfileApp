@@ -120,7 +120,7 @@ export default function Contact({ name }: { name: string }) {
           © {new Date().getFullYear()} {name}
         </span>
         <span>made with ♥ + caffeine</span>
-        <span>v.12.12.24 / home</span>
+        <span>v.12.24 / home</span>
       </div>
     </section>
   );
