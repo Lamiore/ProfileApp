@@ -5,7 +5,7 @@ export default function ProjectPage() {
         <div
             style={{
                 margin: "0 auto",
-                padding: "80px clamp(1rem, 2.6vw, 2.5rem) 64px",
+                padding: "80px clamp(0.75rem, 1.4vw, 1.5rem) 64px",
             }}
         >
             <ProjectGrid />
